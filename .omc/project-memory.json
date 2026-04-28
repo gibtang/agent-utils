@@ -1,0 +1,349 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1777378667507,
+  "projectRoot": "/Users/gibsontang/Dropbox/my-files/code/agent-dev",
+  "techStack": {
+    "languages": [
+      {
+        "name": "JavaScript/TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "package.json"
+        ]
+      },
+      {
+        "name": "TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "tsconfig.json"
+        ]
+      }
+    ],
+    "frameworks": [
+      {
+        "name": "next",
+        "version": "16.2.4",
+        "category": "fullstack"
+      },
+      {
+        "name": "react",
+        "version": "19.2.4",
+        "category": "frontend"
+      },
+      {
+        "name": "react-dom",
+        "version": "19.2.4",
+        "category": "frontend"
+      },
+      {
+        "name": "vitest",
+        "version": "4.1.5",
+        "category": "testing"
+      }
+    ],
+    "packageManager": "npm",
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": "npm run build",
+    "testCommand": "npm test",
+    "lintCommand": "npm run lint",
+    "devCommand": "npm run dev",
+    "scripts": {
+      "dev": "next dev",
+      "build": "next build",
+      "start": "next start",
+      "lint": "eslint",
+      "generate:llms": "node scripts/generate-llms-txt.mjs",
+      "test": "vitest run",
+      "test:watch": "vitest",
+      "prepare": "husky"
+    }
+  },
+  "conventions": {
+    "namingStyle": "camelCase",
+    "importStyle": "ES modules",
+    "testPattern": "*.test.ts",
+    "fileOrganization": null
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [
+      "__tests__",
+      "app",
+      "lib",
+      "public",
+      "scripts"
+    ],
+    "gitBranches": null
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "__tests__": {
+      "path": "__tests__",
+      "purpose": "Test files",
+      "fileCount": 4,
+      "lastAccessed": 1777378667345,
+      "keyFiles": [
+        "generate-llms-txt.test.ts",
+        "llms.test.ts",
+        "openapi.test.ts",
+        "pricing.test.ts"
+      ]
+    },
+    "app": {
+      "path": "app",
+      "purpose": "Application code",
+      "fileCount": 4,
+      "lastAccessed": 1777378667346,
+      "keyFiles": [
+        "favicon.ico",
+        "globals.css",
+        "layout.tsx",
+        "page.tsx"
+      ]
+    },
+    "contexts": {
+      "path": "contexts",
+      "purpose": null,
+      "fileCount": 1,
+      "lastAccessed": 1777378667468,
+      "keyFiles": [
+        "AuthContext.tsx"
+      ]
+    },
+    "lib": {
+      "path": "lib",
+      "purpose": "Library code",
+      "fileCount": 6,
+      "lastAccessed": 1777378667469,
+      "keyFiles": [
+        "auth.ts",
+        "firebase.ts",
+        "mongodb.ts",
+        "pricing.ts",
+        "response.ts"
+      ]
+    },
+    "models": {
+      "path": "models",
+      "purpose": "Data models",
+      "fileCount": 8,
+      "lastAccessed": 1777378667471,
+      "keyFiles": [
+        "ApiKey.ts",
+        "Checkpoint.ts",
+        "DeadLetter.ts",
+        "File.ts",
+        "Notification.ts"
+      ]
+    },
+    "public": {
+      "path": "public",
+      "purpose": "Public files",
+      "fileCount": 6,
+      "lastAccessed": 1777378667472,
+      "keyFiles": [
+        "file.svg",
+        "globe.svg",
+        "llms.txt",
+        "next.svg",
+        "vercel.svg"
+      ]
+    },
+    "scripts": {
+      "path": "scripts",
+      "purpose": "Build/utility scripts",
+      "fileCount": 1,
+      "lastAccessed": 1777378667472,
+      "keyFiles": [
+        "generate-llms-txt.mjs"
+      ]
+    },
+    "app/api": {
+      "path": "app/api",
+      "purpose": "API routes",
+      "fileCount": 0,
+      "lastAccessed": 1777378667474,
+      "keyFiles": []
+    },
+    "app/docs": {
+      "path": "app/docs",
+      "purpose": "Documentation",
+      "fileCount": 2,
+      "lastAccessed": 1777378667474,
+      "keyFiles": [
+        "layout.tsx",
+        "page.tsx"
+      ]
+    }
+  },
+  "hotPaths": [
+    {
+      "path": "__tests__/openapi.test.ts",
+      "accessCount": 13,
+      "lastAccessed": 1777379654267,
+      "type": "file"
+    },
+    {
+      "path": "app/api/json/route.ts",
+      "accessCount": 5,
+      "lastAccessed": 1777379288224,
+      "type": "file"
+    },
+    {
+      "path": "app/api/otp/route.ts",
+      "accessCount": 5,
+      "lastAccessed": 1777379609082,
+      "type": "file"
+    },
+    {
+      "path": "scripts/generate-llms-txt.mjs",
+      "accessCount": 4,
+      "lastAccessed": 1777379421701,
+      "type": "file"
+    },
+    {
+      "path": "app/profile/page.tsx",
+      "accessCount": 4,
+      "lastAccessed": 1777379467385,
+      "type": "file"
+    },
+    {
+      "path": "app/api/notify/route.ts",
+      "accessCount": 3,
+      "lastAccessed": 1777379292146,
+      "type": "file"
+    },
+    {
+      "path": "lib/auth.ts",
+      "accessCount": 3,
+      "lastAccessed": 1777379371211,
+      "type": "file"
+    },
+    {
+      "path": "app/docs/checkpoint/page.tsx",
+      "accessCount": 3,
+      "lastAccessed": 1777379410717,
+      "type": "file"
+    },
+    {
+      "path": "app/dashboard/page.tsx",
+      "accessCount": 3,
+      "lastAccessed": 1777379467218,
+      "type": "file"
+    },
+    {
+      "path": "__tests__/generate-llms-txt.test.ts",
+      "accessCount": 2,
+      "lastAccessed": 1777379198380,
+      "type": "file"
+    },
+    {
+      "path": "app/api/checkpoint/route.ts",
+      "accessCount": 2,
+      "lastAccessed": 1777379256771,
+      "type": "file"
+    },
+    {
+      "path": "app/api/dlq/route.ts",
+      "accessCount": 2,
+      "lastAccessed": 1777379257251,
+      "type": "file"
+    },
+    {
+      "path": "app/api/file-host/[id]/route.ts",
+      "accessCount": 2,
+      "lastAccessed": 1777379258028,
+      "type": "file"
+    },
+    {
+      "path": "app/api/file-host/route.ts",
+      "accessCount": 2,
+      "lastAccessed": 1777379258984,
+      "type": "file"
+    },
+    {
+      "path": "app/api/otp/[id]/route.ts",
+      "accessCount": 2,
+      "lastAccessed": 1777379293531,
+      "type": "file"
+    },
+    {
+      "path": "app/api/otp/webhook/route.ts",
+      "accessCount": 2,
+      "lastAccessed": 1777379323887,
+      "type": "file"
+    },
+    {
+      "path": "app/api/reader/route.ts",
+      "accessCount": 2,
+      "lastAccessed": 1777379324932,
+      "type": "file"
+    },
+    {
+      "path": "app/api/shield/clean/route.ts",
+      "accessCount": 2,
+      "lastAccessed": 1777379347740,
+      "type": "file"
+    },
+    {
+      "path": "app/login/page.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1777379349321,
+      "type": "file"
+    },
+    {
+      "path": "app/signup/page.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1777379349791,
+      "type": "file"
+    },
+    {
+      "path": "lib/response.ts",
+      "accessCount": 2,
+      "lastAccessed": 1777379372127,
+      "type": "file"
+    },
+    {
+      "path": "models/Checkpoint.ts",
+      "accessCount": 2,
+      "lastAccessed": 1777379383603,
+      "type": "file"
+    },
+    {
+      "path": "models/DeadLetter.ts",
+      "accessCount": 2,
+      "lastAccessed": 1777379383825,
+      "type": "file"
+    },
+    {
+      "path": "models/Notification.ts",
+      "accessCount": 2,
+      "lastAccessed": 1777379384060,
+      "type": "file"
+    },
+    {
+      "path": "app/docs/otp/page.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1777379411077,
+      "type": "file"
+    },
+    {
+      "path": "app/api/shield/route.ts",
+      "accessCount": 1,
+      "lastAccessed": 1777379348767,
+      "type": "file"
+    },
+    {
+      "path": "lib/storage.ts",
+      "accessCount": 1,
+      "lastAccessed": 1777379372515,
+      "type": "file"
+    }
+  ],
+  "userDirectives": []
+}

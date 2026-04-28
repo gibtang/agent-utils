@@ -1,0 +1,95 @@
+import Link from "next/link";
+
+const tools = [
+  { name: "Ephemeral File Host", desc: "Park files for agents. Auto-expires.", slug: "file-host" },
+  { name: "JSON Cleaner", desc: "Normalize messy LLM output into valid JSON.", slug: "json" },
+  { name: "Dead Letter Queue", desc: "Catch, inspect, and retry failed agent tasks.", slug: "dlq" },
+  { name: "Human-in-the-Loop Gate", desc: "Pause agents until humans approve.", slug: "checkpoint" },
+  { name: "AgentMarkdown", desc: "Any URL to clean, LLM-optimized markdown.", slug: "reader" },
+  { name: "Agent Shield", desc: "PII redaction proxy. Clean before LLM, hydrate after.", slug: "shield" },
+  { name: "AgentVerify OTP", desc: "Temporary phone numbers for agent 2FA.", slug: "otp" },
+];
+
+export default function Home() {
+  return (
+    <div className="flex flex-col min-h-full">
+      {/* Nav */}
+      <nav className="flex items-center justify-between px-6 py-4 border-b border-zinc-800">
+        <Link href="/" className="text-lg font-semibold tracking-tight">
+          AgentUtils
+        </Link>
+        <div className="flex items-center gap-4 text-sm text-zinc-400">
+          <Link href="/login" className="hover:text-zinc-100 transition-colors">
+            Sign in
+          </Link>
+          <Link
+            href="/signup"
+            className="px-3 py-1.5 rounded-md bg-zinc-100 text-zinc-950 font-medium hover:bg-white transition-colors"
+          >
+            Get API Key
+          </Link>
+        </div>
+      </nav>
+
+      {/* Hero */}
+      <section className="flex flex-col items-center text-center px-6 pt-24 pb-16">
+        <h1 className="text-5xl font-bold tracking-tight">AgentUtils</h1>
+        <p className="mt-4 text-xl text-zinc-400 max-w-xl">
+          One API key. 24 agent-native utilities.
+        </p>
+        <Link
+          href="/signup"
+          className="mt-8 px-6 py-3 rounded-lg bg-zinc-100 text-zinc-950 font-semibold hover:bg-white transition-colors"
+        >
+          Start building free
+        </Link>
+      </section>
+
+      {/* Tools Grid */}
+      <section className="px-6 pb-20">
+        <div className="max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {tools.map((tool) => (
+            <Link
+              key={tool.name}
+              href={`/docs/${tool.slug}`}
+              className="rounded-lg border border-zinc-800 p-5 hover:border-zinc-600 transition-colors block"
+            >
+              <h3 className="font-semibold text-sm">{tool.name}</h3>
+              <p className="mt-1.5 text-sm text-zinc-400 leading-relaxed">
+                {tool.desc}
+              </p>
+              <span className="mt-2 inline-block text-xs text-zinc-500">View docs →</span>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* Quick Start */}
+      <section className="px-6 pb-20">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="text-2xl font-semibold mb-6">Quick start</h2>
+          <pre className="rounded-lg border border-zinc-800 bg-zinc-900 p-5 text-sm leading-relaxed overflow-x-auto text-zinc-300">
+{`# 1. Get your API key
+curl -X POST https://agentutils.dev/api/keys \\
+  -H "Authorization: Bearer YOUR_TOKEN" \\
+  -d '{"name": "my-agent"}'
+
+# 2. Upload a file
+curl -X POST https://agentutils.dev/api/file-host \\
+  -H "x-api-key: au_..." \\
+  -F "file=@report.csv"
+
+# 3. Get clean markdown
+curl https://agentutils.dev/api/reader?url=example.com \\
+  -H "x-api-key: au_..."`}
+          </pre>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="mt-auto border-t border-zinc-800 px-6 py-6 text-center text-sm text-zinc-500">
+        Built for agents. By humans.
+      </footer>
+    </div>
+  );
+}
