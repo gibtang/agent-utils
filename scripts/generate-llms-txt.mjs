@@ -104,7 +104,6 @@ const tagSlugMap = {
   'JSON Cleaner': 'jsonCleaner',
   'Dead Letter Queue': 'dlq',
   'Human-in-the-Loop': 'checkpoint',
-  'AgentMarkdown': 'reader',
   'Agent Shield': 'shield',
   'AgentVerify OTP': 'otp',
 };

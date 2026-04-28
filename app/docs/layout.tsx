@@ -7,7 +7,6 @@ const tools = [
   { slug: 'json', name: 'JSON Cleaner', icon: '🧹' },
   { slug: 'dlq', name: 'Dead Letter Queue', icon: '📬' },
   { slug: 'checkpoint', name: 'Human-in-the-Loop', icon: '👤' },
-  { slug: 'reader', name: 'AgentMarkdown', icon: '📖' },
   { slug: 'shield', name: 'Agent Shield', icon: '🛡️' },
   { slug: 'otp', name: 'AgentVerify OTP', icon: '🔑' },
   { slug: 'notify', name: 'Notification Router', icon: '🔔' },

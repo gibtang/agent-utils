@@ -20,9 +20,9 @@ describe('llms.txt', () => {
     expect(content).toContain('x-api-key');
   });
 
-  it('documents all 7 tools', () => {
+  it('documents all 6 tools', () => {
     const content = fs.readFileSync(llmsPath, 'utf-8');
-    const tools = ['File Host', 'JSON Cleaner', 'Dead Letter Queue', 'Human-in-the-Loop', 'AgentMarkdown', 'Agent Shield', 'AgentVerify OTP'];
+    const tools = ['File Host', 'JSON Cleaner', 'Dead Letter Queue', 'Human-in-the-Loop', 'Agent Shield', 'AgentVerify OTP'];
     for (const tool of tools) {
       expect(content).toContain(tool);
     }

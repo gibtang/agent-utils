@@ -5,7 +5,6 @@ const tools = [
   { name: "JSON Cleaner", desc: "Normalize messy LLM output into valid JSON.", slug: "json" },
   { name: "Dead Letter Queue", desc: "Catch, inspect, and retry failed agent tasks.", slug: "dlq" },
   { name: "Human-in-the-Loop Gate", desc: "Pause agents until humans approve.", slug: "checkpoint" },
-  { name: "AgentMarkdown", desc: "Any URL to clean, LLM-optimized markdown.", slug: "reader" },
   { name: "Agent Shield", desc: "PII redaction proxy. Clean before LLM, hydrate after.", slug: "shield" },
   { name: "AgentVerify OTP", desc: "Temporary phone numbers for agent 2FA.", slug: "otp" },
 ];
@@ -35,7 +34,7 @@ export default function Home() {
       <section className="flex flex-col items-center text-center px-6 pt-24 pb-16">
         <h1 className="text-5xl font-bold tracking-tight">AgentUtils</h1>
         <p className="mt-4 text-xl text-zinc-400 max-w-xl">
-          One API key. 24 agent-native utilities.
+          One API key. 6 agent-native utilities.
         </p>
         <Link
           href="/signup"
@@ -79,9 +78,10 @@ curl -X POST https://agentutils.dev/api/file-host \\
   -H "x-api-key: au_..." \\
   -F "file=@report.csv"
 
-# 3. Get clean markdown
-curl https://agentutils.dev/api/reader?url=example.com \\
-  -H "x-api-key: au_..."`}
+# 3. Clean messy JSON
+curl -X POST https://agentutils.dev/api/json \\
+  -H "x-api-key: au_..." \\
+  -d '{"json": "{\\"name\\": \\"test\\"}"}'`}
           </pre>
         </div>
       </section>

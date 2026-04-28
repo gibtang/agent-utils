@@ -11,7 +11,6 @@ export interface TierConfig {
     jsonCleaner: boolean;
     dlq: boolean;
     checkpoint: boolean;
-    reader: boolean;
     shield: boolean;
     otp: boolean;
     notify: boolean;
@@ -30,7 +29,6 @@ export const TIERS: Record<TierName, TierConfig> = {
       jsonCleaner: true,
       dlq: true,
       checkpoint: true,
-      reader: true,
       shield: false,
       otp: false,
       notify: true,
@@ -47,7 +45,6 @@ export const TIERS: Record<TierName, TierConfig> = {
       jsonCleaner: true,
       dlq: true,
       checkpoint: true,
-      reader: true,
       shield: true,
       otp: true,
       notify: true,
@@ -64,7 +61,6 @@ export const TIERS: Record<TierName, TierConfig> = {
       jsonCleaner: true,
       dlq: true,
       checkpoint: true,
-      reader: true,
       shield: true,
       otp: true,
       notify: true,
@@ -73,5 +69,7 @@ export const TIERS: Record<TierName, TierConfig> = {
 };
 
 export function getTierConfig(tier: TierName): TierConfig {
-  return TIERS[tier];
+  const config = TIERS[tier];
+  if (!config) throw new Error(`Invalid tier: ${tier}`);
+  return config;
 }

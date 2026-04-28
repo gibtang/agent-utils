@@ -37,8 +37,8 @@ describe('pricing', () => {
   });
 
   describe('feature flags', () => {
-    it('free tier has reader but not shield or otp', () => {
-      expect(TIERS.free.features.reader).toBe(true);
+    it('free tier has notify but not shield or otp', () => {
+      expect(TIERS.free.features.notify).toBe(true);
       expect(TIERS.free.features.shield).toBe(false);
       expect(TIERS.free.features.otp).toBe(false);
     });
@@ -53,8 +53,8 @@ describe('pricing', () => {
       expect(features.every(Boolean)).toBe(true);
     });
 
-    it('all tiers have fileHost, jsonCleaner, dlq, checkpoint, reader', () => {
-      const sharedFeatures = ['fileHost', 'jsonCleaner', 'dlq', 'checkpoint', 'reader'] as const;
+    it('all tiers have fileHost, jsonCleaner, dlq, checkpoint, notify', () => {
+      const sharedFeatures = ['fileHost', 'jsonCleaner', 'dlq', 'checkpoint', 'notify'] as const;
       for (const tier of Object.values(TIERS)) {
         for (const feature of sharedFeatures) {
           expect(tier.features[feature]).toBe(true);

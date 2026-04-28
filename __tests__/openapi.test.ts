@@ -37,7 +37,6 @@ describe('OpenAPI spec', () => {
       '/api/json',
       '/api/dlq',
       '/api/checkpoint',
-      '/api/reader',
       '/api/shield',
       '/api/otp',
     ];
@@ -53,7 +52,6 @@ describe('OpenAPI spec', () => {
     expect(tagNames).toContain('JSON Cleaner');
     expect(tagNames).toContain('Dead Letter Queue');
     expect(tagNames).toContain('Human-in-the-Loop');
-    expect(tagNames).toContain('AgentMarkdown');
     expect(tagNames).toContain('Agent Shield');
     expect(tagNames).toContain('AgentVerify OTP');
   });

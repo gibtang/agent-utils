@@ -286,40 +286,6 @@ const spec = {
         responses: { '200': { description: 'Checkpoint resolved, webhook fired' } },
       },
     },
-    '/api/reader': {
-      get: {
-        tags: ['AgentMarkdown'],
-        summary: 'Convert URL to markdown',
-        description: 'Fetch any URL and get clean, LLM-optimized markdown via Mozilla Readability + Turndown.',
-        parameters: [
-          { name: 'url', in: 'query', required: true, schema: { type: 'string', format: 'uri' }, description: 'URL to fetch and convert' },
-        ],
-        responses: {
-          '200': {
-            description: 'Markdown content',
-            content: {
-              'application/json': {
-                schema: {
-                  type: 'object',
-                  properties: {
-                    success: { type: 'boolean' },
-                    data: {
-                      type: 'object',
-                      properties: {
-                        title: { type: 'string' },
-                        markdown: { type: 'string' },
-                        wordCount: { type: 'integer' },
-                        url: { type: 'string' },
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-    },
     '/api/shield': {
       get: {
         tags: ['Agent Shield'],
@@ -443,7 +409,6 @@ const spec = {
     { name: 'JSON Cleaner', description: 'Normalize messy JSON' },
     { name: 'Dead Letter Queue', description: 'Capture and retry failures' },
     { name: 'Human-in-the-Loop', description: 'Pause agents for human approval' },
-    { name: 'AgentMarkdown', description: 'URL to clean markdown' },
     { name: 'Agent Shield', description: 'PII redaction and hydration' },
     { name: 'AgentVerify OTP', description: 'Temporary phone numbers for verification' },
     { name: 'Notification Router', description: 'Email notifications for agents' },

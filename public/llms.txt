@@ -39,10 +39,6 @@ Pause agents for human approval
 - GET /api/checkpoint/{id} — Poll checkpoint status
 - POST /api/checkpoint/{id}/resume — Approve or reject checkpoint — body: { action: "approve|reject", reason?: string }
 
-### AgentMarkdown — URL to clean markdown
-URL to clean markdown
-- GET /api/reader?url=VALUE — Convert URL to markdown
-
 ### Agent Shield — PII redaction and hydration (Pro+)
 PII redaction and hydration
 - GET /api/shield — Shield info
@@ -55,6 +51,12 @@ Temporary phone numbers for verification
 - GET /api/otp — List active OTP sessions
 - GET /api/otp/{id} — Poll for OTP code
 - DELETE /api/otp/{id} — Cancel OTP session
+
+### Notification Router — Email notifications for agents
+Email notifications for agents
+- POST /api/notify — Send an email notification — body: { message: string, priority?: "urgent|normal|low", to?: string, subject?: string, metadata?: object }
+- GET /api/notify?status=VALUE&priority=VALUE&limit=VALUE&offset=VALUE — List notification history
+- GET /api/notify/{id} — Get notification detail
 
 ## Rate Limits
 

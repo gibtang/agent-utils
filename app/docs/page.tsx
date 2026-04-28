@@ -7,7 +7,6 @@ const tools = [
   { slug: 'json', name: 'JSON Cleaner', desc: 'Normalize messy LLM output into valid, sorted JSON.', icon: '🧹' },
   { slug: 'dlq', name: 'Dead Letter Queue', desc: 'Catch failed agent tasks, inspect payloads, retry with webhooks.', icon: '📬' },
   { slug: 'checkpoint', name: 'Human-in-the-Loop Gate', desc: 'Pause agents until a human approves or rejects.', icon: '👤' },
-  { slug: 'reader', name: 'AgentMarkdown Reader', desc: 'Fetch any URL and get clean, LLM-optimized markdown.', icon: '📖' },
   { slug: 'shield', name: 'Agent Shield (PII)', desc: 'Redact PII before LLM calls, hydrate it back after.', icon: '🛡️' },
   { slug: 'otp', name: 'AgentVerify OTP', desc: 'Temporary phone numbers for agent 2FA/verification.', icon: '🔑' },
   { slug: 'notify', name: 'Notification Router', desc: 'One API call to email a human. Priority routing, no SMTP config.', icon: '🔔' },

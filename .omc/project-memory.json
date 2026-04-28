@@ -184,8 +184,8 @@
   "hotPaths": [
     {
       "path": "__tests__/openapi.test.ts",
-      "accessCount": 13,
-      "lastAccessed": 1777379654267,
+      "accessCount": 15,
+      "lastAccessed": 1777385817376,
       "type": "file"
     },
     {
@@ -202,8 +202,8 @@
     },
     {
       "path": "scripts/generate-llms-txt.mjs",
-      "accessCount": 4,
-      "lastAccessed": 1777379421701,
+      "accessCount": 5,
+      "lastAccessed": 1777385819007,
       "type": "file"
     },
     {
@@ -234,6 +234,18 @@
       "path": "app/dashboard/page.tsx",
       "accessCount": 3,
       "lastAccessed": 1777379467218,
+      "type": "file"
+    },
+    {
+      "path": "__tests__/pricing.test.ts",
+      "accessCount": 3,
+      "lastAccessed": 1777385818418,
+      "type": "file"
+    },
+    {
+      "path": "app/page.tsx",
+      "accessCount": 3,
+      "lastAccessed": 1777385832075,
       "type": "file"
     },
     {
@@ -333,6 +345,18 @@
       "type": "file"
     },
     {
+      "path": "__tests__/llms.test.ts",
+      "accessCount": 2,
+      "lastAccessed": 1777385817636,
+      "type": "file"
+    },
+    {
+      "path": "lib/pricing.ts",
+      "accessCount": 2,
+      "lastAccessed": 1777385866507,
+      "type": "file"
+    },
+    {
       "path": "app/api/shield/route.ts",
       "accessCount": 1,
       "lastAccessed": 1777379348767,
@@ -343,6 +367,12 @@
       "accessCount": 1,
       "lastAccessed": 1777379372515,
       "type": "file"
+    },
+    {
+      "path": "public/llms.txt",
+      "accessCount": 1,
+      "lastAccessed": 1777385658327,
+      "type": "directory"
     }
   ],
   "userDirectives": []
