@@ -14,7 +14,18 @@ export interface TierConfig {
     shield: boolean;
     otp: boolean;
     notify: boolean;
+    kv: boolean;
+    audit: boolean;
+    rateLimit: boolean;
+    webhook: boolean;
+    form: boolean;
   };
+  // Tool-specific limits
+  kvMaxKeys: number;           // -1 = unlimited
+  kvMaxValueBytes: number;     // bytes
+  webhookMaxInboxes: number;   // -1 = unlimited
+  formMaxForms: number;        // -1 = unlimited
+  auditRetentionDays: number;  // -1 = unlimited
 }
 
 export const TIERS: Record<TierName, TierConfig> = {
@@ -32,7 +43,17 @@ export const TIERS: Record<TierName, TierConfig> = {
       shield: false,
       otp: false,
       notify: true,
+      kv: true,
+      audit: true,
+      rateLimit: true,
+      webhook: true,
+      form: true,
     },
+    kvMaxKeys: 10,
+    kvMaxValueBytes: 10240, // 10KB
+    webhookMaxInboxes: 3,
+    formMaxForms: 5,
+    auditRetentionDays: 30,
   },
   builder: {
     name: 'Builder',
@@ -48,7 +69,17 @@ export const TIERS: Record<TierName, TierConfig> = {
       shield: false,
       otp: false,
       notify: true,
+      kv: true,
+      audit: true,
+      rateLimit: true,
+      webhook: true,
+      form: true,
     },
+    kvMaxKeys: 100,
+    kvMaxValueBytes: 10240, // 10KB
+    webhookMaxInboxes: 10,
+    formMaxForms: 25,
+    auditRetentionDays: 90,
   },
   pro: {
     name: 'Pro',
@@ -64,7 +95,17 @@ export const TIERS: Record<TierName, TierConfig> = {
       shield: true,
       otp: true,
       notify: true,
+      kv: true,
+      audit: true,
+      rateLimit: true,
+      webhook: true,
+      form: true,
     },
+    kvMaxKeys: 1000,
+    kvMaxValueBytes: 10240, // 10KB
+    webhookMaxInboxes: 50,
+    formMaxForms: 100,
+    auditRetentionDays: 365,
   },
   enterprise: {
     name: 'Enterprise',
@@ -80,7 +121,17 @@ export const TIERS: Record<TierName, TierConfig> = {
       shield: true,
       otp: true,
       notify: true,
+      kv: true,
+      audit: true,
+      rateLimit: true,
+      webhook: true,
+      form: true,
     },
+    kvMaxKeys: -1, // unlimited
+    kvMaxValueBytes: 10240, // 10KB
+    webhookMaxInboxes: -1, // unlimited
+    formMaxForms: -1, // unlimited
+    auditRetentionDays: -1, // unlimited
   },
 };
 

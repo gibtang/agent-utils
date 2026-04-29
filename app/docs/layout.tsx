@@ -9,6 +9,11 @@ const tools = [
   { slug: 'shield', name: 'Agent Shield', icon: '🛡️' },
   { slug: 'otp', name: 'AgentVerify OTP', icon: '🔑' },
   { slug: 'notify', name: 'Notification Router', icon: '🔔' },
+  { slug: 'audit', name: 'Audit Log', icon: '📋' },
+  { slug: 'kv', name: 'KV Store', icon: '🗄️' },
+  { slug: 'rate-limit', name: 'Rate Limiter', icon: '⚡' },
+  { slug: 'webhook', name: 'Webhook Inbox', icon: '📩' },
+  { slug: 'form', name: 'Agent Form', icon: '📝' },
 ];
 
 export default function DocsLayout({ children }: { children: React.ReactNode }) {

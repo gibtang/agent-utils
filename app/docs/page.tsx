@@ -9,6 +9,11 @@ const tools = [
   { slug: 'shield', name: 'Agent Shield (PII)', desc: 'Redact PII before LLM calls, hydrate it back after.', icon: '🛡️' },
   { slug: 'otp', name: 'AgentVerify OTP', desc: 'Temporary phone numbers for agent 2FA/verification.', icon: '🔑' },
   { slug: 'notify', name: 'Notification Router', desc: 'One API call to email a human. Priority routing, no SMTP config.', icon: '🔔' },
+  { slug: 'audit', name: 'Audit Log', desc: 'Immutable agent action history for user-facing accountability.', icon: '📋' },
+  { slug: 'kv', name: 'Key-Value Store', desc: 'Simple state persistence for stateless agents. API-key scoped, atomic increment.', icon: '🗄️' },
+  { slug: 'rate-limit', name: 'Rate Limiter', desc: 'Outbound API rate limiting for agents. Check-before-act pattern.', icon: '⚡' },
+  { slug: 'webhook', name: 'Webhook Inbox', desc: 'Pre-provisioned public HTTPS endpoints for agents with no public URL.', icon: '📩' },
+  { slug: 'form', name: 'Agent Form', desc: 'Hosted forms for human-in-the-loop data collection. Agent creates, human fills, webhook delivers.', icon: '📝' },
 ];
 
 export default function DocsPage() {

@@ -5,7 +5,7 @@ export default withAuth(
     // Kinde handles auth checking automatically
   },
   {
-    publicPaths: ["/", "/pricing", "/api/webhooks", "/api/auth", "/api/health", "/docs", "/llms.txt"],
+    publicPaths: ["/", "/pricing", "/api/webhooks", "/api/auth", "/api/health", "/docs", "/llms.txt", "/hook", "/f"],
   }
 );
 
