@@ -6,31 +6,33 @@ import User from '@/models/User';
 import ApiKey from '@/models/ApiKey';
 
 /**
- * POST /api/user — Upsert user after Firebase auth
- * Called from client after onAuthStateChanged fires
+ * POST /api/user — Upsert user after Kinde auth
  */
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { firebaseUid, email } = body;
+    const { kindeId, email, name } = body;
 
-    if (!firebaseUid || !email) {
-      return errorResponse('firebaseUid and email are required', 400);
+    if (!kindeId || !email) {
+      return errorResponse('kindeId and email are required', 400);
     }
 
     await connectDB();
 
-    const existing = await User.findOne({ firebaseUid }).lean();
+    const existing = await User.findOne({ kindeId }).lean();
 
     if (existing) {
       // Update email if changed
-      if (existing.email !== email) {
-        await User.updateOne({ firebaseUid }, { email });
+      const updates: Record<string, string> = {};
+      if (existing.email !== email) updates.email = email;
+      if (name && existing.name !== name) updates.name = name;
+      if (Object.keys(updates).length > 0) {
+        await User.updateOne({ kindeId }, updates);
       }
-      return successResponse({ user: { ...existing, email }, isNew: false });
+      return successResponse({ user: { ...existing, ...updates }, isNew: false });
     }
 
-    const user = await User.create({ firebaseUid, email });
+    const user = await User.create({ kindeId, email, name: name || '' });
     return successResponse({ user, isNew: true }, 201);
   } catch (error) {
     console.error('User upsert error:', error);
@@ -40,16 +42,14 @@ export async function POST(request: NextRequest) {
 
 /**
  * GET /api/user — Get current user profile
- * Requires Authorization: Bearer <firebase-id-token>
  */
 export async function GET(request: NextRequest) {
   try {
-    const user = await getAuthenticatedUser(request);
+    const user = await getAuthenticatedUser();
     if (!user) {
       return errorResponse('Unauthorized', 401);
     }
 
-    // Get key count
     await connectDB();
     const keyCount = await ApiKey.countDocuments({ userId: user._id, active: true });
 
@@ -68,7 +68,7 @@ export async function GET(request: NextRequest) {
  */
 export async function PATCH(request: NextRequest) {
   try {
-    const user = await getAuthenticatedUser(request);
+    const user = await getAuthenticatedUser();
     if (!user) {
       return errorResponse('Unauthorized', 401);
     }
@@ -82,7 +82,7 @@ export async function PATCH(request: NextRequest) {
 
     await connectDB();
     const updated = await User.findOneAndUpdate(
-      { firebaseUid: user.firebaseUid, active: true },
+      { kindeId: user.kindeId, active: true },
       { ...(name !== undefined && { name }) },
       { new: true }
     ).lean();
@@ -104,23 +104,21 @@ export async function PATCH(request: NextRequest) {
  */
 export async function DELETE(request: NextRequest) {
   try {
-    const user = await getAuthenticatedUser(request);
+    const user = await getAuthenticatedUser();
     if (!user) {
       return errorResponse('Unauthorized', 401);
     }
 
     await connectDB();
 
-    const fullUser = await User.findOne({ firebaseUid: user.firebaseUid, active: true });
+    const fullUser = await User.findOne({ kindeId: user.kindeId, active: true });
     if (!fullUser) {
       return errorResponse('User not found', 404);
     }
 
-    // Deactivate user
     fullUser.active = false;
     await fullUser.save();
 
-    // Revoke all API keys
     await ApiKey.updateMany(
       { userId: fullUser._id, active: true },
       { active: false }

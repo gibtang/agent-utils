@@ -27,7 +27,7 @@ export default function DocsPage() {
           <p className="text-zinc-500"># 1. Create an account & get API key</p>
           <p>curl -X POST https://agentutils.dev/api/user \</p>
           <p className="ml-4">-H &quot;Content-Type: application/json&quot; \</p>
-          <p className="ml-4">-d {`'{"firebaseUid":"...", "email":"you@example.com"}'`}</p>
+          <p className="ml-4">-d {`'{"kindeId":"...", "email":"you@example.com"}'`}</p>
           <p className="mt-3 text-zinc-500"># 2. Use any endpoint with your API key</p>
           <p>curl https://agentutils.dev/api/health \</p>
           <p className="ml-4">-H &quot;x-api-key: au_your_key_here&quot;</p>

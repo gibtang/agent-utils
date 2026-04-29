@@ -50,7 +50,7 @@ describe('billing', () => {
     it('returns correct structure for a free user with no usage', async () => {
       mockUserFindOne.mockResolvedValue({
         _id: 'user1',
-        firebaseUid: 'uid1',
+        kindeId: 'uid1',
         tier: 'free',
         active: true,
         subscriptionStatus: 'none',
@@ -75,7 +75,7 @@ describe('billing', () => {
     it('returns correct structure for a builder user with usage', async () => {
       mockUserFindOne.mockResolvedValue({
         _id: 'user2',
-        firebaseUid: 'uid2',
+        kindeId: 'uid2',
         tier: 'builder',
         active: true,
         subscriptionStatus: 'active',

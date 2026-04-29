@@ -8,7 +8,7 @@ import { successResponse, errorResponse } from '@/lib/response';
 // GET /api/keys — List API keys for a user (requires Firebase token)
 export async function GET(request: NextRequest) {
   try {
-    const user = await getAuthenticatedUser(request);
+    const user = await getAuthenticatedUser();
     if (!user) {
       return errorResponse('Unauthorized', 401);
     }
@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
 // POST /api/keys — Create new API key
 export async function POST(request: NextRequest) {
   try {
-    const user = await getAuthenticatedUser(request);
+    const user = await getAuthenticatedUser();
     if (!user) {
       return errorResponse('Unauthorized', 401);
     }

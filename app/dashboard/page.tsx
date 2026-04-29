@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
+import { useKindeBrowserClient } from '@kinde-oss/kinde-auth-nextjs';
 
 interface ApiKeyData {
   _id: string;
@@ -28,7 +29,8 @@ interface UsageData {
 }
 
 export default function DashboardPage() {
-  const { user, profile, loading, logout } = useAuth();
+  const { user, profile, loading, isAuthenticated, LogoutLink, ensureProfile } = useAuth();
+  const { getAccessTokenRaw } = useKindeBrowserClient();
   const router = useRouter();
   const [keys, setKeys] = useState<ApiKeyData[]>([]);
   const [keyName, setKeyName] = useState('');
@@ -37,11 +39,12 @@ export default function DashboardPage() {
   const [newKey, setNewKey] = useState<string | null>(null);
   const [error, setError] = useState('');
   const [usage, setUsage] = useState<UsageData | null>(null);
+  const fetchedRef = useRef(false);
 
   const fetchKeys = useCallback(async () => {
-    if (!user) return;
+    if (!isAuthenticated) return;
     try {
-      const token = await user.getIdToken();
+      const token = await getAccessTokenRaw();
       const res = await fetch('/api/keys', {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -55,10 +58,10 @@ export default function DashboardPage() {
       setFetching(false);
     }
 
-    // Fetch usage alongside keys
     try {
+      const token = await getAccessTokenRaw();
       const usageRes = await fetch('/api/billing/usage', {
-        headers: { 'x-firebase-uid': user.uid },
+        headers: { Authorization: `Bearer ${token}` },
       });
       const usageJson = await usageRes.json();
       if (usageJson.success) {
@@ -67,20 +70,28 @@ export default function DashboardPage() {
     } catch {
       // Usage fetch failure is non-critical
     }
-  }, [user]);
+  }, [isAuthenticated, getAccessTokenRaw]);
 
   useEffect(() => {
-    if (!loading && !user) {
+    if (loading) return;
+    if (!isAuthenticated) {
       router.push('/login');
+      return;
     }
-  }, [user, loading, router]);
+    ensureProfile().then(() => {
+      if (!fetchedRef.current) {
+        fetchedRef.current = true;
+        fetchKeys();
+      }
+    });
+  }, [isAuthenticated, loading, router, ensureProfile, fetchKeys]);
 
   const handleCreate = async () => {
-    if (!keyName.trim() || !user) return;
+    if (!keyName.trim() || !isAuthenticated) return;
     setCreating(true);
     setError('');
     try {
-      const token = await user.getIdToken();
+      const token = await getAccessTokenRaw();
       const res = await fetch('/api/keys', {
         method: 'POST',
         headers: {
@@ -105,9 +116,9 @@ export default function DashboardPage() {
   };
 
   const handleRevoke = async (id: string) => {
-    if (!user) return;
+    if (!isAuthenticated) return;
     try {
-      const token = await user.getIdToken();
+      const token = await getAccessTokenRaw();
       const res = await fetch(`/api/keys/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
@@ -119,11 +130,6 @@ export default function DashboardPage() {
     } catch {
       setError('Failed to revoke key');
     }
-  };
-
-  const handleLogout = async () => {
-    await logout();
-    router.push('/login');
   };
 
   const copyKey = () => {
@@ -140,7 +146,7 @@ export default function DashboardPage() {
     );
   }
 
-  if (!user) return null;
+  if (!isAuthenticated) return null;
 
   const isFirstTime = !fetching && keys.length === 0 && !newKey;
 
@@ -157,16 +163,16 @@ export default function DashboardPage() {
             >
               Profile
             </Link>
-            <span className="text-sm text-zinc-500">{user.email}</span>
+            <span className="text-sm text-zinc-500">{user?.email}</span>
             <span className="inline-flex rounded-full bg-zinc-800 px-2.5 py-0.5 text-xs text-zinc-300">
               {profile?.tier || 'free'}
             </span>
-            <button
-              onClick={handleLogout}
+            <LogoutLink
+              postLogoutRedirectURL="/"
               className="rounded-md border border-zinc-700 px-3 py-1.5 text-sm text-zinc-300 transition-colors hover:border-zinc-500 hover:text-zinc-100"
             >
               Logout
-            </button>
+            </LogoutLink>
           </div>
         </div>
 
@@ -242,7 +248,6 @@ export default function DashboardPage() {
           <div className="mb-8 rounded-lg border border-zinc-800 bg-zinc-900 p-6">
             <h2 className="mb-4 text-lg font-semibold">API Keys</h2>
 
-            {/* Create Key */}
             <div className="mb-6 flex gap-3">
               <input
                 type="text"
@@ -261,7 +266,6 @@ export default function DashboardPage() {
               </button>
             </div>
 
-            {/* Keys Table */}
             {fetching ? (
               <p className="text-sm text-zinc-500">Loading keys...</p>
             ) : keys.length === 0 ? (

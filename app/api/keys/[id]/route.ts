@@ -10,7 +10,7 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-    const user = await getAuthenticatedUser(request);
+    const user = await getAuthenticatedUser();
     if (!user) {
       return errorResponse('Unauthorized', 401);
     }

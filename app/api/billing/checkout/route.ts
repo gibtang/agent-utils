@@ -10,7 +10,7 @@ import type { TierName } from '@/lib/pricing';
  */
 export async function POST(request: NextRequest) {
   try {
-    const user = await getAuthenticatedUser(request);
+    const user = await getAuthenticatedUser();
     if (!user) {
       return errorResponse('Unauthorized', 401);
     }

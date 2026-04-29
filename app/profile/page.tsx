@@ -4,9 +4,11 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
+import { useKindeBrowserClient } from '@kinde-oss/kinde-auth-nextjs';
 
 export default function ProfilePage() {
-  const { user, profile, loading, logout, refreshProfile } = useAuth();
+  const { user, profile, loading, isAuthenticated, refreshProfile } = useAuth();
+  const { getAccessTokenRaw } = useKindeBrowserClient();
   const router = useRouter();
   const [name, setName] = useState('');
   const [saving, setSaving] = useState(false);
@@ -14,26 +16,25 @@ export default function ProfilePage() {
   const [error, setError] = useState('');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [sendingReset, setSendingReset] = useState(false);
-  const [resetSent, setResetSent] = useState(false);
   const [billingLoading, setBillingLoading] = useState(false);
 
   useEffect(() => {
-    if (!loading && !user) {
+    if (!loading && !isAuthenticated) {
       router.push('/login');
     }
-  }, [user, loading, router]);
+  }, [isAuthenticated, loading, router]);
 
   const handleSaveName = async () => {
-    if (!user || name === profile?.name) return;
+    if (!isAuthenticated || name === profile?.name) return;
     setSaving(true);
     setError('');
     try {
+      const token = await getAccessTokenRaw();
       const res = await fetch('/api/user', {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          'x-firebase-uid': user.uid,
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({ name }),
       });
@@ -52,35 +53,20 @@ export default function ProfilePage() {
     }
   };
 
-  const handlePasswordReset = async () => {
-    if (!user?.email) return;
-    setSendingReset(true);
-    try {
-      const { sendPasswordResetEmail } = await import('firebase/auth');
-      const { getAuth } = await import('firebase/auth');
-      await sendPasswordResetEmail(getAuth(), user.email);
-      setResetSent(true);
-      setTimeout(() => setResetSent(false), 5000);
-    } catch {
-      setError('Failed to send reset email');
-    } finally {
-      setSendingReset(false);
-    }
-  };
-
   const handleDeleteAccount = async () => {
-    if (!user) return;
+    if (!isAuthenticated) return;
     setDeleting(true);
     setError('');
     try {
+      const token = await getAccessTokenRaw();
       const res = await fetch('/api/user', {
         method: 'DELETE',
-        headers: { 'x-firebase-uid': user.uid },
+        headers: { Authorization: `Bearer ${token}` },
       });
       const json = await res.json();
       if (json.success) {
-        await logout();
-        router.push('/');
+        // Redirect to home via logout
+        window.location.href = '/';
       } else {
         setError(json.error || 'Failed to delete account');
       }
@@ -93,15 +79,16 @@ export default function ProfilePage() {
   };
 
   const handleUpgrade = async (tier: string) => {
-    if (!user) return;
+    if (!isAuthenticated) return;
     setBillingLoading(true);
     setError('');
     try {
+      const token = await getAccessTokenRaw();
       const res = await fetch('/api/billing/checkout', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-firebase-uid': user.uid,
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({ tier }),
       });
@@ -119,13 +106,14 @@ export default function ProfilePage() {
   };
 
   const handleManageBilling = async () => {
-    if (!user) return;
+    if (!isAuthenticated) return;
     setBillingLoading(true);
     setError('');
     try {
+      const token = await getAccessTokenRaw();
       const res = await fetch('/api/billing/portal', {
         method: 'POST',
-        headers: { 'x-firebase-uid': user.uid },
+        headers: { Authorization: `Bearer ${token}` },
       });
       const json = await res.json();
       if (json.success && json.data.url) {
@@ -148,7 +136,7 @@ export default function ProfilePage() {
     );
   }
 
-  if (!user) return null;
+  if (!isAuthenticated) return null;
 
   const tierColors: Record<string, string> = {
     free: 'text-zinc-400 bg-zinc-800',
@@ -182,13 +170,11 @@ export default function ProfilePage() {
           <h2 className="text-lg font-semibold mb-4">Account</h2>
 
           <div className="space-y-4">
-            {/* Email */}
             <div>
               <label className="block text-sm font-medium text-zinc-400 mb-1">Email</label>
-              <p className="text-zinc-200">{user.email}</p>
+              <p className="text-zinc-200">{user?.email}</p>
             </div>
 
-            {/* Tier */}
             <div>
               <label className="block text-sm font-medium text-zinc-400 mb-1">Plan</label>
               <span className={`inline-flex rounded-full px-3 py-1 text-xs font-medium border ${tierColors[profile?.tier || 'free'] || tierColors.free}`}>
@@ -196,7 +182,6 @@ export default function ProfilePage() {
               </span>
             </div>
 
-            {/* Member Since */}
             {profile?.createdAt && (
               <div>
                 <label className="block text-sm font-medium text-zinc-400 mb-1">Member Since</label>
@@ -204,7 +189,6 @@ export default function ProfilePage() {
               </div>
             )}
 
-            {/* API Keys */}
             {profile?.keyCount !== undefined && (
               <div>
                 <label className="block text-sm font-medium text-zinc-400 mb-1">Active API Keys</label>
@@ -218,7 +202,6 @@ export default function ProfilePage() {
         <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-6 mb-6">
           <h2 className="text-lg font-semibold mb-4">Billing & Plan</h2>
 
-          {/* Current plan status */}
           <div className="mb-4 flex items-center gap-3">
             <span className={`inline-flex rounded-full px-3 py-1 text-xs font-medium border ${tierColors[profile?.tier || 'free'] || tierColors.free}`}>
               {(profile?.tier || 'free').charAt(0).toUpperCase() + (profile?.tier || 'free').slice(1)}
@@ -234,9 +217,7 @@ export default function ProfilePage() {
             )}
           </div>
 
-          {/* Plan options */}
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-            {/* Free */}
             <div className={`rounded-md border p-4 ${profile?.tier === 'free' ? 'border-zinc-600 bg-zinc-800/50' : 'border-zinc-800'}`}>
               <p className="font-medium text-zinc-200">Free</p>
               <p className="text-sm text-zinc-500">$0/mo &middot; 500 calls</p>
@@ -245,7 +226,6 @@ export default function ProfilePage() {
               )}
             </div>
 
-            {/* Builder */}
             <div className={`rounded-md border p-4 ${profile?.tier === 'builder' ? 'border-emerald-700 bg-emerald-900/20' : 'border-zinc-800'}`}>
               <p className="font-medium text-zinc-200">Builder</p>
               <p className="text-sm text-zinc-500">$19/mo &middot; 10,000 calls</p>
@@ -262,7 +242,6 @@ export default function ProfilePage() {
               ) : null}
             </div>
 
-            {/* Pro */}
             <div className={`rounded-md border p-4 ${profile?.tier === 'pro' ? 'border-blue-700 bg-blue-900/20' : 'border-zinc-800'}`}>
               <p className="font-medium text-zinc-200">Pro</p>
               <p className="text-sm text-zinc-500">$49/mo &middot; 100,000 calls</p>
@@ -274,7 +253,7 @@ export default function ProfilePage() {
                   disabled={billingLoading}
                   className="mt-2 rounded bg-blue-600 px-3 py-1 text-xs font-medium text-white hover:bg-blue-500 disabled:opacity-50"
                 >
-                  {profile?.tier === 'builder' ? 'Upgrade' : 'Upgrade'}
+                  Upgrade
                 </button>
               ) : null}
             </div>
@@ -306,21 +285,6 @@ export default function ProfilePage() {
               {saving ? 'Saving...' : saved ? 'Saved!' : 'Save'}
             </button>
           </div>
-        </div>
-
-        {/* Password Reset */}
-        <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-6 mb-6">
-          <h2 className="text-lg font-semibold mb-2">Password</h2>
-          <p className="text-sm text-zinc-400 mb-4">
-            Send a password reset link to your email address.
-          </p>
-          <button
-            onClick={handlePasswordReset}
-            disabled={sendingReset}
-            className="rounded-md border border-zinc-700 px-4 py-2 text-sm text-zinc-300 transition-colors hover:border-zinc-500 hover:text-zinc-100 disabled:opacity-50"
-          >
-            {sendingReset ? 'Sending...' : resetSent ? 'Reset email sent!' : 'Send Reset Link'}
-          </button>
         </div>
 
         {/* Danger Zone */}

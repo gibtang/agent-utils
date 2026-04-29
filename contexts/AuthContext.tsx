@@ -1,12 +1,11 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState, useCallback } from 'react';
-import { User, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, signInWithPopup, GoogleAuthProvider, Auth } from 'firebase/auth';
-import { firebaseInitializationPromise } from '@/lib/firebase';
+import { createContext, useContext, useState, useCallback, useRef } from 'react';
+import { useKindeBrowserClient, LoginLink, RegisterLink, LogoutLink } from '@kinde-oss/kinde-auth-nextjs';
 
 interface UserProfile {
   _id: string;
-  firebaseUid: string;
+  kindeId: string;
   email: string;
   name: string;
   tier: string;
@@ -15,26 +14,36 @@ interface UserProfile {
   keyCount?: number;
 }
 
+interface KindeUser {
+  id: string;
+  email: string | null;
+  given_name: string | null;
+  family_name: string | null;
+  picture: string | null;
+}
+
 interface AuthContextType {
-  user: User | null;
+  user: KindeUser | null;
   profile: UserProfile | null;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string) => Promise<void>;
-  logout: () => Promise<void>;
-  signInWithGoogle: () => Promise<void>;
+  isAuthenticated: boolean;
   refreshProfile: () => Promise<void>;
+  ensureProfile: () => Promise<void>;
+  LoginLink: typeof LoginLink;
+  RegisterLink: typeof RegisterLink;
+  LogoutLink: typeof LogoutLink;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   profile: null,
   loading: true,
-  signIn: async () => {},
-  signUp: async () => {},
-  logout: async () => {},
-  signInWithGoogle: async () => {},
+  isAuthenticated: false,
   refreshProfile: async () => {},
+  ensureProfile: async () => {},
+  LoginLink,
+  RegisterLink,
+  LogoutLink,
 });
 
 export function useAuth() {
@@ -42,23 +51,24 @@ export function useAuth() {
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const { user: kindeUser, isAuthenticated, isLoading, getAccessTokenRaw } = useKindeBrowserClient();
   const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [firebaseAuth, setFirebaseAuth] = useState<Auth | null>(null);
+  const hasSynced = useRef(false);
 
-  const upsertUser = useCallback(async (firebaseUser: User) => {
+  const upsertUser = useCallback(async () => {
+    if (!kindeUser?.id || !kindeUser?.email) return false;
     try {
-      const idToken = await firebaseUser.getIdToken();
+      const token = await getAccessTokenRaw();
       const res = await fetch('/api/user', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${idToken}`,
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
-          firebaseUid: firebaseUser.uid,
-          email: firebaseUser.email,
+          kindeId: kindeUser.id,
+          email: kindeUser.email,
+          name: kindeUser.given_name || '',
         }),
       });
       const json = await res.json();
@@ -70,15 +80,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.error('User upsert failed:', err);
     }
     return false;
-  }, []);
+  }, [kindeUser, getAccessTokenRaw]);
 
   const refreshProfile = useCallback(async () => {
-    if (!user) return;
+    if (!kindeUser?.id) return;
     try {
-      const idToken = await user.getIdToken();
+      const token = await getAccessTokenRaw();
       const res = await fetch('/api/user', {
         headers: {
-          'Authorization': `Bearer ${idToken}`,
+          'Authorization': `Bearer ${token}`,
         },
       });
       const json = await res.json();
@@ -88,56 +98,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (err) {
       console.error('Profile refresh failed:', err);
     }
-  }, [user]);
+  }, [kindeUser, getAccessTokenRaw]);
 
-  useEffect(() => {
-    const initFirebase = async () => {
-      const { auth } = await firebaseInitializationPromise;
-      setFirebaseAuth(auth);
+  // Call from consuming components on mount to sync profile
+  const ensureProfile = useCallback(async () => {
+    if (hasSynced.current) return;
+    hasSynced.current = true;
+    if (!isAuthenticated || !kindeUser) return;
+    await upsertUser();
+  }, [isAuthenticated, kindeUser, upsertUser]);
 
-      if (auth) {
-        const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-          setUser(firebaseUser);
-          if (firebaseUser) {
-            await upsertUser(firebaseUser);
-          } else {
-            setProfile(null);
-          }
-          setLoading(false);
-        });
-        return () => unsubscribe();
-      } else {
-        setLoading(false);
-      }
-    };
-
-    initFirebase();
-  }, [upsertUser]);
-
-  const signIn = async (email: string, password: string) => {
-    if (!firebaseAuth) throw new Error('Firebase not initialized');
-    await signInWithEmailAndPassword(firebaseAuth, email, password);
-  };
-
-  const signUp = async (email: string, password: string) => {
-    if (!firebaseAuth) throw new Error('Firebase not initialized');
-    await createUserWithEmailAndPassword(firebaseAuth, email, password);
-  };
-
-  const logout = async () => {
-    if (!firebaseAuth) throw new Error('Firebase not initialized');
-    await signOut(firebaseAuth);
-    setProfile(null);
-  };
-
-  const signInWithGoogle = async () => {
-    if (!firebaseAuth) throw new Error('Firebase not initialized');
-    const provider = new GoogleAuthProvider();
-    await signInWithPopup(firebaseAuth, provider);
-  };
+  const user: KindeUser | null = kindeUser ? {
+    id: kindeUser.id,
+    email: kindeUser.email,
+    given_name: kindeUser.given_name,
+    family_name: kindeUser.family_name,
+    picture: kindeUser.picture,
+  } : null;
 
   return (
-    <AuthContext.Provider value={{ user, profile, loading, signIn, signUp, logout, signInWithGoogle, refreshProfile }}>
+    <AuthContext.Provider value={{ user, profile, loading: isLoading, isAuthenticated: !!isAuthenticated, refreshProfile, ensureProfile, LoginLink, RegisterLink, LogoutLink }}>
       {children}
     </AuthContext.Provider>
   );

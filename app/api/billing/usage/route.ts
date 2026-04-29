@@ -10,7 +10,7 @@ import { getTierConfig, type TierName } from '@/lib/pricing';
  */
 export async function GET(request: NextRequest) {
   try {
-    const user = await getAuthenticatedUser(request);
+    const user = await getAuthenticatedUser();
     if (!user) {
       return errorResponse('Unauthorized', 401);
     }
