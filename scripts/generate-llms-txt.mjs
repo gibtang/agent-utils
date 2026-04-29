@@ -172,8 +172,9 @@ lines.push('## Rate Limits');
 lines.push('');
 for (const [, tier] of Object.entries(tiers)) {
   const label = tier.name;
-  const rpd = tier.requestsPerDay === -1 ? 'Unlimited' : `${tier.requestsPerDay.toLocaleString()} req/day`;
-  lines.push(`- ${label}: ${rpd}, ${formatBytes(tier.maxFileSize)} files, ${tier.fileRetentionHours}h retention — $${tier.price}/mo`);
+  const cpm = tier.callsPerMonth === -1 ? 'Unlimited' : `${tier.callsPerMonth.toLocaleString()} calls/mo`;
+  const overage = tier.overageRate > 0 ? `, $${tier.overageRate}/call overage` : '';
+  lines.push(`- ${label}: ${cpm}${overage}, ${formatBytes(tier.maxFileSize)} files, ${tier.fileRetentionHours}h retention — $${tier.price}/mo`);
 }
 lines.push('');
 

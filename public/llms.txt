@@ -60,9 +60,10 @@ Email notifications for agents
 
 ## Rate Limits
 
-- Free: 100 req/day, 5MB files, 1h retention — $0/mo
-- Pro: 10,000 req/day, 50MB files, 24h retention — $29/mo
-- Enterprise: Unlimited, 500MB files, 72h retention — $99/mo
+- Free: 500 calls/mo, 5MB files, 1h retention — $0/mo
+- Builder: 10,000 calls/mo, $0.002/call overage, 25MB files, 12h retention — $19/mo
+- Pro: 100,000 calls/mo, $0.001/call overage, 50MB files, 24h retention — $49/mo
+- Enterprise: Unlimited, 500MB files, 72h retention — $0/mo
 
 ## OpenAPI Spec
 Full machine-readable spec: https://agentutils.dev/api/docs
