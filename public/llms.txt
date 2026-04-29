@@ -20,10 +20,6 @@ Ephemeral file hosting
 - POST /api/file-host — Upload a file — body:  (multipart, field: "file")
 - GET /api/file-host/{id} — Retrieve a file
 
-### JSON Cleaner — Normalize messy JSON
-Normalize messy JSON
-- POST /api/json — Clean and validate JSON — body: { json: string, schema?: any, sortKeys?: boolean }
-
 ### Dead Letter Queue — Capture and retry failures
 Capture and retry failures
 - POST /api/dlq — Capture a failure — body: { agentName: string, taskType: string, payload: any, error: string, retryWebhook?: string }
