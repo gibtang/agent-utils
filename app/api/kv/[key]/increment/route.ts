@@ -45,7 +45,7 @@ export async function POST(
         expiresAt,
       });
 
-      await incrementQuota(userId, tier);
+      await incrementQuota(userId, tier, apiKeyId);
 
       return successResponse({ key: entry.key, value: entry.value }, 201);
     }
@@ -62,7 +62,7 @@ export async function POST(
       { new: true }
     );
 
-    await incrementQuota(userId, tier);
+    await incrementQuota(userId, tier, apiKeyId);
 
     return successResponse({ key: updated!.key, value: updated!.value });
   } catch (err) {

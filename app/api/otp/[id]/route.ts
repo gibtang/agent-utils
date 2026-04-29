@@ -22,7 +22,7 @@ export async function GET(
     return errorResponse('OTP verification requires Pro or Enterprise tier', 403, 'UPGRADE_REQUIRED');
   }
 
-  await incrementQuota(auth.apiKey.userId, auth.apiKey.tier as TierName);
+  await incrementQuota(auth.apiKey.userId, auth.apiKey.tier as TierName, auth.apiKey._id);
 
   try {
     const { id } = await params;
@@ -76,7 +76,7 @@ export async function DELETE(
   try {
     const { id } = await params;
     await connectDB();
-    await incrementQuota(auth.apiKey.userId, auth.apiKey.tier as TierName);
+    await incrementQuota(auth.apiKey.userId, auth.apiKey.tier as TierName, auth.apiKey._id);
 
     const session = await OtpSession.findOneAndUpdate(
       { _id: id, userId: auth.apiKey.userId, status: 'waiting' },

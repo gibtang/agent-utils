@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
       windowSeconds
     );
 
-    await incrementQuota(authResult.apiKey.userId, tier);
+    await incrementQuota(authResult.apiKey.userId, tier, authResult.apiKey._id);
 
     const statusCode = result.allowed ? 200 : 429;
     return successResponse(result, statusCode);

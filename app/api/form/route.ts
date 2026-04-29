@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
       expiresAt,
     });
 
-    await incrementQuota(userId, tier);
+    await incrementQuota(userId, tier, apiKeyId);
 
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://agentutils.dev';
 

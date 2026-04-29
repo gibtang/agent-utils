@@ -66,9 +66,10 @@ export async function validateApiKey(
     const tierConfig = getTierConfig(tier);
     const { start: periodStart, end: periodEnd } = getCurrentPeriod(user);
 
-    // Get usage record for this period
+    // Get usage record for this period (scoped per API key)
     const usage = await Usage.findOne({
       userId: user._id,
+      apiKeyId: apiKey._id,
       periodStart,
       periodEnd,
     }).lean();
@@ -107,7 +108,7 @@ export async function validateApiKey(
         },
       };
       await Usage.findOneAndUpdate(
-        { userId: user._id, periodStart, periodEnd },
+        { userId: user._id, apiKeyId: apiKey._id, periodStart, periodEnd },
         updateOp,
         { upsert: true }
       );
@@ -116,6 +117,7 @@ export async function validateApiKey(
       if (isOverage) {
         const updatedUsage = await Usage.findOne({
           userId: user._id,
+          apiKeyId: apiKey._id,
           periodStart,
           periodEnd,
         }).lean();
@@ -163,7 +165,7 @@ export async function validateApiKey(
  * Used alongside validateApiKey({ skipQuota: true }) to avoid
  * burning quota on 403 feature-gate rejections.
  */
-export async function incrementQuota(userId: string, tier: TierName): Promise<void> {
+export async function incrementQuota(userId: string, tier: TierName, apiKeyId?: string): Promise<void> {
   const tierConfig = getTierConfig(tier);
 
   // Find user to get billing period
@@ -172,11 +174,10 @@ export async function incrementQuota(userId: string, tier: TierName): Promise<vo
 
   const { start: periodStart, end: periodEnd } = getCurrentPeriod(user);
 
-  const usage = await Usage.findOne({
-    userId: user._id,
-    periodStart,
-    periodEnd,
-  }).lean();
+  const usageFilter: Record<string, unknown> = { userId: user._id, periodStart, periodEnd };
+  if (apiKeyId) usageFilter.apiKeyId = apiKeyId;
+
+  const usage = await Usage.findOne(usageFilter).lean();
 
   const totalCalls = usage ? usage.callsIncluded + usage.callsOverage : 0;
   const isOverage = tierConfig.callsPerMonth !== -1 && totalCalls >= tierConfig.callsPerMonth;
@@ -191,18 +192,14 @@ export async function incrementQuota(userId: string, tier: TierName): Promise<vo
     },
   };
   await Usage.findOneAndUpdate(
-    { userId: user._id, periodStart, periodEnd },
+    usageFilter,
     updateOp,
     { upsert: true }
   );
 
   // Recalculate overage cost if in overage
   if (isOverage) {
-    const updatedUsage = await Usage.findOne({
-      userId: user._id,
-      periodStart,
-      periodEnd,
-    }).lean();
+    const updatedUsage = await Usage.findOne(usageFilter).lean();
     if (updatedUsage) {
       const newTotal = updatedUsage.callsIncluded + updatedUsage.callsOverage;
       const overageCost = Math.round(calculateOverageCost(tier, newTotal) * 100);

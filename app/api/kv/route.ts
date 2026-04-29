@@ -59,7 +59,7 @@ export async function PUT(request: NextRequest) {
       { upsert: true, new: true }
     );
 
-    await incrementQuota(userId, tier);
+    await incrementQuota(userId, tier, apiKeyId);
 
     return successResponse({
       key: entry.key,

@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
     return errorResponse('OTP verification requires Pro or Enterprise tier', 403, 'UPGRADE_REQUIRED');
   }
 
-  await incrementQuota(auth.apiKey.userId, auth.apiKey.tier as TierName);
+  await incrementQuota(auth.apiKey.userId, auth.apiKey.tier as TierName, auth.apiKey._id);
 
   try {
     const body = await request.json().catch(() => ({}));
@@ -93,7 +93,7 @@ export async function GET(request: NextRequest) {
     return errorResponse('OTP verification requires Pro or Enterprise tier', 403, 'UPGRADE_REQUIRED');
   }
 
-  await incrementQuota(auth.apiKey.userId, auth.apiKey.tier as TierName);
+  await incrementQuota(auth.apiKey.userId, auth.apiKey.tier as TierName, auth.apiKey._id);
 
   try {
     await connectDB();

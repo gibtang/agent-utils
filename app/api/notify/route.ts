@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
   const authResult = await validateApiKey(request, { skipQuota: true });
   if (!authResult.success) return authErrorResponse(authResult);
 
-  await incrementQuota(authResult.apiKey.userId, authResult.apiKey.tier as TierName);
+  await incrementQuota(authResult.apiKey.userId, authResult.apiKey.tier as TierName, authResult.apiKey._id);
 
   try {
     const body = await request.json();
@@ -115,7 +115,7 @@ export async function GET(request: NextRequest) {
   const authResult = await validateApiKey(request, { skipQuota: true });
   if (!authResult.success) return authErrorResponse(authResult);
 
-  await incrementQuota(authResult.apiKey.userId, authResult.apiKey.tier as TierName);
+  await incrementQuota(authResult.apiKey.userId, authResult.apiKey.tier as TierName, authResult.apiKey._id);
 
   try {
     await connectDB();
