@@ -78,8 +78,8 @@ describe('pricing', () => {
       expect(features.every(Boolean)).toBe(true);
     });
 
-    it('all tiers have fileHost, jsonCleaner, dlq, checkpoint, notify', () => {
-      const sharedFeatures = ['fileHost', 'jsonCleaner', 'dlq', 'checkpoint', 'notify'] as const;
+    it('all tiers have fileHost, dlq, checkpoint, notify', () => {
+      const sharedFeatures = ['fileHost', 'dlq', 'checkpoint', 'notify'] as const;
       for (const tier of Object.values(TIERS)) {
         for (const feature of sharedFeatures) {
           expect(tier.features[feature]).toBe(true);

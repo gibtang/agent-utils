@@ -31,10 +31,9 @@ describe('OpenAPI spec', () => {
     expect(spec.components.securitySchemes.ApiKeyAuth.name).toBe('x-api-key');
   });
 
-  it('documents all 7 tool endpoints', () => {
+  it('documents all tool endpoints', () => {
     const pathPrefixes = [
       '/api/file-host',
-      '/api/json',
       '/api/dlq',
       '/api/checkpoint',
       '/api/shield',
@@ -49,8 +48,7 @@ describe('OpenAPI spec', () => {
   it('has tags for all tool groups', () => {
     const tagNames = spec.tags.map((t: { name: string }) => t.name);
     expect(tagNames).toContain('File Host');
-    expect(tagNames).toContain('JSON Cleaner');
-    expect(tagNames).toContain('Dead Letter Queue');
+expect(tagNames).toContain('Dead Letter Queue');
     expect(tagNames).toContain('Human-in-the-Loop');
     expect(tagNames).toContain('Agent Shield');
     expect(tagNames).toContain('AgentVerify OTP');

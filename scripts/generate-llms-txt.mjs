@@ -101,8 +101,7 @@ for (const [pPath, methods] of Object.entries(spec.paths)) {
 // Map tag name to slug for finding tier info
 const tagSlugMap = {
   'File Host': 'fileHost',
-  'JSON Cleaner': 'jsonCleaner',
-  'Dead Letter Queue': 'dlq',
+'Dead Letter Queue': 'dlq',
   'Human-in-the-Loop': 'checkpoint',
   'Agent Shield': 'shield',
   'AgentVerify OTP': 'otp',

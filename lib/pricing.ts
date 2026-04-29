@@ -9,7 +9,6 @@ export interface TierConfig {
   fileRetentionHours: number;
   features: {
     fileHost: boolean;
-    jsonCleaner: boolean;
     dlq: boolean;
     checkpoint: boolean;
     shield: boolean;
@@ -28,7 +27,6 @@ export const TIERS: Record<TierName, TierConfig> = {
     fileRetentionHours: 1,
     features: {
       fileHost: true,
-      jsonCleaner: true,
       dlq: true,
       checkpoint: true,
       shield: false,
@@ -45,7 +43,6 @@ export const TIERS: Record<TierName, TierConfig> = {
     fileRetentionHours: 12,
     features: {
       fileHost: true,
-      jsonCleaner: true,
       dlq: true,
       checkpoint: true,
       shield: false,
@@ -62,7 +59,6 @@ export const TIERS: Record<TierName, TierConfig> = {
     fileRetentionHours: 24,
     features: {
       fileHost: true,
-      jsonCleaner: true,
       dlq: true,
       checkpoint: true,
       shield: true,
@@ -79,7 +75,6 @@ export const TIERS: Record<TierName, TierConfig> = {
     fileRetentionHours: 72,
     features: {
       fileHost: true,
-      jsonCleaner: true,
       dlq: true,
       checkpoint: true,
       shield: true,

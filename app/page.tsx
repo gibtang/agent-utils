@@ -2,7 +2,6 @@ import Link from "next/link";
 
 const tools = [
   { name: "Ephemeral File Host", desc: "Park files for agents. Auto-expires.", slug: "file-host" },
-  { name: "JSON Cleaner", desc: "Normalize messy LLM output into valid JSON.", slug: "json" },
   { name: "Dead Letter Queue", desc: "Catch, inspect, and retry failed agent tasks.", slug: "dlq" },
   { name: "Human-in-the-Loop Gate", desc: "Pause agents until humans approve.", slug: "checkpoint" },
   { name: "Agent Shield", desc: "PII redaction proxy. Clean before LLM, hydrate after.", slug: "shield" },
@@ -78,10 +77,10 @@ curl -X POST https://agentutils.dev/api/file-host \\
   -H "x-api-key: au_..." \\
   -F "file=@report.csv"
 
-# 3. Clean messy JSON
-curl -X POST https://agentutils.dev/api/json \\
+# 3. Send a notification
+curl -X POST https://agentutils.dev/api/notify \\
   -H "x-api-key: au_..." \\
-  -d '{"json": "{\\"name\\": \\"test\\"}"}'`}
+  -d '{"message": "Task complete"}'`}
           </pre>
         </div>
       </section>

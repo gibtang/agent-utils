@@ -4,7 +4,6 @@ export const dynamic = 'force-static';
 
 const tools = [
   { slug: 'file-host', name: 'File Host', icon: '📎' },
-  { slug: 'json', name: 'JSON Cleaner', icon: '🧹' },
   { slug: 'dlq', name: 'Dead Letter Queue', icon: '📬' },
   { slug: 'checkpoint', name: 'Human-in-the-Loop', icon: '👤' },
   { slug: 'shield', name: 'Agent Shield', icon: '🛡️' },

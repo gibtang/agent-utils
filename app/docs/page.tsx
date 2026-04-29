@@ -4,7 +4,6 @@ export const dynamic = 'force-static';
 
 const tools = [
   { slug: 'file-host', name: 'Ephemeral File Host', desc: 'Park files for agents with auto-expiry. Upload, retrieve, done.', icon: '📎' },
-  { slug: 'json', name: 'JSON Cleaner', desc: 'Normalize messy LLM output into valid, sorted JSON.', icon: '🧹' },
   { slug: 'dlq', name: 'Dead Letter Queue', desc: 'Catch failed agent tasks, inspect payloads, retry with webhooks.', icon: '📬' },
   { slug: 'checkpoint', name: 'Human-in-the-Loop Gate', desc: 'Pause agents until a human approves or rejects.', icon: '👤' },
   { slug: 'shield', name: 'Agent Shield (PII)', desc: 'Redact PII before LLM calls, hydrate it back after.', icon: '🛡️' },

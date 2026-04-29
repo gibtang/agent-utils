@@ -177,33 +177,6 @@ const spec = {
         },
       },
     },
-    '/api/json': {
-      post: {
-        tags: ['JSON Cleaner'],
-        summary: 'Clean and validate JSON',
-        description: 'Normalize messy LLM output into valid JSON. Strips markdown fences, validates against schema, deep-sorts keys.',
-        requestBody: {
-          required: true,
-          content: {
-            'application/json': {
-              schema: {
-                type: 'object',
-                required: ['json'],
-                properties: {
-                  json: { type: 'string', description: 'Raw JSON string (may include markdown fences)' },
-                  schema: { description: 'Optional JSON Schema for validation (AJV)' },
-                  sortKeys: { type: 'boolean', default: true, description: 'Deep-sort object keys' },
-                },
-              },
-            },
-          },
-        },
-        responses: {
-          '200': { description: 'Cleaned JSON' },
-          '400': { description: 'Invalid JSON or schema validation failed' },
-        },
-      },
-    },
     '/api/dlq': {
       post: {
         tags: ['Dead Letter Queue'],
@@ -406,8 +379,7 @@ const spec = {
     { name: 'System', description: 'Health and status' },
     { name: 'API Keys', description: 'Manage API keys' },
     { name: 'File Host', description: 'Ephemeral file hosting' },
-    { name: 'JSON Cleaner', description: 'Normalize messy JSON' },
-    { name: 'Dead Letter Queue', description: 'Capture and retry failures' },
+{ name: 'Dead Letter Queue', description: 'Capture and retry failures' },
     { name: 'Human-in-the-Loop', description: 'Pause agents for human approval' },
     { name: 'Agent Shield', description: 'PII redaction and hydration' },
     { name: 'AgentVerify OTP', description: 'Temporary phone numbers for verification' },
