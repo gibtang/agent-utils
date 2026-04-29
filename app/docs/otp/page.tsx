@@ -11,6 +11,10 @@ export default function OtpDocs() {
         Provision temporary phone numbers for agent 2FA/verification. Request a number, use it, poll for the code.
       </p>
 
+      <div className="mt-6 rounded-md bg-yellow-900/20 border border-yellow-700 px-4 py-3 text-sm text-yellow-300">
+        <strong>Platform Compatibility:</strong> Virtual numbers are blocked by WhatsApp, Google, Meta, and major crypto exchanges. This tool works for niche platforms, internal systems, and third-party APIs that do not maintain VoIP blocklists.
+      </div>
+
       <section className="mt-8">
         <h2 className="text-xl font-semibold mb-3">How it works</h2>
         <ol className="list-decimal list-inside text-sm text-zinc-400 space-y-2">

@@ -295,7 +295,7 @@ const spec = {
       post: {
         tags: ['AgentVerify OTP'],
         summary: 'Provision temporary phone number',
-        description: 'Get a phone number for OTP verification. Poll for the code. Pro+ only.',
+        description: 'Provision a temporary phone number to receive SMS verification codes. Note: virtual numbers are blocked by WhatsApp, Google, Meta, and major crypto exchanges. Works for niche platforms and internal systems. Pro+ only.',
         requestBody: {
           content: { 'application/json': { schema: { $ref: '#/components/schemas/OtpCreate' } } },
         },
@@ -382,7 +382,7 @@ const spec = {
 { name: 'Dead Letter Queue', description: 'Capture and retry failures' },
     { name: 'Human-in-the-Loop', description: 'Pause agents for human approval' },
     { name: 'Agent Shield', description: 'PII redaction and hydration' },
-    { name: 'AgentVerify OTP', description: 'Temporary phone numbers for verification' },
+    { name: 'AgentVerify OTP', description: 'Temporary phone numbers for verification. Virtual numbers blocked by WhatsApp, Google, Meta, and major crypto exchanges. Works for niche platforms and internal systems.' },
     { name: 'Notification Router', description: 'Email notifications for agents' },
   ],
 };

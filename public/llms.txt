@@ -41,8 +41,8 @@ PII redaction and hydration
 - POST /api/shield/clean — Redact PII from text — body: { text: string }
 - POST /api/shield/hydrate — Restore original PII values — body: { text: string, sessionId: string }
 
-### AgentVerify OTP — Temporary phone numbers for verification (Pro+)
-Temporary phone numbers for verification
+### AgentVerify OTP — Temporary phone numbers for verification. Virtual numbers blocked by WhatsApp, Google, Meta, and major crypto exchanges. Works for niche platforms and internal systems. (Pro+)
+Temporary phone numbers for verification. Virtual numbers blocked by WhatsApp, Google, Meta, and major crypto exchanges. Works for niche platforms and internal systems.
 - POST /api/otp — Provision temporary phone number — body: { countryCode?: string }
 - GET /api/otp — List active OTP sessions
 - GET /api/otp/{id} — Poll for OTP code

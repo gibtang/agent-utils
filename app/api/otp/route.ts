@@ -69,6 +69,11 @@ export async function POST(request: NextRequest) {
       status: session.status,
       expiresAt: session.expiresAt.toISOString(),
       instructions: `Use this phone number for verification. Poll GET /api/otp/{sessionId} until status is 'received'.`,
+      limitations: {
+        note: 'Virtual numbers are blocked by some major platforms.',
+        blockedBy: ['WhatsApp', 'Google', 'Meta', 'most crypto exchanges'],
+        worksFor: ['niche platforms', 'internal systems', 'third-party APIs without VoIP blocklists'],
+      },
     }, 201);
   } catch (error) {
     console.error('OTP create error:', error);
