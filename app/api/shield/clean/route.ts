@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 import connectDB from '@/lib/mongodb';
-import { validateApiKey, errorResponse } from '@/lib/auth';
+import { validateApiKey, authErrorResponse, incrementQuota } from '@/lib/auth';
+import { type TierName } from '@/lib/pricing';
 import { successResponse } from '@/lib/response';
 import { v4 as uuidv4 } from 'uuid';
 import PiiSession from '@/models/PiiSession';
@@ -16,8 +17,10 @@ const PII_PATTERNS = [
 ];
 
 export async function POST(request: NextRequest) {
-  const authResult = await validateApiKey(request);
-  if (!authResult.success) return errorResponse(authResult);
+  const authResult = await validateApiKey(request, { skipQuota: true });
+  if (!authResult.success) return authErrorResponse(authResult);
+
+  await incrementQuota(authResult.apiKey.userId, authResult.apiKey.tier as TierName);
 
   try {
     const body = await request.json();

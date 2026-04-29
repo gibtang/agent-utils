@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import { successResponse, errorResponse } from '@/lib/response';
-import User from '@/models/User';
+import { getAuthenticatedUser } from '@/lib/auth-user';
 import Usage from '@/models/Usage';
 import { getTierConfig, type TierName } from '@/lib/pricing';
 
@@ -10,15 +10,9 @@ import { getTierConfig, type TierName } from '@/lib/pricing';
  */
 export async function GET(request: NextRequest) {
   try {
-    const firebaseUid = request.headers.get('x-firebase-uid');
-    if (!firebaseUid) {
-      return errorResponse('Missing x-firebase-uid header', 401);
-    }
-
-    await connectDB();
-    const user = await User.findOne({ firebaseUid, active: true }).lean();
+    const user = await getAuthenticatedUser(request);
     if (!user) {
-      return errorResponse('User not found', 404);
+      return errorResponse('Unauthorized', 401);
     }
 
     const tier = user.tier as TierName;
@@ -37,6 +31,7 @@ export async function GET(request: NextRequest) {
       periodEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
     }
 
+    await connectDB();
     const usage = await Usage.findOne({
       userId: user._id,
       periodStart: { $lte: now },

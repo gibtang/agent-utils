@@ -6,7 +6,7 @@ import User from '@/models/User';
 function getStripe(): Stripe {
   const key = process.env.STRIPE_SECRET_KEY;
   if (!key) throw new Error('STRIPE_SECRET_KEY is not configured');
-  return new Stripe(key, { apiVersion: '2025-04-30.basil' });
+  return new Stripe(key, { apiVersion: '2026-04-22.dahlia' });
 }
 
 /**
@@ -84,22 +84,28 @@ export async function handleWebhook(event: Stripe.Event): Promise<void> {
       if (!userId || !tier) break;
 
       const subscription = await getStripe().subscriptions.retrieve(session.subscription as string);
+      const item = subscription.items.data[0];
       await User.updateOne({ _id: userId }, {
         tier,
         subscriptionId: subscription.id,
         subscriptionStatus: subscription.status,
-        billingCycleStart: new Date(subscription.current_period_start * 1000),
-        billingCycleEnd: new Date(subscription.current_period_end * 1000),
+        billingCycleStart: item ? new Date(item.current_period_start * 1000) : undefined,
+        billingCycleEnd: item ? new Date(item.current_period_end * 1000) : undefined,
       });
       break;
     }
 
     case 'customer.subscription.updated': {
       const subscription = event.data.object as Stripe.Subscription;
+      // Fetch full subscription to get items with period data
+      const fullSubscription = await getStripe().subscriptions.retrieve(subscription.id);
+      const item = fullSubscription.items.data[0];
       await User.updateOne({ subscriptionId: subscription.id }, {
         subscriptionStatus: subscription.status,
-        billingCycleStart: new Date(subscription.current_period_start * 1000),
-        billingCycleEnd: new Date(subscription.current_period_end * 1000),
+        ...(item ? {
+          billingCycleStart: new Date(item.current_period_start * 1000),
+          billingCycleEnd: new Date(item.current_period_end * 1000),
+        } : {}),
       });
       break;
     }
@@ -116,8 +122,9 @@ export async function handleWebhook(event: Stripe.Event): Promise<void> {
 
     case 'invoice.payment_failed': {
       const invoice = event.data.object as Stripe.Invoice;
-      if (invoice.subscription) {
-        await User.updateOne({ subscriptionId: invoice.subscription as string }, {
+      const subscriptionId = invoice.parent?.subscription_details?.subscription;
+      if (subscriptionId && typeof subscriptionId === 'string') {
+        await User.updateOne({ subscriptionId }, {
           subscriptionStatus: 'past_due',
         });
       }
@@ -136,13 +143,12 @@ export async function reportUsage(userId: string, quantity: number): Promise<voi
   const user = await User.findById(userId);
   if (!user || !user.subscriptionId) return;
 
-  const subscription = await stripe.subscriptions.retrieve(user.subscriptionId);
-  const meteredItem = subscription.items.data.find(item => item.plan.metadata?.type === 'overage');
-  if (!meteredItem) return;
-
-  await stripe.subscriptionItems.createUsageRecord(meteredItem.id, {
-    quantity,
-    timestamp: Math.floor(Date.now() / 1000),
-    action: 'increment',
+  // Report usage via meter events (replaces deprecated createUsageRecord)
+  await stripe.billing.meterEvents.create({
+    event_name: 'overage',
+    payload: {
+      stripe_customer_id: user.stripeCustomerId,
+      value: String(quantity),
+    },
   });
 }

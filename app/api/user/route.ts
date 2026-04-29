@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import { successResponse, errorResponse } from '@/lib/response';
+import { getAuthenticatedUser } from '@/lib/auth-user';
 import User from '@/models/User';
 import ApiKey from '@/models/ApiKey';
 
@@ -43,27 +44,13 @@ export async function POST(request: NextRequest) {
  */
 export async function GET(request: NextRequest) {
   try {
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader?.startsWith('Bearer ')) {
-      return errorResponse('Missing authorization header', 401);
-    }
-
-    // We use Firebase ID token to identify the user
-    // The token is verified client-side; here we just need the uid from the body or a separate lookup
-    // For simplicity, the client sends firebaseUid in a header
-    const firebaseUid = request.headers.get('x-firebase-uid');
-    if (!firebaseUid) {
-      return errorResponse('Missing x-firebase-uid header', 400);
-    }
-
-    await connectDB();
-    const user = await User.findOne({ firebaseUid, active: true }).lean();
-
+    const user = await getAuthenticatedUser(request);
     if (!user) {
-      return errorResponse('User not found', 404);
+      return errorResponse('Unauthorized', 401);
     }
 
     // Get key count
+    await connectDB();
     const keyCount = await ApiKey.countDocuments({ userId: user._id, active: true });
 
     return successResponse({
@@ -81,9 +68,9 @@ export async function GET(request: NextRequest) {
  */
 export async function PATCH(request: NextRequest) {
   try {
-    const firebaseUid = request.headers.get('x-firebase-uid');
-    if (!firebaseUid) {
-      return errorResponse('Missing x-firebase-uid header', 400);
+    const user = await getAuthenticatedUser(request);
+    if (!user) {
+      return errorResponse('Unauthorized', 401);
     }
 
     const body = await request.json();
@@ -94,17 +81,17 @@ export async function PATCH(request: NextRequest) {
     }
 
     await connectDB();
-    const user = await User.findOneAndUpdate(
-      { firebaseUid, active: true },
+    const updated = await User.findOneAndUpdate(
+      { firebaseUid: user.firebaseUid, active: true },
       { ...(name !== undefined && { name }) },
       { new: true }
     ).lean();
 
-    if (!user) {
+    if (!updated) {
       return errorResponse('User not found', 404);
     }
 
-    return successResponse(user);
+    return successResponse(updated);
   } catch (error) {
     console.error('Update user error:', error);
     return errorResponse('Failed to update user', 500);
@@ -117,25 +104,25 @@ export async function PATCH(request: NextRequest) {
  */
 export async function DELETE(request: NextRequest) {
   try {
-    const firebaseUid = request.headers.get('x-firebase-uid');
-    if (!firebaseUid) {
-      return errorResponse('Missing x-firebase-uid header', 400);
+    const user = await getAuthenticatedUser(request);
+    if (!user) {
+      return errorResponse('Unauthorized', 401);
     }
 
     await connectDB();
 
-    const user = await User.findOne({ firebaseUid, active: true });
-    if (!user) {
+    const fullUser = await User.findOne({ firebaseUid: user.firebaseUid, active: true });
+    if (!fullUser) {
       return errorResponse('User not found', 404);
     }
 
     // Deactivate user
-    user.active = false;
-    await user.save();
+    fullUser.active = false;
+    await fullUser.save();
 
     // Revoke all API keys
     await ApiKey.updateMany(
-      { userId: user._id, active: true },
+      { userId: fullUser._id, active: true },
       { active: false }
     );
 

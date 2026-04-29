@@ -1,7 +1,6 @@
 import { NextRequest } from 'next/server';
-import connectDB from '@/lib/mongodb';
 import { successResponse, errorResponse } from '@/lib/response';
-import User from '@/models/User';
+import { getAuthenticatedUser } from '@/lib/auth-user';
 import { createCheckoutSession } from '@/lib/stripe';
 import type { TierName } from '@/lib/pricing';
 
@@ -11,9 +10,9 @@ import type { TierName } from '@/lib/pricing';
  */
 export async function POST(request: NextRequest) {
   try {
-    const firebaseUid = request.headers.get('x-firebase-uid');
-    if (!firebaseUid) {
-      return errorResponse('Missing x-firebase-uid header', 401);
+    const user = await getAuthenticatedUser(request);
+    if (!user) {
+      return errorResponse('Unauthorized', 401);
     }
 
     const body = await request.json();
@@ -22,12 +21,6 @@ export async function POST(request: NextRequest) {
     const validTiers: TierName[] = ['builder', 'pro'];
     if (!validTiers.includes(tier)) {
       return errorResponse('Invalid tier. Must be builder or pro.', 400);
-    }
-
-    await connectDB();
-    const user = await User.findOne({ firebaseUid, active: true });
-    if (!user) {
-      return errorResponse('User not found', 404);
     }
 
     const url = await createCheckoutSession(user._id.toString(), tier);

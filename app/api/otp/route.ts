@@ -1,8 +1,8 @@
 import { NextRequest } from 'next/server';
 import connectDB from '@/lib/mongodb';
-import { validateApiKey } from '@/lib/auth';
+import { validateApiKey, authErrorResponse, incrementQuota } from '@/lib/auth';
 import { successResponse, errorResponse } from '@/lib/response';
-import { getTierConfig } from '@/lib/pricing';
+import { getTierConfig, type TierName } from '@/lib/pricing';
 import OtpSession from '@/models/OtpSession';
 
 /**
@@ -12,13 +12,15 @@ import OtpSession from '@/models/OtpSession';
  * Returns: sessionId + phoneNumber for the agent to use
  */
 export async function POST(request: NextRequest) {
-  const auth = await validateApiKey(request);
-  if (!auth.success) return errorResponse(auth.error, auth.statusCode);
+  const auth = await validateApiKey(request, { skipQuota: true });
+  if (!auth.success) return authErrorResponse(auth);
 
   const tierConfig = getTierConfig(auth.apiKey.tier as string);
   if (!tierConfig.features.otp) {
     return errorResponse('OTP verification requires Pro or Enterprise tier', 403, 'UPGRADE_REQUIRED');
   }
+
+  await incrementQuota(auth.apiKey.userId, auth.apiKey.tier as TierName);
 
   try {
     const body = await request.json().catch(() => ({}));
@@ -78,13 +80,15 @@ export async function POST(request: NextRequest) {
  * GET /api/otp — List active OTP sessions for the authenticated user
  */
 export async function GET(request: NextRequest) {
-  const auth = await validateApiKey(request);
-  if (!auth.success) return errorResponse(auth.error, auth.statusCode);
+  const auth = await validateApiKey(request, { skipQuota: true });
+  if (!auth.success) return authErrorResponse(auth);
 
   const tierConfig = getTierConfig(auth.apiKey.tier as string);
   if (!tierConfig.features.otp) {
     return errorResponse('OTP verification requires Pro or Enterprise tier', 403, 'UPGRADE_REQUIRED');
   }
+
+  await incrementQuota(auth.apiKey.userId, auth.apiKey.tier as TierName);
 
   try {
     await connectDB();

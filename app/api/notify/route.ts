@@ -1,7 +1,8 @@
 import { NextRequest } from 'next/server';
 import { Resend } from 'resend';
 import connectDB from '@/lib/mongodb';
-import { validateApiKey, errorResponse } from '@/lib/auth';
+import { validateApiKey, authErrorResponse, incrementQuota } from '@/lib/auth';
+import { type TierName } from '@/lib/pricing';
 import { successResponse } from '@/lib/response';
 import Notification from '@/models/Notification';
 import User from '@/models/User';
@@ -12,8 +13,10 @@ const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'notify@agentutils.dev';
 
 // POST /api/notify — Send an email notification
 export async function POST(request: NextRequest) {
-  const authResult = await validateApiKey(request);
-  if (!authResult.success) return errorResponse(authResult);
+  const authResult = await validateApiKey(request, { skipQuota: true });
+  if (!authResult.success) return authErrorResponse(authResult);
+
+  await incrementQuota(authResult.apiKey.userId, authResult.apiKey.tier as TierName);
 
   try {
     const body = await request.json();
@@ -109,8 +112,10 @@ export async function POST(request: NextRequest) {
 
 // GET /api/notify — List notification history
 export async function GET(request: NextRequest) {
-  const authResult = await validateApiKey(request);
-  if (!authResult.success) return errorResponse(authResult);
+  const authResult = await validateApiKey(request, { skipQuota: true });
+  if (!authResult.success) return authErrorResponse(authResult);
+
+  await incrementQuota(authResult.apiKey.userId, authResult.apiKey.tier as TierName);
 
   try {
     await connectDB();

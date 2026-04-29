@@ -1,8 +1,8 @@
 import { NextRequest } from 'next/server';
 import connectDB from '@/lib/mongodb';
-import { validateApiKey } from '@/lib/auth';
+import { validateApiKey, authErrorResponse, incrementQuota } from '@/lib/auth';
 import { successResponse, errorResponse } from '@/lib/response';
-import { getTierConfig } from '@/lib/pricing';
+import { getTierConfig, type TierName } from '@/lib/pricing';
 import OtpSession from '@/models/OtpSession';
 
 /**
@@ -14,13 +14,15 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const auth = await validateApiKey(request);
-  if (!auth.success) return errorResponse(auth.error, auth.statusCode);
+  const auth = await validateApiKey(request, { skipQuota: true });
+  if (!auth.success) return authErrorResponse(auth);
 
   const tierConfig = getTierConfig(auth.apiKey.tier as string);
   if (!tierConfig.features.otp) {
     return errorResponse('OTP verification requires Pro or Enterprise tier', 403, 'UPGRADE_REQUIRED');
   }
+
+  await incrementQuota(auth.apiKey.userId, auth.apiKey.tier as TierName);
 
   try {
     const { id } = await params;
@@ -68,12 +70,13 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const auth = await validateApiKey(request);
-  if (!auth.success) return errorResponse(auth.error, auth.statusCode);
+  const auth = await validateApiKey(request, { skipQuota: true });
+  if (!auth.success) return authErrorResponse(auth);
 
   try {
     const { id } = await params;
     await connectDB();
+    await incrementQuota(auth.apiKey.userId, auth.apiKey.tier as TierName);
 
     const session = await OtpSession.findOneAndUpdate(
       { _id: id, userId: auth.apiKey.userId, status: 'waiting' },

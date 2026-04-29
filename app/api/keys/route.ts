@@ -1,88 +1,73 @@
-import { NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import connectDB from '@/lib/mongodb';
+import { getAuthenticatedUser } from '@/lib/auth-user';
 import ApiKey from '@/models/ApiKey';
 import User from '@/models/User';
+import { successResponse, errorResponse } from '@/lib/response';
 
 // GET /api/keys — List API keys for a user (requires Firebase token)
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
-    const authHeader = request.headers.get('Authorization');
-    if (!authHeader?.startsWith('Bearer ')) {
-      return NextResponse.json({ error: 'Missing auth token' }, { status: 401 });
-    }
-
-    const token = authHeader.split(' ')[1];
-    // In production, verify Firebase token here
-    // For now, use token as firebaseUid for simplicity
-    const firebaseUid = token;
-
-    await connectDB();
-    const user = await User.findOne({ firebaseUid });
+    const user = await getAuthenticatedUser(request);
     if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      return errorResponse('Unauthorized', 401);
     }
 
     const keys = await ApiKey.find({ userId: user._id, active: true })
-      .select('-key') // Don't return full key
+      .select('-key')
       .sort({ createdAt: -1 });
 
-    return NextResponse.json({ success: true, data: keys });
+    return successResponse(keys);
   } catch (error) {
     console.error('List keys error:', error);
-    return NextResponse.json({ error: 'Failed to list API keys' }, { status: 500 });
+    return errorResponse('Failed to list API keys', 500);
   }
 }
 
 // POST /api/keys — Create new API key
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const authHeader = request.headers.get('Authorization');
-    if (!authHeader?.startsWith('Bearer ')) {
-      return NextResponse.json({ error: 'Missing auth token' }, { status: 401 });
+    const user = await getAuthenticatedUser(request);
+    if (!user) {
+      return errorResponse('Unauthorized', 401);
     }
 
-    const token = authHeader.split(' ')[1];
-    const firebaseUid = token;
     const body = await request.json();
     const { name } = body;
 
     if (!name) {
-      return NextResponse.json({ error: 'Name is required' }, { status: 400 });
+      return errorResponse('Name is required', 400);
     }
 
+    // Ensure fully connected
     await connectDB();
-    let user = await User.findOne({ firebaseUid });
-
-    if (!user) {
-      // Auto-create user on first key creation
-      user = await User.create({ firebaseUid, email: `${firebaseUid}@agentutils.dev`, tier: 'free' });
+    const fullUser = await User.findById(user._id);
+    if (!fullUser) {
+      return errorResponse('User not found', 404);
     }
 
     // Limit: max 5 keys per user on free tier
-    const keyCount = await ApiKey.countDocuments({ userId: user._id, active: true });
-    if (keyCount >= 5 && user.tier === 'free') {
-      return NextResponse.json({ error: 'Maximum 5 API keys on free tier' }, { status: 400 });
+    const keyCount = await ApiKey.countDocuments({ userId: fullUser._id, active: true });
+    if (keyCount >= 5 && fullUser.tier === 'free') {
+      return errorResponse('Maximum 5 API keys on free tier', 400);
     }
 
     const apiKey = await ApiKey.create({
-      userId: user._id,
+      userId: fullUser._id,
       name,
-      tier: user.tier,
+      tier: fullUser.tier,
     });
 
     // Return the full key ONLY on creation
-    return NextResponse.json({
-      success: true,
-      data: {
-        id: apiKey._id,
-        name: apiKey.name,
-        key: apiKey.key, // Full key — show once!
-        tier: apiKey.tier,
-        createdAt: apiKey.createdAt,
-      },
-    }, { status: 201 });
+    return successResponse({
+      id: apiKey._id,
+      name: apiKey.name,
+      key: apiKey.key,
+      tier: apiKey.tier,
+      createdAt: apiKey.createdAt,
+    }, 201);
   } catch (error) {
     console.error('Create key error:', error);
-    return NextResponse.json({ error: 'Failed to create API key' }, { status: 500 });
+    return errorResponse('Failed to create API key', 500);
   }
 }

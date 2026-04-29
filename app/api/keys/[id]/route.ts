@@ -1,39 +1,32 @@
-import { NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import connectDB from '@/lib/mongodb';
+import { getAuthenticatedUser } from '@/lib/auth-user';
 import ApiKey from '@/models/ApiKey';
-import User from '@/models/User';
+import { successResponse, errorResponse } from '@/lib/response';
 
 export async function DELETE(
-  request: Request,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
-    const authHeader = request.headers.get('Authorization');
-    if (!authHeader?.startsWith('Bearer ')) {
-      return NextResponse.json({ error: 'Missing auth token' }, { status: 401 });
+    const user = await getAuthenticatedUser(request);
+    if (!user) {
+      return errorResponse('Unauthorized', 401);
     }
-
-    const token = authHeader.split(' ')[1];
-    const firebaseUid = token;
 
     await connectDB();
-    const user = await User.findOne({ firebaseUid });
-    if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
-    }
-
     const apiKey = await ApiKey.findOne({ _id: id, userId: user._id });
     if (!apiKey) {
-      return NextResponse.json({ error: 'API key not found' }, { status: 404 });
+      return errorResponse('API key not found', 404);
     }
 
     apiKey.active = false;
     await apiKey.save();
 
-    return NextResponse.json({ success: true, data: { id: apiKey._id, revoked: true } });
+    return successResponse({ id: apiKey._id, revoked: true });
   } catch (error) {
     console.error('Revoke key error:', error);
-    return NextResponse.json({ error: 'Failed to revoke API key' }, { status: 500 });
+    return errorResponse('Failed to revoke API key', 500);
   }
 }

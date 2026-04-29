@@ -1,14 +1,14 @@
 import { NextRequest } from 'next/server';
 import Ajv from 'ajv';
 import { jsonrepair } from 'jsonrepair';
-import { validateApiKey, errorResponse } from '@/lib/auth';
+import { validateApiKey, authErrorResponse } from '@/lib/auth';
 import { successResponse } from '@/lib/response';
 
 const ajv = new Ajv({ coerceTypes: true, useDefaults: true });
 
 export async function POST(request: NextRequest) {
   const authResult = await validateApiKey(request);
-  if (!authResult.success) return errorResponse(authResult);
+  if (!authResult.success) return authErrorResponse(authResult);
 
   try {
     const body = await request.json();

@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import connectDB from '@/lib/mongodb';
-import { validateApiKey, errorResponse } from '@/lib/auth';
+import { validateApiKey, authErrorResponse } from '@/lib/auth';
 import { successResponse } from '@/lib/response';
 import DeadLetter from '@/models/DeadLetter';
 
@@ -10,7 +10,7 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const authResult = await validateApiKey(request);
-  if (!authResult.success) return errorResponse(authResult);
+  if (!authResult.success) return authErrorResponse(authResult);
 
   try {
     const { id } = await params;

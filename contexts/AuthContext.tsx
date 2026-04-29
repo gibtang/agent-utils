@@ -49,9 +49,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const upsertUser = useCallback(async (firebaseUser: User) => {
     try {
+      const idToken = await firebaseUser.getIdToken();
       const res = await fetch('/api/user', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${idToken}`,
+        },
         body: JSON.stringify({
           firebaseUid: firebaseUser.uid,
           email: firebaseUser.email,
@@ -71,9 +75,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const refreshProfile = useCallback(async () => {
     if (!user) return;
     try {
+      const idToken = await user.getIdToken();
       const res = await fetch('/api/user', {
         headers: {
-          'x-firebase-uid': user.uid,
+          'Authorization': `Bearer ${idToken}`,
         },
       });
       const json = await res.json();

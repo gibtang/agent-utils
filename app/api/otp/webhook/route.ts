@@ -16,15 +16,18 @@ export async function POST(request: NextRequest) {
   try {
     const contentType = request.headers.get('content-type') || '';
     let from: string | undefined;
+    let to: string | undefined;
     let body: string | undefined;
 
     if (contentType.includes('application/x-www-form-urlencoded')) {
       const formData = await request.formData();
       from = formData.get('From') as string;
+      to = formData.get('To') as string;
       body = formData.get('Body') as string;
     } else {
       const json = await request.json();
       from = json.From;
+      to = json.To;
       body = json.Body;
     }
 
@@ -55,8 +58,13 @@ export async function POST(request: NextRequest) {
     await connectDB();
 
     // Find the earliest waiting session and update it
+    // Scope by phone number when available for multi-tenant safety
     const session = await OtpSession.findOneAndUpdate(
-      { status: 'waiting', expiresAt: { $gt: new Date() } },
+      {
+        status: 'waiting',
+        expiresAt: { $gt: new Date() },
+        ...(to ? { phoneNumber: to } : {}),
+      },
       {
         status: extractedCode ? 'received' : 'failed',
         code: extractedCode,

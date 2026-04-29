@@ -1,7 +1,6 @@
 import { NextRequest } from 'next/server';
-import connectDB from '@/lib/mongodb';
 import { successResponse, errorResponse } from '@/lib/response';
-import User from '@/models/User';
+import { getAuthenticatedUser } from '@/lib/auth-user';
 import { createPortalSession } from '@/lib/stripe';
 
 /**
@@ -9,15 +8,9 @@ import { createPortalSession } from '@/lib/stripe';
  */
 export async function POST(request: NextRequest) {
   try {
-    const firebaseUid = request.headers.get('x-firebase-uid');
-    if (!firebaseUid) {
-      return errorResponse('Missing x-firebase-uid header', 401);
-    }
-
-    await connectDB();
-    const user = await User.findOne({ firebaseUid, active: true });
+    const user = await getAuthenticatedUser(request);
     if (!user) {
-      return errorResponse('User not found', 404);
+      return errorResponse('Unauthorized', 401);
     }
 
     const url = await createPortalSession(user._id.toString());

@@ -37,7 +37,10 @@ function getCurrentPeriod(user: { billingCycleStart?: Date | null; billingCycleE
   return { start, end };
 }
 
-export async function validateApiKey(request: NextRequest): Promise<AuthResult | AuthError> {
+export async function validateApiKey(
+  request: NextRequest,
+  options?: { skipQuota?: boolean }
+): Promise<AuthResult | AuthError> {
   const key = request.headers.get('x-api-key');
 
   if (!key) {
@@ -63,11 +66,11 @@ export async function validateApiKey(request: NextRequest): Promise<AuthResult |
     const tierConfig = getTierConfig(tier);
     const { start: periodStart, end: periodEnd } = getCurrentPeriod(user);
 
-    // Get or create usage record for this period
+    // Get usage record for this period
     const usage = await Usage.findOne({
       userId: user._id,
-      periodStart: { $lte: new Date() },
-      periodEnd: { $gte: new Date() },
+      periodStart,
+      periodEnd,
     }).lean();
 
     const totalCalls = usage ? usage.callsIncluded + usage.callsOverage : 0;
@@ -92,35 +95,43 @@ export async function validateApiKey(request: NextRequest): Promise<AuthResult |
     // Determine if this call is overage
     const isOverage = tierConfig.callsPerMonth !== -1 && totalCalls >= tierConfig.callsPerMonth;
 
-    // Update usage record
-    const now = new Date();
-    if (!usage) {
-      await Usage.create({
-        userId: user._id,
-        periodStart,
-        periodEnd,
-        callsIncluded: isOverage ? 0 : 1,
-        callsOverage: isOverage ? 1 : 0,
-        overageCost: 0,
-        toolBreakdown: {},
-      });
-    } else {
+    // Atomic upsert with increment (Fix 2: race condition)
+    if (!options?.skipQuota) {
+      const incField = isOverage ? { callsOverage: 1 } : { callsIncluded: 1 };
+      const updateOp: Record<string, unknown> = {
+        $inc: incField,
+        $setOnInsert: {
+          overageCost: 0,
+          toolBreakdown: {},
+          ...(isOverage ? { callsIncluded: 0 } : { callsOverage: 0 }),
+        },
+      };
+      await Usage.findOneAndUpdate(
+        { userId: user._id, periodStart, periodEnd },
+        updateOp,
+        { upsert: true }
+      );
+
+      // Recalculate overage cost if in overage
       if (isOverage) {
-        const newOverage = usage.callsOverage + 1;
-        const overageCost = Math.round(calculateOverageCost(tier, usage.callsIncluded + newOverage) * 100);
-        await Usage.updateOne(
-          { _id: usage._id },
-          { $inc: { callsOverage: 1 }, $set: { overageCost } }
-        );
-      } else {
-        await Usage.updateOne(
-          { _id: usage._id },
-          { $inc: { callsIncluded: 1 } }
-        );
+        const updatedUsage = await Usage.findOne({
+          userId: user._id,
+          periodStart,
+          periodEnd,
+        }).lean();
+        if (updatedUsage) {
+          const newTotal = updatedUsage.callsIncluded + updatedUsage.callsOverage;
+          const overageCost = Math.round(calculateOverageCost(tier, newTotal) * 100);
+          await Usage.updateOne(
+            { _id: updatedUsage._id },
+            { $set: { overageCost } }
+          );
+        }
       }
     }
 
     // Update the key's monthly counter
+    const now = new Date();
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
     const update: Record<string, unknown> = { lastUsedAt: now };
     if (!apiKey.monthStartedAt || apiKey.monthStartedAt < monthStart) {
@@ -147,7 +158,63 @@ export async function validateApiKey(request: NextRequest): Promise<AuthResult |
   }
 }
 
-export function errorResponse(error: AuthError) {
+/**
+ * Increment quota for a user after a feature gate check passes.
+ * Used alongside validateApiKey({ skipQuota: true }) to avoid
+ * burning quota on 403 feature-gate rejections.
+ */
+export async function incrementQuota(userId: string, tier: TierName): Promise<void> {
+  const tierConfig = getTierConfig(tier);
+
+  // Find user to get billing period
+  const user = await User.findById(userId).lean();
+  if (!user) return;
+
+  const { start: periodStart, end: periodEnd } = getCurrentPeriod(user);
+
+  const usage = await Usage.findOne({
+    userId: user._id,
+    periodStart,
+    periodEnd,
+  }).lean();
+
+  const totalCalls = usage ? usage.callsIncluded + usage.callsOverage : 0;
+  const isOverage = tierConfig.callsPerMonth !== -1 && totalCalls >= tierConfig.callsPerMonth;
+
+  const incField = isOverage ? { callsOverage: 1 } : { callsIncluded: 1 };
+  const updateOp: Record<string, unknown> = {
+    $inc: incField,
+    $setOnInsert: {
+      overageCost: 0,
+      toolBreakdown: {},
+      ...(isOverage ? { callsIncluded: 0 } : { callsOverage: 0 }),
+    },
+  };
+  await Usage.findOneAndUpdate(
+    { userId: user._id, periodStart, periodEnd },
+    updateOp,
+    { upsert: true }
+  );
+
+  // Recalculate overage cost if in overage
+  if (isOverage) {
+    const updatedUsage = await Usage.findOne({
+      userId: user._id,
+      periodStart,
+      periodEnd,
+    }).lean();
+    if (updatedUsage) {
+      const newTotal = updatedUsage.callsIncluded + updatedUsage.callsOverage;
+      const overageCost = Math.round(calculateOverageCost(tier, newTotal) * 100);
+      await Usage.updateOne(
+        { _id: updatedUsage._id },
+        { $set: { overageCost } }
+      );
+    }
+  }
+}
+
+export function authErrorResponse(error: AuthError) {
   return NextResponse.json(
     { error: error.error, code: `HTTP_${error.statusCode}` },
     { status: error.statusCode }

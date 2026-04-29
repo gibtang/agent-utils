@@ -1,13 +1,13 @@
 import { NextRequest } from 'next/server';
 import connectDB from '@/lib/mongodb';
-import { validateApiKey, errorResponse } from '@/lib/auth';
+import { validateApiKey, authErrorResponse } from '@/lib/auth';
 import { successResponse } from '@/lib/response';
 import Checkpoint from '@/models/Checkpoint';
 
 // POST /api/checkpoint — Create a checkpoint (agent sleeps here)
 export async function POST(request: NextRequest) {
   const authResult = await validateApiKey(request);
-  if (!authResult.success) return errorResponse(authResult);
+  if (!authResult.success) return authErrorResponse(authResult);
 
   try {
     const body = await request.json();
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
 // GET /api/checkpoint — List checkpoints
 export async function GET(request: NextRequest) {
   const authResult = await validateApiKey(request);
-  if (!authResult.success) return errorResponse(authResult);
+  if (!authResult.success) return authErrorResponse(authResult);
 
   try {
     await connectDB();
