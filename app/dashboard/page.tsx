@@ -13,6 +13,20 @@ interface ApiKeyData {
   lastUsedAt: string | null;
 }
 
+interface UsageData {
+  tier: string;
+  tierName: string;
+  price: number;
+  callsIncluded: number;
+  callsOverage: number;
+  totalCalls: number;
+  quota: number;
+  overageRate: number;
+  overageCostDollars: number;
+  periodEnd: string;
+  subscriptionStatus: string;
+}
+
 export default function DashboardPage() {
   const { user, profile, loading, logout } = useAuth();
   const router = useRouter();
@@ -22,6 +36,7 @@ export default function DashboardPage() {
   const [creating, setCreating] = useState(false);
   const [newKey, setNewKey] = useState<string | null>(null);
   const [error, setError] = useState('');
+  const [usage, setUsage] = useState<UsageData | null>(null);
 
   const fetchKeys = useCallback(async () => {
     if (!user) return;
@@ -38,6 +53,19 @@ export default function DashboardPage() {
       setError('Failed to load API keys');
     } finally {
       setFetching(false);
+    }
+
+    // Fetch usage alongside keys
+    try {
+      const usageRes = await fetch('/api/billing/usage', {
+        headers: { 'x-firebase-uid': user.uid },
+      });
+      const usageJson = await usageRes.json();
+      if (usageJson.success) {
+        setUsage(usageJson.data);
+      }
+    } catch {
+      // Usage fetch failure is non-critical
     }
   }, [user]);
 
@@ -287,18 +315,82 @@ export default function DashboardPage() {
         {/* Usage Section */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-6">
-            <p className="text-sm font-medium text-zinc-400">Requests Today</p>
-            <p className="mt-2 text-2xl font-bold text-zinc-500">Coming soon</p>
+            <p className="text-sm font-medium text-zinc-400">API Calls This Month</p>
+            {usage ? (
+              <>
+                <p className="mt-2 text-2xl font-bold text-zinc-100">
+                  {usage.totalCalls.toLocaleString()}
+                  {usage.quota !== -1 && (
+                    <span className="text-sm font-normal text-zinc-500"> / {usage.quota.toLocaleString()}</span>
+                  )}
+                </p>
+                {usage.quota !== -1 && (
+                  <div className="mt-3 h-2 rounded-full bg-zinc-800">
+                    <div
+                      className={`h-2 rounded-full transition-all ${
+                        usage.totalCalls >= usage.quota ? 'bg-red-500' : usage.totalCalls >= usage.quota * 0.8 ? 'bg-amber-500' : 'bg-emerald-500'
+                      }`}
+                      style={{ width: `${Math.min((usage.totalCalls / usage.quota) * 100, 100)}%` }}
+                    />
+                  </div>
+                )}
+                {usage.quota === -1 && <p className="mt-1 text-xs text-zinc-500">Unlimited</p>}
+              </>
+            ) : (
+              <p className="mt-2 text-2xl font-bold text-zinc-500">--</p>
+            )}
           </div>
           <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-6">
-            <p className="text-sm font-medium text-zinc-400">Files Hosted</p>
-            <p className="mt-2 text-2xl font-bold text-zinc-500">Coming soon</p>
+            <p className="text-sm font-medium text-zinc-400">Overage Charges</p>
+            {usage ? (
+              <>
+                <p className="mt-2 text-2xl font-bold text-zinc-100">
+                  ${usage.overageCostDollars.toFixed(2)}
+                </p>
+                {usage.callsOverage > 0 && (
+                  <p className="mt-1 text-xs text-zinc-500">
+                    {usage.callsOverage.toLocaleString()} overage calls @ ${usage.overageRate}/call
+                  </p>
+                )}
+              </>
+            ) : (
+              <p className="mt-2 text-2xl font-bold text-zinc-500">--</p>
+            )}
           </div>
           <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-6">
-            <p className="text-sm font-medium text-zinc-400">Active Checkpoints</p>
-            <p className="mt-2 text-2xl font-bold text-zinc-500">Coming soon</p>
+            <p className="text-sm font-medium text-zinc-400">Current Plan</p>
+            {usage ? (
+              <>
+                <p className="mt-2 text-2xl font-bold text-zinc-100">
+                  {usage.tierName}
+                </p>
+                <p className="mt-1 text-xs text-zinc-500">
+                  {usage.price > 0 ? `$${usage.price}/mo` : 'Free'}
+                  {usage.subscriptionStatus === 'past_due' && (
+                    <span className="ml-2 text-red-400">Payment overdue</span>
+                  )}
+                </p>
+              </>
+            ) : (
+              <p className="mt-2 text-2xl font-bold text-zinc-500">--</p>
+            )}
           </div>
         </div>
+
+        {/* Upgrade CTA for free tier */}
+        {usage && usage.tier === 'free' && (
+          <div className="mt-6 rounded-lg border border-zinc-800 bg-zinc-900 p-6 text-center">
+            <p className="text-zinc-300 mb-2">
+              <span className="font-semibold">Upgrade to Builder</span> — 10,000 calls/mo + overage support
+            </p>
+            <Link
+              href="/profile"
+              className="inline-block rounded-md bg-zinc-100 px-4 py-2 text-sm font-medium text-zinc-900 transition-colors hover:bg-white"
+            >
+              View Plans
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   );

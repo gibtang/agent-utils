@@ -16,6 +16,7 @@ export default function ProfilePage() {
   const [deleting, setDeleting] = useState(false);
   const [sendingReset, setSendingReset] = useState(false);
   const [resetSent, setResetSent] = useState(false);
+  const [billingLoading, setBillingLoading] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -91,6 +92,54 @@ export default function ProfilePage() {
     }
   };
 
+  const handleUpgrade = async (tier: string) => {
+    if (!user) return;
+    setBillingLoading(true);
+    setError('');
+    try {
+      const res = await fetch('/api/billing/checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-firebase-uid': user.uid,
+        },
+        body: JSON.stringify({ tier }),
+      });
+      const json = await res.json();
+      if (json.success && json.data.url) {
+        window.location.href = json.data.url;
+      } else {
+        setError(json.error || 'Failed to start checkout');
+      }
+    } catch {
+      setError('Failed to start checkout');
+    } finally {
+      setBillingLoading(false);
+    }
+  };
+
+  const handleManageBilling = async () => {
+    if (!user) return;
+    setBillingLoading(true);
+    setError('');
+    try {
+      const res = await fetch('/api/billing/portal', {
+        method: 'POST',
+        headers: { 'x-firebase-uid': user.uid },
+      });
+      const json = await res.json();
+      if (json.success && json.data.url) {
+        window.location.href = json.data.url;
+      } else {
+        setError(json.error || 'Failed to open billing portal');
+      }
+    } catch {
+      setError('Failed to open billing portal');
+    } finally {
+      setBillingLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-zinc-950">
@@ -103,6 +152,7 @@ export default function ProfilePage() {
 
   const tierColors: Record<string, string> = {
     free: 'text-zinc-400 bg-zinc-800',
+    builder: 'text-emerald-400 bg-emerald-900/30 border-emerald-800',
     pro: 'text-blue-400 bg-blue-900/30 border-blue-800',
     enterprise: 'text-purple-400 bg-purple-900/30 border-purple-800',
   };
@@ -162,6 +212,79 @@ export default function ProfilePage() {
               </div>
             )}
           </div>
+        </div>
+
+        {/* Billing & Plan */}
+        <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-6 mb-6">
+          <h2 className="text-lg font-semibold mb-4">Billing & Plan</h2>
+
+          {/* Current plan status */}
+          <div className="mb-4 flex items-center gap-3">
+            <span className={`inline-flex rounded-full px-3 py-1 text-xs font-medium border ${tierColors[profile?.tier || 'free'] || tierColors.free}`}>
+              {(profile?.tier || 'free').charAt(0).toUpperCase() + (profile?.tier || 'free').slice(1)}
+            </span>
+            {profile?.tier !== 'free' && profile?.tier !== 'enterprise' && (
+              <button
+                onClick={handleManageBilling}
+                disabled={billingLoading}
+                className="text-sm text-zinc-400 hover:text-zinc-100 transition-colors underline underline-offset-2 disabled:opacity-50"
+              >
+                Manage billing
+              </button>
+            )}
+          </div>
+
+          {/* Plan options */}
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+            {/* Free */}
+            <div className={`rounded-md border p-4 ${profile?.tier === 'free' ? 'border-zinc-600 bg-zinc-800/50' : 'border-zinc-800'}`}>
+              <p className="font-medium text-zinc-200">Free</p>
+              <p className="text-sm text-zinc-500">$0/mo &middot; 500 calls</p>
+              {profile?.tier === 'free' && (
+                <p className="mt-2 text-xs text-zinc-400">Current plan</p>
+              )}
+            </div>
+
+            {/* Builder */}
+            <div className={`rounded-md border p-4 ${profile?.tier === 'builder' ? 'border-emerald-700 bg-emerald-900/20' : 'border-zinc-800'}`}>
+              <p className="font-medium text-zinc-200">Builder</p>
+              <p className="text-sm text-zinc-500">$19/mo &middot; 10,000 calls</p>
+              {profile?.tier === 'builder' ? (
+                <p className="mt-2 text-xs text-emerald-400">Current plan</p>
+              ) : profile?.tier === 'free' ? (
+                <button
+                  onClick={() => handleUpgrade('builder')}
+                  disabled={billingLoading}
+                  className="mt-2 rounded bg-emerald-600 px-3 py-1 text-xs font-medium text-white hover:bg-emerald-500 disabled:opacity-50"
+                >
+                  Upgrade
+                </button>
+              ) : null}
+            </div>
+
+            {/* Pro */}
+            <div className={`rounded-md border p-4 ${profile?.tier === 'pro' ? 'border-blue-700 bg-blue-900/20' : 'border-zinc-800'}`}>
+              <p className="font-medium text-zinc-200">Pro</p>
+              <p className="text-sm text-zinc-500">$49/mo &middot; 100,000 calls</p>
+              {profile?.tier === 'pro' ? (
+                <p className="mt-2 text-xs text-blue-400">Current plan</p>
+              ) : profile?.tier !== 'enterprise' ? (
+                <button
+                  onClick={() => handleUpgrade('pro')}
+                  disabled={billingLoading}
+                  className="mt-2 rounded bg-blue-600 px-3 py-1 text-xs font-medium text-white hover:bg-blue-500 disabled:opacity-50"
+                >
+                  {profile?.tier === 'builder' ? 'Upgrade' : 'Upgrade'}
+                </button>
+              ) : null}
+            </div>
+          </div>
+
+          {profile?.tier === 'enterprise' && (
+            <p className="mt-3 text-sm text-zinc-400">
+              Enterprise plan — contact support for changes.
+            </p>
+          )}
         </div>
 
         {/* Edit Name */}
