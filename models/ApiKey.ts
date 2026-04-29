@@ -7,7 +7,8 @@ export interface IApiKey extends Document {
   key: string;
   tier: string;
   active: boolean;
-  dailyCount: number;
+  monthlyCount: number;
+  monthStartedAt: Date;
   lastUsedAt: Date;
   createdAt: Date;
 }
@@ -16,9 +17,10 @@ const ApiKeySchema = new Schema<IApiKey>({
   userId: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
   name: { type: String, required: true },
   key: { type: String, required: true, unique: true, index: true },
-  tier: { type: String, enum: ['free', 'pro', 'enterprise'], default: 'free' },
+  tier: { type: String, enum: ['free', 'builder', 'pro', 'enterprise'], default: 'free' },
   active: { type: Boolean, default: true },
-  dailyCount: { type: Number, default: 0 },
+  monthlyCount: { type: Number, default: 0 },
+  monthStartedAt: { type: Date },
   lastUsedAt: { type: Date },
 }, { timestamps: true });
 
