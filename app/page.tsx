@@ -1,6 +1,7 @@
 import Link from "next/link";
+import { tools as allTools } from "@/lib/seo-tools";
 
-const tools = [
+const featuredTools = [
   { name: "Ephemeral File Host", desc: "Park files for agents. Auto-expires.", slug: "file-host" },
   { name: "Dead Letter Queue", desc: "Catch, inspect, and retry failed agent tasks.", slug: "dlq" },
   { name: "Human-in-the-Loop Gate", desc: "Pause agents until humans approve.", slug: "checkpoint" },
@@ -46,17 +47,17 @@ export default function Home() {
       {/* Tools Grid */}
       <section className="px-6 pb-20">
         <div className="max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {tools.map((tool) => (
+          {featuredTools.map((tool) => (
             <Link
               key={tool.name}
-              href={`/docs/${tool.slug}`}
+              href={`/tools/${tool.slug}`}
               className="rounded-lg border border-zinc-800 p-5 hover:border-zinc-600 transition-colors block"
             >
               <h3 className="font-semibold text-sm">{tool.name}</h3>
               <p className="mt-1.5 text-sm text-zinc-400 leading-relaxed">
                 {tool.desc}
               </p>
-              <span className="mt-2 inline-block text-xs text-zinc-500">View docs →</span>
+              <span className="mt-2 inline-block text-xs text-zinc-500">Learn more →</span>
             </Link>
           ))}
         </div>
@@ -82,6 +83,25 @@ curl -X POST https://agentutils.dev/api/notify \\
   -H "x-api-key: au_..." \\
   -d '{"message": "Task complete"}'`}
           </pre>
+        </div>
+      </section>
+
+      {/* All Tools */}
+      <section className="px-6 pb-20">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-2xl font-semibold mb-6">All tools</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+            {allTools.map((tool) => (
+              <Link
+                key={tool.slug}
+                href={`/tools/${tool.slug}`}
+                className="rounded-lg border border-zinc-800 p-4 hover:border-zinc-600 transition-colors block"
+              >
+                <p className="text-sm font-medium">{tool.icon} {tool.name}</p>
+                <p className="mt-1 text-xs text-zinc-500">{tool.tagline}</p>
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
 
