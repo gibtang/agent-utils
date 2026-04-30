@@ -6,6 +6,7 @@ import { NextRequest } from 'next/server';
 // ── Mocks ──────────────────────────────────────────────────────────────────
 
 const mockResendSend = vi.fn();
+process.env.RESEND_API_KEY = 'test-key';
 vi.mock('resend', () => ({
   Resend: vi.fn().mockImplementation(function(this: { emails: { send: (...a: unknown[]) => unknown } }) {
     this.emails = { send: (...args: unknown[]) => mockResendSend(...args) };
