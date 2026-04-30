@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
       return new Response(JSON.stringify({ error: 'Webhook not configured' }), { status: 500 });
     }
 
-    const stripe = new Stripe(secret, { apiVersion: '2025-04-30.basil' } as Stripe.StripeConfig);
+    const stripe = new Stripe(secret);
     const event = stripe.webhooks.constructEvent(body, signature, secret);
 
     await handleWebhook(event);

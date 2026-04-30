@@ -90,6 +90,51 @@ Tools with a stateful session round-trip (clean → hydrate, checkpoint → resu
 
 ---
 
+## Build vs Drop Decision Process
+
+Once a tool idea passes the evaluation framework, apply this tiebreaker process to assign a final verdict:
+
+### Step 1 — Count the constraints
+How many of the three constraints (stateless, sandboxed, credential-less) does it hit?
+- **3 constraints** → strong build signal
+- **2 constraints** → build if round-trip or infrastructure moat exists
+- **1 constraint** → likely drop unless no competitor exists at all
+
+### Step 2 — Is there a stateful round-trip?
+Does the tool require the platform to hold state between two or more separate agent calls?
+- **Yes** → deepest moat, build
+- **No** → check Step 3 carefully
+
+### Step 3 — Does a zero-config HTTP competitor exist?
+Can a developer solve this with a 2-line npm install or a free API that needs no separate account setup?
+- **Yes** → drop (you will lose)
+- **No, but framework-specific solutions exist** → build the HTTP-native version
+- **No competitor at all** → build
+
+### Step 4 — Is it pure compute?
+Does the tool just transform input → output with no state, no shared infrastructure, no credentials?
+- **Yes** → drop. It's a library, not a service. Anti-pattern.
+- **No** → proceed
+
+### Step 5 — What is the user-facing value?
+Who sees the output — the developer debugging, or the end user trusting the agent?
+- **End user sees it** → strong build signal (Audit Log, Notify, Agent Form)
+- **Developer only** → weaker moat, apply scrutiny
+
+### Quick Reference
+
+| Signal | Verdict |
+|--------|---------|
+| Stateful round-trip + no competitor | **Build** |
+| Post-hoc capture (agent already dead) | **Build** |
+| Pre-provisioned infrastructure required | **Build** |
+| Pure compute, no state | **Drop** |
+| Mature zero-config competitor exists | **Drop** |
+| Framework-specific competitor only | **Build** (HTTP-native wins) |
+| High infra cost + strong competitor | **Drop** |
+
+---
+
 ## Anti-Patterns to Avoid
 
 - **Pure compute tools** — if it's just a function call with no state, it's a library, not a service

@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
   const auth = await validateApiKey(request, { skipQuota: true });
   if (!auth.success) return authErrorResponse(auth);
 
-  const tierConfig = getTierConfig(auth.apiKey.tier as string);
+  const tierConfig = getTierConfig(auth.apiKey.tier as TierName);
   if (!tierConfig.features.otp) {
     return errorResponse('OTP verification requires Pro or Enterprise tier', 403, 'UPGRADE_REQUIRED');
   }
@@ -88,7 +88,7 @@ export async function GET(request: NextRequest) {
   const auth = await validateApiKey(request, { skipQuota: true });
   if (!auth.success) return authErrorResponse(auth);
 
-  const tierConfig = getTierConfig(auth.apiKey.tier as string);
+  const tierConfig = getTierConfig(auth.apiKey.tier as TierName);
   if (!tierConfig.features.otp) {
     return errorResponse('OTP verification requires Pro or Enterprise tier', 403, 'UPGRADE_REQUIRED');
   }

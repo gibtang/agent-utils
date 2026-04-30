@@ -23,7 +23,13 @@ function NotFoundView({ message }: { message: string }) {
   );
 }
 
-function FormView({ form, token }: { form: NonNullable<ReturnType<typeof Object> extends new () => infer T ? T : never>; token: string }) {
+interface FormData {
+  title: string;
+  fields: FormField[];
+  [key: string]: unknown;
+}
+
+function FormView({ form, token }: { form: FormData; token: string }) {
   const fields: FormField[] = form.fields;
 
   return (

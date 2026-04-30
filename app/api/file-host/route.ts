@@ -4,7 +4,7 @@ import { validateApiKey, authErrorResponse } from '@/lib/auth';
 import { uploadFile } from '@/lib/storage';
 import { successResponse } from '@/lib/response';
 import File from '@/models/File';
-import { getTierConfig } from '@/lib/pricing';
+import { getTierConfig, type TierName } from '@/lib/pricing';
 
 export async function POST(request: NextRequest) {
   // Validate API key
@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check file size against tier limits
-    const tierConfig = getTierConfig(authResult.apiKey.tier as string);
+    const tierConfig = getTierConfig(authResult.apiKey.tier as TierName);
     const buffer = Buffer.from(await file.arrayBuffer());
 
     if (buffer.length > tierConfig.maxFileSize) {
