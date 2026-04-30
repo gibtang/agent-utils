@@ -37,7 +37,7 @@ function extractNamedExport(filePath, exportName) {
 
 function extractDefaultExportArray(filePath) {
   const src = fs.readFileSync(path.join(ROOT, filePath), 'utf-8');
-  const re = /const\s+tools\s*=\s*(\[[\s\S]*?\n\]);/;
+  const re = /const\s+(?:tools|featuredTools)\s*=\s*(\[[\s\S]*?\n\]);/;
   const m = src.match(re);
   if (!m) throw new Error(`Could not find tools array in ${filePath}`);
   return (new Function(`return ${m[1]}`))();
