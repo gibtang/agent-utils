@@ -44,3 +44,9 @@ next-env.d.ts
 .dolt/
 *.db
 .beads-credential-key
+
+# OMC (oh-my-claudecode) state
+.omc/
+
+# Claude Code local settings
+.claude/settings.local.json
