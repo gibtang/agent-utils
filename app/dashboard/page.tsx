@@ -39,6 +39,7 @@ export default function DashboardPage() {
   const [newKey, setNewKey] = useState<string | null>(null);
   const [error, setError] = useState('');
   const [usage, setUsage] = useState<UsageData | null>(null);
+  const [copied, setCopied] = useState(false);
   const fetchedRef = useRef(false);
 
   const fetchKeys = useCallback(async () => {
@@ -132,10 +133,10 @@ export default function DashboardPage() {
     }
   };
 
-  const copyKey = () => {
-    if (newKey) {
-      navigator.clipboard.writeText(newKey);
-    }
+  const copyKey = (key: string) => {
+    navigator.clipboard.writeText(key);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   if (loading) {
@@ -148,7 +149,7 @@ export default function DashboardPage() {
 
   if (!isAuthenticated) return null;
 
-  const isFirstTime = !fetching && keys.length === 0 && !newKey;
+  const defaultKey = profile?.defaultKey || newKey;
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100">
@@ -182,70 +183,36 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* First-time CTA */}
-        {isFirstTime && (
-          <div className="mb-8 rounded-lg border border-zinc-700 bg-zinc-900 p-6">
-            <h2 className="text-lg font-semibold mb-2">Get started</h2>
-            <p className="text-sm text-zinc-400 mb-4">
-              Create an API key to start integrating AgentUtils into your agents.
-            </p>
-            <div className="flex gap-3">
-              <input
-                type="text"
-                placeholder='e.g. "my-production-agent"'
-                value={keyName}
-                onChange={(e) => setKeyName(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
-                className="flex-1 rounded-md border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-zinc-100 placeholder-zinc-500 outline-none focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500"
-              />
-              <button
-                onClick={handleCreate}
-                className="rounded-md bg-zinc-100 px-4 py-2 text-sm font-medium text-zinc-900 transition-colors hover:bg-white"
-              >
-                Create API Key
-              </button>
+        {/* Default API Key */}
+        {defaultKey && (
+          <div className="mb-6 rounded-lg border border-zinc-700 bg-zinc-900 p-5">
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="text-sm font-medium text-zinc-300">Your API Key</h2>
+              {newKey && (
+                <button
+                  onClick={() => setNewKey(null)}
+                  className="text-xs text-zinc-500 hover:text-zinc-300"
+                >
+                  Dismiss
+                </button>
+              )}
             </div>
-          </div>
-        )}
-
-        {/* New Key Alert */}
-        {newKey && (
-          <div className="mb-6 rounded-md bg-amber-900/30 border border-amber-700 px-4 py-4">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-sm font-medium text-amber-300">
-                  Copy now — won&apos;t be shown again!
-                </p>
-                <div className="mt-2 flex items-center gap-2">
-                  <p className="rounded bg-zinc-900 px-3 py-2 font-mono text-sm text-amber-200 select-all">
-                    {newKey}
-                  </p>
-                  <button
-                    onClick={copyKey}
-                    className="rounded border border-zinc-700 px-2 py-1.5 text-xs text-zinc-300 hover:border-zinc-500 hover:text-zinc-100"
-                  >
-                    Copy
-                  </button>
-                </div>
-                <div className="mt-3 rounded-md bg-zinc-900 p-3 text-xs text-zinc-400 font-mono">
-                  <p className="text-zinc-500"># Try it now:</p>
-                  <p className="mt-1">curl https://agentutils.dev/api/health \</p>
-                  <p className="ml-4">-H &quot;x-api-key: {newKey}&quot;</p>
-                </div>
-              </div>
+            <div className="flex items-center gap-3">
+              <p className="rounded bg-zinc-800 px-3 py-2 font-mono text-sm text-zinc-200 select-all flex-1 overflow-x-auto">
+                {defaultKey}
+              </p>
               <button
-                onClick={() => setNewKey(null)}
-                className="ml-4 text-amber-400 hover:text-amber-200"
+                onClick={() => copyKey(defaultKey)}
+                className="shrink-0 rounded-md border border-zinc-700 px-3 py-2 text-sm text-zinc-300 transition-colors hover:border-zinc-500 hover:text-zinc-100"
               >
-                Dismiss
+                {copied ? 'Copied!' : 'Copy'}
               </button>
             </div>
           </div>
         )}
 
         {/* API Keys Section */}
-        {!isFirstTime && (
-          <div className="mb-8 rounded-lg border border-zinc-800 bg-zinc-900 p-6">
+        <div className="mb-8 rounded-lg border border-zinc-800 bg-zinc-900 p-6">
             <h2 className="mb-4 text-lg font-semibold">API Keys</h2>
 
             <div className="mb-6 flex gap-3">
@@ -314,7 +281,6 @@ export default function DashboardPage() {
               </div>
             )}
           </div>
-        )}
 
         {/* Usage Section */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">

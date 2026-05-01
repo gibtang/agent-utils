@@ -12,6 +12,7 @@ interface UserProfile {
   isNew?: boolean;
   createdAt: string;
   keyCount?: number;
+  defaultKey?: string | null;
 }
 
 interface KindeUser {
@@ -73,7 +74,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
       const json = await res.json();
       if (json.success) {
-        setProfile(json.data.user);
+        setProfile({ ...json.data.user, defaultKey: json.data.apiKey || null });
         return json.data.isNew;
       }
     } catch (err) {

@@ -33,7 +33,11 @@ export async function POST(request: NextRequest) {
     }
 
     const user = await User.create({ kindeId, email, name: name || '' });
-    return successResponse({ user, isNew: true }, 201);
+
+    // Auto-create a default API key for new users
+    const apiKey = await ApiKey.create({ userId: user._id, name: 'default', tier: user.tier });
+
+    return successResponse({ user, isNew: true, apiKey: apiKey.key }, 201);
   } catch (error) {
     console.error('User upsert error:', error);
     return errorResponse('Failed to create user', 500);
@@ -52,10 +56,15 @@ export async function GET(request: NextRequest) {
 
     await connectDB();
     const keyCount = await ApiKey.countDocuments({ userId: user._id, active: true });
+    const defaultKey = await ApiKey.findOne({ userId: user._id, active: true })
+      .sort({ createdAt: 1 })
+      .select('key')
+      .lean();
 
     return successResponse({
       ...user,
       keyCount,
+      defaultKey: defaultKey?.key || null,
     });
   } catch (error) {
     console.error('Get user error:', error);
