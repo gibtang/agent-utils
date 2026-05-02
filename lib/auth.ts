@@ -213,7 +213,7 @@ export async function incrementQuota(userId: string, tier: TierName, apiKeyId?: 
 
 export function authErrorResponse(error: AuthError) {
   return NextResponse.json(
-    { error: error.error, code: `HTTP_${error.statusCode}`, url: process.env.NEXT_PUBLIC_APP_URL || 'https://agentutils.dev' },
+    { error: error.error, code: `HTTP_${error.statusCode}`, url: process.env.NEXT_PUBLIC_APP_URL },
     { status: error.statusCode }
   );
 }

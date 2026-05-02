@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://agentutils.dev';
+const baseUrl = process.env.NEXT_PUBLIC_APP_URL;
 
 export function successResponse(data: unknown, status = 200) {
   return NextResponse.json({ success: true, data, url: baseUrl }, { status });
