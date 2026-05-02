@@ -10,7 +10,7 @@ async function handleIncoming(request: NextRequest, { params }: { params: Promis
 
     const inbox = await WebhookInbox.findOne({ token }).lean();
     if (!inbox) {
-      return NextResponse.json({ error: 'Inbox not found' }, { status: 404 });
+      return NextResponse.json({ error: 'Inbox not found', url: process.env.NEXT_PUBLIC_APP_URL || 'https://agentutils.dev' }, { status: 404 });
     }
 
     // Parse body
@@ -65,10 +65,10 @@ async function handleIncoming(request: NextRequest, { params }: { params: Promis
       }).catch(() => {}); // Ignore forwarding errors
     }
 
-    return NextResponse.json({ received: true });
+    return NextResponse.json({ received: true, url: process.env.NEXT_PUBLIC_APP_URL || 'https://agentutils.dev' });
   } catch (err) {
     console.error('Webhook receive error:', err);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error', url: process.env.NEXT_PUBLIC_APP_URL || 'https://agentutils.dev' }, { status: 500 });
   }
 }
 

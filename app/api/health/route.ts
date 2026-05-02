@@ -16,5 +16,6 @@ export async function GET() {
     db: dbStatus,
     uptime: process.uptime(),
     timestamp: new Date().toISOString(),
+    url: process.env.NEXT_PUBLIC_APP_URL || 'https://agentutils.dev',
   });
 }

@@ -11,7 +11,7 @@ export async function GET(
 
     if (!result) {
       return NextResponse.json(
-        { success: false, error: 'File not found or expired', code: 'HTTP_404' },
+        { success: false, error: 'File not found or expired', code: 'HTTP_404', url: process.env.NEXT_PUBLIC_APP_URL || 'https://agentutils.dev' },
         { status: 404 }
       );
     }
@@ -27,7 +27,7 @@ export async function GET(
   } catch (error) {
     console.error('File serve error:', error);
     return NextResponse.json(
-      { success: false, error: 'Failed to retrieve file' },
+      { success: false, error: 'Failed to retrieve file', url: process.env.NEXT_PUBLIC_APP_URL || 'https://agentutils.dev' },
       { status: 500 }
     );
   }

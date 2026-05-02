@@ -13,12 +13,12 @@ export async function POST(
 
     const form = await AgentForm.findOne({ token: id }).lean();
     if (!form) {
-      return NextResponse.json({ error: 'Form not found' }, { status: 404 });
+      return NextResponse.json({ error: 'Form not found', url: process.env.NEXT_PUBLIC_APP_URL || 'https://agentutils.dev' }, { status: 404 });
     }
 
     const now = new Date();
     if (form.status !== 'active' || (form.expiresAt && form.expiresAt < now)) {
-      return NextResponse.json({ error: 'Form no longer available' }, { status: 410 });
+      return NextResponse.json({ error: 'Form no longer available', url: process.env.NEXT_PUBLIC_APP_URL || 'https://agentutils.dev' }, { status: 410 });
     }
 
     // Parse form data (support both JSON and form-urlencoded)
@@ -64,6 +64,6 @@ export async function POST(
     );
   } catch (err) {
     console.error('Form submit error:', err);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error', url: process.env.NEXT_PUBLIC_APP_URL || 'https://agentutils.dev' }, { status: 500 });
   }
 }
