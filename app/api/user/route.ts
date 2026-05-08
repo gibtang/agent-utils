@@ -6,33 +6,32 @@ import User from '@/models/User';
 import ApiKey from '@/models/ApiKey';
 
 /**
- * POST /api/user — Upsert user after Kinde auth
+ * POST /api/user — Upsert user after Firebase auth
  */
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { kindeId, email, name } = body;
+    const { firebaseUid, email, name } = body;
 
-    if (!kindeId || !email) {
-      return errorResponse('kindeId and email are required', 400);
+    if (!firebaseUid || !email) {
+      return errorResponse('firebaseUid and email are required', 400);
     }
 
     await connectDB();
 
-    const existing = await User.findOne({ kindeId }).lean();
+    const existing = await User.findOne({ firebaseUid }).lean();
 
     if (existing) {
-      // Update email if changed
       const updates: Record<string, string> = {};
       if (existing.email !== email) updates.email = email;
       if (name && existing.name !== name) updates.name = name;
       if (Object.keys(updates).length > 0) {
-        await User.updateOne({ kindeId }, updates);
+        await User.updateOne({ firebaseUid }, updates);
       }
       return successResponse({ user: { ...existing, ...updates }, isNew: false });
     }
 
-    const user = await User.create({ kindeId, email, name: name || '' });
+    const user = await User.create({ firebaseUid, email, name: name || '' });
 
     // Auto-create a default API key for new users
     const apiKey = await ApiKey.create({ userId: user._id, name: 'default', tier: user.tier });
@@ -85,22 +84,14 @@ export async function PATCH(request: NextRequest) {
     const body = await request.json();
     const { name } = body;
 
-    if (name !== undefined && typeof name !== 'string') {
-      return errorResponse('Name must be a string', 400);
+    if (!name || typeof name !== 'string') {
+      return errorResponse('Name is required', 400);
     }
 
     await connectDB();
-    const updated = await User.findOneAndUpdate(
-      { kindeId: user.kindeId, active: true },
-      { ...(name !== undefined && { name }) },
-      { new: true }
-    ).lean();
+    await User.updateOne({ _id: user._id }, { name });
 
-    if (!updated) {
-      return errorResponse('User not found', 404);
-    }
-
-    return successResponse(updated);
+    return successResponse({ name });
   } catch (error) {
     console.error('Update user error:', error);
     return errorResponse('Failed to update user', 500);
@@ -108,8 +99,7 @@ export async function PATCH(request: NextRequest) {
 }
 
 /**
- * DELETE /api/user — Deactivate account
- * Revokes all API keys, marks user inactive
+ * DELETE /api/user — Delete user account and all associated data
  */
 export async function DELETE(request: NextRequest) {
   try {
@@ -120,22 +110,15 @@ export async function DELETE(request: NextRequest) {
 
     await connectDB();
 
-    const fullUser = await User.findOne({ kindeId: user.kindeId, active: true });
-    if (!fullUser) {
-      return errorResponse('User not found', 404);
-    }
+    // Delete API keys
+    await ApiKey.deleteMany({ userId: user._id });
 
-    fullUser.active = false;
-    await fullUser.save();
+    // Delete user
+    await User.deleteOne({ _id: user._id });
 
-    await ApiKey.updateMany(
-      { userId: fullUser._id, active: true },
-      { active: false }
-    );
-
-    return successResponse({ message: 'Account deactivated. All API keys revoked.' });
+    return successResponse({ deleted: true });
   } catch (error) {
     console.error('Delete user error:', error);
-    return errorResponse('Failed to delete account', 500);
+    return errorResponse('Failed to delete user', 500);
   }
 }

@@ -5,7 +5,7 @@ export type SubscriptionTier = 'free' | 'builder' | 'pro' | 'enterprise';
 export type SubscriptionStatus = 'active' | 'past_due' | 'canceled' | 'trialing' | 'none';
 
 export interface IUser extends Document {
-  kindeId: string;
+  firebaseUid: string;
   email: string;
   name: string;
   tier: SubscriptionTier;
@@ -20,7 +20,7 @@ export interface IUser extends Document {
 }
 
 const UserSchema = new Schema<IUser>({
-  kindeId: { type: String, required: true, unique: true, index: true },
+  firebaseUid: { type: String, required: true, unique: true, index: true },
   email: { type: String, required: true, unique: true },
   name: { type: String, default: '' },
   tier: { type: String, enum: ['free', 'builder', 'pro', 'enterprise'], default: 'free' },

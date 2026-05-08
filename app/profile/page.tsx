@@ -4,11 +4,9 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
-import { useKindeBrowserClient } from '@kinde-oss/kinde-auth-nextjs';
 
 export default function ProfilePage() {
   const { user, profile, loading, isAuthenticated, refreshProfile } = useAuth();
-  const { getAccessTokenRaw } = useKindeBrowserClient();
   const router = useRouter();
   const [name, setName] = useState('');
   const [saving, setSaving] = useState(false);
@@ -29,7 +27,7 @@ export default function ProfilePage() {
     setSaving(true);
     setError('');
     try {
-      const token = await getAccessTokenRaw();
+      const token = await user!.getIdToken();
       const res = await fetch('/api/user', {
         method: 'PATCH',
         headers: {
@@ -58,7 +56,7 @@ export default function ProfilePage() {
     setDeleting(true);
     setError('');
     try {
-      const token = await getAccessTokenRaw();
+      const token = await user!.getIdToken();
       const res = await fetch('/api/user', {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
@@ -83,7 +81,7 @@ export default function ProfilePage() {
     setBillingLoading(true);
     setError('');
     try {
-      const token = await getAccessTokenRaw();
+      const token = await user!.getIdToken();
       const res = await fetch('/api/billing/checkout', {
         method: 'POST',
         headers: {
@@ -110,7 +108,7 @@ export default function ProfilePage() {
     setBillingLoading(true);
     setError('');
     try {
-      const token = await getAccessTokenRaw();
+      const token = await user!.getIdToken();
       const res = await fetch('/api/billing/portal', {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },

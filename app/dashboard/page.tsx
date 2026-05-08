@@ -4,7 +4,6 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
-import { useKindeBrowserClient } from '@kinde-oss/kinde-auth-nextjs';
 
 interface ApiKeyData {
   _id: string;
@@ -29,8 +28,7 @@ interface UsageData {
 }
 
 export default function DashboardPage() {
-  const { user, profile, loading, isAuthenticated, LogoutLink, ensureProfile } = useAuth();
-  const { getAccessTokenRaw } = useKindeBrowserClient();
+  const { user, profile, loading, isAuthenticated, ensureProfile, logout } = useAuth();
   const router = useRouter();
   const [keys, setKeys] = useState<ApiKeyData[]>([]);
   const [keyName, setKeyName] = useState('');
@@ -45,7 +43,7 @@ export default function DashboardPage() {
   const fetchKeys = useCallback(async () => {
     if (!isAuthenticated) return;
     try {
-      const token = await getAccessTokenRaw();
+      const token = await user!.getIdToken();
       const res = await fetch('/api/keys', {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -60,7 +58,7 @@ export default function DashboardPage() {
     }
 
     try {
-      const token = await getAccessTokenRaw();
+      const token = await user!.getIdToken();
       const usageRes = await fetch('/api/billing/usage', {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -71,7 +69,7 @@ export default function DashboardPage() {
     } catch {
       // Usage fetch failure is non-critical
     }
-  }, [isAuthenticated, getAccessTokenRaw]);
+  }, [isAuthenticated, user]);
 
   useEffect(() => {
     if (loading) return;
@@ -92,7 +90,7 @@ export default function DashboardPage() {
     setCreating(true);
     setError('');
     try {
-      const token = await getAccessTokenRaw();
+      const token = await user!.getIdToken();
       const res = await fetch('/api/keys', {
         method: 'POST',
         headers: {
@@ -119,7 +117,7 @@ export default function DashboardPage() {
   const handleRevoke = async (id: string) => {
     if (!isAuthenticated) return;
     try {
-      const token = await getAccessTokenRaw();
+      const token = await user!.getIdToken();
       const res = await fetch(`/api/keys/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
@@ -168,12 +166,12 @@ export default function DashboardPage() {
             <span className="inline-flex rounded-full bg-zinc-800 px-2.5 py-0.5 text-xs text-zinc-300">
               {profile?.tier || 'free'}
             </span>
-            <LogoutLink
-              postLogoutRedirectURL="/"
+            <button
+              onClick={logout}
               className="rounded-md border border-zinc-700 px-3 py-1.5 text-sm text-zinc-300 transition-colors hover:border-zinc-500 hover:text-zinc-100"
             >
               Logout
-            </LogoutLink>
+            </button>
           </div>
         </div>
 
