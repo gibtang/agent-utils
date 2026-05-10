@@ -53,3 +53,6 @@ lib/          # Core utilities (auth, pricing, storage, rate limiting)
 models/       # Mongoose schemas (User, ApiKey, DeadLetter, Checkpoint, etc.)
 contexts/     # React context providers
 ```
+
+## Functionality
+Utilities and tools for AI agent development.
