@@ -1,36 +1,55 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AgentUtils
+
+A centralized API platform providing 11 specialized utilities designed for AI agents. A single API key gives access to multiple tools that solve common pain points in agent development — file handling, error recovery, human oversight, privacy, and notifications.
+
+## Tools
+
+1. **Ephemeral File Host** — Temporary file storage for agents with auto-expiration (1–72 hours by tier)
+2. **Dead Letter Queue** — Catches failed agent tasks, stores payloads for inspection/retry
+3. **Human-in-the-Loop Gate** — Pauses agents for human approval via webhooks
+4. **Agent Shield** — PII redaction proxy (clean before LLM, hydrate after)
+5. **AgentVerify OTP** — Temporary phone numbers for agent 2FA verification
+6. **Notification Router** — Unified notifications (email, SMS, Slack)
+7. **KV Store** — Key-value storage for agent state/memory
+8. **Audit Log** — Compliance logging for agent actions
+9. **Rate Limiter** — Rate limiting and queuing for API calls
+10. **Webhook Inbox** — Webhook catching and forwarding
+11. **Agent Form** — Dynamic form generation for human input
+
+## Tech Stack
+
+- **Framework:** Next.js 16 (App Router), React 19, TypeScript
+- **Styling:** Tailwind CSS 4
+- **Database:** MongoDB (Mongoose)
+- **Auth:** Firebase (client + admin SDKs)
+- **Storage:** AWS S3
+- **Payments:** Stripe (subscriptions + usage-based billing)
+- **Notifications:** Twilio (SMS), Resend (email)
+
+## Pricing
+
+| Tier | Price | Calls/mo | Overage |
+|------|-------|----------|---------|
+| Free | $0 | 500 | Hard cap |
+| Builder | $19/mo | 10,000 | $0.002/call |
+| Pro | $49/mo | 100,000 | $0.001/call |
+| Enterprise | Custom | Unlimited | — |
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+npm install
+cp .env.example .env.local
+# Fill in Firebase, MongoDB, Stripe, S3, Twilio, Resend credentials
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Project Structure
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+app/          # Next.js pages (landing, dashboard, tool docs, auth)
+app/api/      # REST API endpoints for all tools + billing
+lib/          # Core utilities (auth, pricing, storage, rate limiting)
+models/       # Mongoose schemas (User, ApiKey, DeadLetter, Checkpoint, etc.)
+contexts/     # React context providers
+```
