@@ -1,0 +1,549 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "AgentUtils API",
+    "version": "1.0.0",
+    "description": "One API key. Agent-native utilities. File hosting, PII redaction, dead letter queues, audit logs, KV store, rate limiting, webhook inboxes, forms, and more.",
+    "contact": {
+      "name": "AgentUtils",
+      "url": "https://www.agent-utils.com"
+    }
+  },
+  "servers": [
+    { "url": "https://www.agent-utils.com", "description": "Production" }
+  ],
+  "security": [{ "ApiKeyAuth": [] }],
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-key",
+        "description": "API key starting with au_"
+      }
+    },
+    "schemas": {
+      "SuccessResponse": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean", "enum": [true] },
+          "data": {}
+        },
+        "required": ["success", "data"]
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean", "enum": [false] },
+          "error": { "type": "string" },
+          "code": { "type": "string" }
+        },
+        "required": ["success", "error"]
+      },
+      "DeadLetter": {
+        "type": "object",
+        "required": ["agentName", "taskType", "payload", "error"],
+        "properties": {
+          "agentName": { "type": "string", "description": "Name of the agent that failed" },
+          "taskType": { "type": "string", "description": "Type of task that failed" },
+          "payload": { "description": "Original task input data" },
+          "error": { "type": "string", "description": "Error message" },
+          "retryWebhook": { "type": "string", "format": "uri", "description": "URL to POST payload on retry" }
+        }
+      },
+      "CheckpointCreate": {
+        "type": "object",
+        "required": ["agentName", "taskDescription", "state", "webhookUrl"],
+        "properties": {
+          "agentName": { "type": "string" },
+          "taskDescription": { "type": "string", "description": "What the agent wants to do" },
+          "state": { "description": "Serialized agent state (returned on approve)" },
+          "webhookUrl": { "type": "string", "format": "uri", "description": "URL to POST when human acts" }
+        }
+      },
+      "ResumeRequest": {
+        "type": "object",
+        "required": ["action"],
+        "properties": {
+          "action": { "type": "string", "enum": ["approve", "reject"] },
+          "reason": { "type": "string", "description": "Reason for rejection" }
+        }
+      },
+      "ShieldCleanRequest": {
+        "type": "object",
+        "required": ["text"],
+        "properties": {
+          "text": { "type": "string", "description": "Text containing PII" }
+        }
+      },
+      "ShieldHydrateRequest": {
+        "type": "object",
+        "required": ["text", "sessionId"],
+        "properties": {
+          "text": { "type": "string", "description": "Text with placeholders" },
+          "sessionId": { "type": "string", "description": "Session ID from clean response" }
+        }
+      },
+      "OtpCreate": {
+        "type": "object",
+        "properties": {
+          "countryCode": { "type": "string", "default": "US", "description": "Country code" }
+        }
+      },
+      "AuditCreate": {
+        "type": "object",
+        "required": ["agentName", "action"],
+        "properties": {
+          "agentName": { "type": "string", "description": "Name of the agent" },
+          "action": { "type": "string", "description": "Action performed" },
+          "target": { "type": "string", "description": "Target of the action" },
+          "metadata": { "type": "object", "description": "Additional context" },
+          "severity": { "type": "string", "enum": ["debug", "info", "warn", "error"], "default": "info" }
+        }
+      },
+      "KvSetRequest": {
+        "type": "object",
+        "required": ["key", "value"],
+        "properties": {
+          "key": { "type": "string", "maxLength": 256, "description": "Key name" },
+          "value": { "description": "Any JSON value" },
+          "ttl": { "type": "integer", "description": "Time-to-live in seconds" }
+        }
+      },
+      "RateLimitCheckRequest": {
+        "type": "object",
+        "required": ["key", "limit", "windowSeconds"],
+        "properties": {
+          "key": { "type": "string", "description": "Rate limit key" },
+          "limit": { "type": "integer", "description": "Max requests in window" },
+          "windowSeconds": { "type": "integer", "description": "Window duration in seconds" }
+        }
+      },
+      "RateLimitResetRequest": {
+        "type": "object",
+        "required": ["key"],
+        "properties": {
+          "key": { "type": "string", "description": "Rate limit key to reset" }
+        }
+      },
+      "WebhookCreate": {
+        "type": "object",
+        "required": ["label"],
+        "properties": {
+          "label": { "type": "string", "description": "Human-readable inbox label" },
+          "forwardUrl": { "type": "string", "format": "uri", "description": "URL to forward incoming webhooks" },
+          "ttl": { "type": "integer", "description": "Time-to-live in seconds" }
+        }
+      },
+      "FormCreate": {
+        "type": "object",
+        "required": ["title", "fields", "webhookUrl"],
+        "properties": {
+          "title": { "type": "string", "description": "Form title shown to humans" },
+          "fields": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["name", "type"],
+              "properties": {
+                "name": { "type": "string" },
+                "type": { "type": "string", "description": "Field type (text, boolean, number, etc.)" },
+                "required": { "type": "boolean", "default": false }
+              }
+            }
+          },
+          "webhookUrl": { "type": "string", "format": "uri", "description": "URL to POST form responses" },
+          "ttl": { "type": "integer", "description": "Time-to-live in seconds" }
+        }
+      },
+      "NotifyCreate": {
+        "type": "object",
+        "required": ["message"],
+        "properties": {
+          "message": { "type": "string", "description": "Notification body" },
+          "priority": { "type": "string", "enum": ["urgent", "normal", "low"], "default": "normal" },
+          "to": { "type": "string", "format": "email", "description": "Recipient email (defaults to account email)" },
+          "subject": { "type": "string", "description": "Email subject" },
+          "metadata": { "type": "object", "description": "Arbitrary data stored with the record" }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/api/health": {
+      "get": {
+        "tags": ["System"],
+        "summary": "Health check",
+        "security": [],
+        "responses": {
+          "200": { "description": "Service status" }
+        }
+      }
+    },
+    "/api/file-host": {
+      "post": {
+        "tags": ["File Host"],
+        "summary": "Upload a file",
+        "description": "Upload a file for ephemeral hosting. Auto-expires based on tier.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": ["file"],
+                "properties": {
+                  "file": { "type": "string", "format": "binary" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "File uploaded. Returns url, id, expiresAt." }
+        }
+      }
+    },
+    "/api/file-host/{id}": {
+      "get": {
+        "tags": ["File Host"],
+        "summary": "Retrieve a file",
+        "parameters": [{ "$ref": "#/components/parameters/PathId" }],
+        "responses": {
+          "200": { "description": "File data" },
+          "404": { "description": "File not found or expired" }
+        }
+      }
+    },
+    "/api/dlq": {
+      "post": {
+        "tags": ["Dead Letter Queue"],
+        "summary": "Capture a failure",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DeadLetter" } } }
+        },
+        "responses": { "201": { "description": "Failure captured" } }
+      },
+      "get": {
+        "tags": ["Dead Letter Queue"],
+        "summary": "List failures",
+        "parameters": [
+          { "name": "status", "in": "query", "schema": { "type": "string", "enum": ["pending", "retried", "resolved", "dismissed"] } },
+          { "name": "page", "in": "query", "schema": { "type": "integer", "default": 1 } },
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "default": 20 } }
+        ],
+        "responses": { "200": { "description": "Paginated list of failures" } }
+      }
+    },
+    "/api/dlq/{id}": {
+      "get": {
+        "tags": ["Dead Letter Queue"],
+        "summary": "Inspect failure (full payload)",
+        "parameters": [{ "$ref": "#/components/parameters/PathId" }],
+        "responses": { "200": { "description": "Full failure details" } }
+      },
+      "delete": {
+        "tags": ["Dead Letter Queue"],
+        "summary": "Dismiss failure",
+        "parameters": [{ "$ref": "#/components/parameters/PathId" }],
+        "responses": { "200": { "description": "Failure dismissed" } }
+      }
+    },
+    "/api/dlq/{id}/retry": {
+      "post": {
+        "tags": ["Dead Letter Queue"],
+        "summary": "Retry — forward payload to webhook",
+        "parameters": [{ "$ref": "#/components/parameters/PathId" }],
+        "responses": { "200": { "description": "Payload forwarded to retry webhook" } }
+      }
+    },
+    "/api/checkpoint": {
+      "post": {
+        "tags": ["Human-in-the-Loop"],
+        "summary": "Create checkpoint (agent sleeps)",
+        "description": "Pause agent until human approves or rejects. Returns checkpoint ID for polling.",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CheckpointCreate" } } }
+        },
+        "responses": { "201": { "description": "Checkpoint created" } }
+      },
+      "get": {
+        "tags": ["Human-in-the-Loop"],
+        "summary": "List checkpoints",
+        "responses": { "200": { "description": "List of checkpoints" } }
+      }
+    },
+    "/api/checkpoint/{id}": {
+      "get": {
+        "tags": ["Human-in-the-Loop"],
+        "summary": "Poll checkpoint status",
+        "description": "Returns state only when approved. Pending checkpoints return state=null.",
+        "parameters": [{ "$ref": "#/components/parameters/PathId" }],
+        "responses": { "200": { "description": "Checkpoint status" } }
+      }
+    },
+    "/api/checkpoint/{id}/resume": {
+      "post": {
+        "tags": ["Human-in-the-Loop"],
+        "summary": "Approve or reject checkpoint",
+        "parameters": [{ "$ref": "#/components/parameters/PathId" }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ResumeRequest" } } }
+        },
+        "responses": { "200": { "description": "Checkpoint resolved, webhook fired" } }
+      }
+    },
+    "/api/shield": {
+      "get": {
+        "tags": ["Agent Shield"],
+        "summary": "Shield info",
+        "responses": { "200": { "description": "Shield service info" } }
+      }
+    },
+    "/api/shield/clean": {
+      "post": {
+        "tags": ["Agent Shield"],
+        "summary": "Redact PII from text",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ShieldCleanRequest" } } }
+        },
+        "responses": { "200": { "description": "Redacted text with sessionId" } }
+      }
+    },
+    "/api/shield/hydrate": {
+      "post": {
+        "tags": ["Agent Shield"],
+        "summary": "Restore original PII values",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ShieldHydrateRequest" } } }
+        },
+        "responses": { "200": { "description": "Hydrated text with original values" } }
+      }
+    },
+    "/api/otp": {
+      "post": {
+        "tags": ["AgentVerify OTP"],
+        "summary": "Provision temporary phone number",
+        "description": "Provision a temporary phone number to receive SMS verification codes. Pro+ only.",
+        "requestBody": {
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/OtpCreate" } } }
+        },
+        "responses": { "201": { "description": "Session created with phone number" } }
+      },
+      "get": {
+        "tags": ["AgentVerify OTP"],
+        "summary": "List active OTP sessions",
+        "responses": { "200": { "description": "List of sessions" } }
+      }
+    },
+    "/api/otp/{id}": {
+      "get": {
+        "tags": ["AgentVerify OTP"],
+        "summary": "Poll for OTP code",
+        "parameters": [{ "$ref": "#/components/parameters/PathId" }],
+        "responses": { "200": { "description": "Session status and code (if received)" } }
+      },
+      "delete": {
+        "tags": ["AgentVerify OTP"],
+        "summary": "Cancel OTP session",
+        "parameters": [{ "$ref": "#/components/parameters/PathId" }],
+        "responses": { "200": { "description": "Session cancelled" } }
+      }
+    },
+    "/api/notify": {
+      "post": {
+        "tags": ["Notification Router"],
+        "summary": "Send an email notification",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/NotifyCreate" } } }
+        },
+        "responses": {
+          "201": { "description": "Notification sent" },
+          "502": { "description": "Email delivery failed" }
+        }
+      },
+      "get": {
+        "tags": ["Notification Router"],
+        "summary": "List notification history",
+        "parameters": [
+          { "name": "status", "in": "query", "schema": { "type": "string", "enum": ["sent", "failed"] } },
+          { "name": "priority", "in": "query", "schema": { "type": "string", "enum": ["urgent", "normal", "low"] } },
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "default": 50 } },
+          { "name": "offset", "in": "query", "schema": { "type": "integer", "default": 0 } }
+        ],
+        "responses": { "200": { "description": "Paginated notification history" } }
+      }
+    },
+    "/api/notify/{id}": {
+      "get": {
+        "tags": ["Notification Router"],
+        "summary": "Get notification detail",
+        "parameters": [{ "$ref": "#/components/parameters/PathId" }],
+        "responses": {
+          "200": { "description": "Notification record" },
+          "404": { "description": "Not found" }
+        }
+      }
+    },
+    "/api/audit": {
+      "post": {
+        "tags": ["Audit Log"],
+        "summary": "Log an action",
+        "description": "Create an immutable audit log entry for agent accountability.",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AuditCreate" } } }
+        },
+        "responses": { "201": { "description": "Audit entry created" } }
+      },
+      "get": {
+        "tags": ["Audit Log"],
+        "summary": "Query audit logs",
+        "parameters": [
+          { "name": "agent", "in": "query", "schema": { "type": "string" }, "description": "Filter by agent name" },
+          { "name": "action", "in": "query", "schema": { "type": "string" }, "description": "Filter by action type" },
+          { "name": "severity", "in": "query", "schema": { "type": "string", "enum": ["debug", "info", "warn", "error"] } },
+          { "name": "startDate", "in": "query", "schema": { "type": "string", "format": "date-time" } },
+          { "name": "endDate", "in": "query", "schema": { "type": "string", "format": "date-time" } },
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "default": 50 } },
+          { "name": "offset", "in": "query", "schema": { "type": "integer", "default": 0 } }
+        ],
+        "responses": { "200": { "description": "Paginated audit log entries" } }
+      }
+    },
+    "/api/audit/{id}": {
+      "get": {
+        "tags": ["Audit Log"],
+        "summary": "Get single audit entry",
+        "parameters": [{ "$ref": "#/components/parameters/PathId" }],
+        "responses": {
+          "200": { "description": "Audit log entry" },
+          "404": { "description": "Entry not found" }
+        }
+      }
+    },
+    "/api/kv": {
+      "put": {
+        "tags": ["Key-Value Store"],
+        "summary": "Set a key-value pair",
+        "description": "Store a value with optional TTL. API-key scoped. Max key 256 chars.",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/KvSetRequest" } } }
+        },
+        "responses": { "200": { "description": "Key stored" } }
+      }
+    },
+    "/api/kv/{key}": {
+      "get": {
+        "tags": ["Key-Value Store"],
+        "summary": "Get value",
+        "parameters": [{ "name": "key", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": {
+          "200": { "description": "Key-value pair with expiresAt" },
+          "404": { "description": "Key not found" }
+        }
+      },
+      "delete": {
+        "tags": ["Key-Value Store"],
+        "summary": "Delete key",
+        "parameters": [{ "name": "key", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "Key deleted" } }
+      }
+    },
+    "/api/rate-limit/check": {
+      "post": {
+        "tags": ["Rate Limiter"],
+        "summary": "Check rate limit",
+        "description": "Check-before-act pattern for outbound API rate limiting.",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RateLimitCheckRequest" } } }
+        },
+        "responses": { "200": { "description": "Returns allowed, remaining, resetAt" } }
+      }
+    },
+    "/api/rate-limit/reset": {
+      "post": {
+        "tags": ["Rate Limiter"],
+        "summary": "Reset rate limit counter",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RateLimitResetRequest" } } }
+        },
+        "responses": { "200": { "description": "Counter reset" } }
+      }
+    },
+    "/api/webhook": {
+      "post": {
+        "tags": ["Webhook Inbox"],
+        "summary": "Create inbox",
+        "description": "Create a pre-provisioned public HTTPS endpoint for receiving webhooks.",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/WebhookCreate" } } }
+        },
+        "responses": { "201": { "description": "Inbox created with id, token, public URL" } }
+      },
+      "get": {
+        "tags": ["Webhook Inbox"],
+        "summary": "List inboxes",
+        "responses": { "200": { "description": "List of webhook inboxes" } }
+      }
+    },
+    "/api/webhook/{id}": {
+      "get": {
+        "tags": ["Webhook Inbox"],
+        "summary": "Get inbox + latest 50 messages",
+        "parameters": [{ "$ref": "#/components/parameters/PathId" }],
+        "responses": {
+          "200": { "description": "Inbox with messages" },
+          "404": { "description": "Inbox not found" }
+        }
+      }
+    },
+    "/api/form": {
+      "post": {
+        "tags": ["Agent Form"],
+        "summary": "Create form",
+        "description": "Create a hosted form for human-in-the-loop data collection. Returns a shareable URL.",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/FormCreate" } } }
+        },
+        "responses": { "201": { "description": "Form created with id, token, shareable URL" } }
+      }
+    },
+    "/api/form/{id}": {
+      "get": {
+        "tags": ["Agent Form"],
+        "summary": "Get form + latest 100 responses",
+        "parameters": [{ "$ref": "#/components/parameters/PathId" }],
+        "responses": {
+          "200": { "description": "Form with responses" },
+          "404": { "description": "Form not found" }
+        }
+      }
+    }
+  },
+  "tags": [
+    { "name": "System", "description": "Health and status" },
+    { "name": "File Host", "description": "Ephemeral file hosting" },
+    { "name": "Dead Letter Queue", "description": "Capture and retry failures" },
+    { "name": "Human-in-the-Loop", "description": "Pause agents for human approval" },
+    { "name": "Agent Shield", "description": "PII redaction and hydration" },
+    { "name": "AgentVerify OTP", "description": "Temporary phone numbers for verification" },
+    { "name": "Notification Router", "description": "Email notifications for agents" },
+    { "name": "Audit Log", "description": "Immutable agent action history" },
+    { "name": "Key-Value Store", "description": "Simple state persistence for stateless agents" },
+    { "name": "Rate Limiter", "description": "Outbound API rate limiting for agents" },
+    { "name": "Webhook Inbox", "description": "Pre-provisioned public HTTPS endpoints" },
+    { "name": "Agent Form", "description": "Hosted forms for human data collection" }
+  ]
+}
