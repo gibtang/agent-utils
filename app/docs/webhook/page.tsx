@@ -24,22 +24,22 @@ export default function WebhookDocs() {
       <section className="mt-8">
         <h2 className="text-xl font-semibold mb-3">Create an inbox</h2>
         <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4 text-sm font-mono text-zinc-300 overflow-x-auto">
-          <p>curl -X POST https://agentutils.dev/api/webhook \</p>
+          <p>curl -X POST https://www.agent-utils.com/api/webhook \</p>
           <p className="ml-4">-H &quot;x-api-key: au_your_key&quot; \</p>
           <p className="ml-4">-H &quot;Content-Type: application/json&quot; \</p>
           <p className="ml-4">{`-d '{"label":"Stripe payments","forwardUrl":"https://myapp.com/process","ttl":86400}'`}</p>
           <p className="mt-3 text-zinc-500"># Response (201)</p>
-          <p>{`{"success":true,"data":{"id":"...","token":"a1b2c3...","url":"https://agentutils.dev/hook/a1b2c3...","label":"Stripe payments","expiresAt":"2025-01-16T12:00:00Z"}}`}</p>
+          <p>{`{"success":true,"data":{"id":"...","token":"a1b2c3...","url":"https://www.agent-utils.com/hook/a1b2c3...","label":"Stripe payments","expiresAt":"2025-01-16T12:00:00Z"}}`}</p>
         </div>
       </section>
 
       <section className="mt-8">
         <h2 className="text-xl font-semibold mb-3">List inboxes</h2>
         <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4 text-sm font-mono text-zinc-300 overflow-x-auto">
-          <p>curl https://agentutils.dev/api/webhook \</p>
+          <p>curl https://www.agent-utils.com/api/webhook \</p>
           <p className="ml-4">-H &quot;x-api-key: au_your_key&quot;</p>
           <p className="mt-3 text-zinc-500"># Response</p>
-          <p>{`{"success":true,"data":{"items":[{"id":"...","token":"a1b2c3...","url":"https://agentutils.dev/hook/a1b2c3...","label":"Stripe payments","messageCount":5,"expiresAt":"..."}],"total":1}}`}</p>
+          <p>{`{"success":true,"data":{"items":[{"id":"...","token":"a1b2c3...","url":"https://www.agent-utils.com/hook/a1b2c3...","label":"Stripe payments","messageCount":5,"expiresAt":"..."}],"total":1}}`}</p>
         </div>
       </section>
 
@@ -47,7 +47,7 @@ export default function WebhookDocs() {
         <h2 className="text-xl font-semibold mb-3">Get inbox messages</h2>
         <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4 text-sm font-mono text-zinc-300 overflow-x-auto">
           <p className="text-zinc-500"># Get inbox details + latest 50 messages</p>
-          <p>curl https://agentutils.dev/api/webhook/{`{inbox_id}`} \</p>
+          <p>curl https://www.agent-utils.com/api/webhook/{`{inbox_id}`} \</p>
           <p className="ml-4">-H &quot;x-api-key: au_your_key&quot;</p>
           <p className="mt-3 text-zinc-500"># Response</p>
           <p>{`{"success":true,"data":{"inbox":{...},"messages":[{"id":"...","method":"POST","headers":{...},"body":{...},"query":{},"sourceIp":"1.2.3.4","contentType":"application/json","createdAt":"..."}]}}`}</p>
@@ -57,7 +57,7 @@ export default function WebhookDocs() {
       <section className="mt-8">
         <h2 className="text-xl font-semibold mb-3">Delete an inbox</h2>
         <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4 text-sm font-mono text-zinc-300 overflow-x-auto">
-          <p>curl -X DELETE https://agentutils.dev/api/webhook/{`{inbox_id}`} \</p>
+          <p>curl -X DELETE https://www.agent-utils.com/api/webhook/{`{inbox_id}`} \</p>
           <p className="ml-4">-H &quot;x-api-key: au_your_key&quot;</p>
           <p className="mt-3 text-zinc-500"># Response</p>
           <p>{`{"success":true,"data":{"deleted":true}}`}</p>
@@ -71,7 +71,7 @@ export default function WebhookDocs() {
         </p>
         <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4 text-sm font-mono text-zinc-300 overflow-x-auto">
           <p className="text-zinc-500"># Any HTTP method works — no auth header needed</p>
-          <p>curl -X POST https://agentutils.dev/hook/{`{token}`} \</p>
+          <p>curl -X POST https://www.agent-utils.com/hook/{`{token}`} \</p>
           <p className="ml-4">-H &quot;Content-Type: application/json&quot; \</p>
           <p className="ml-4">{`-d '{"event":"payment.completed","amount":4900}'`}</p>
           <p className="mt-3 text-zinc-500"># Response</p>
@@ -133,14 +133,14 @@ export default function WebhookDocs() {
           <p>{`import requests`}</p>
           <p className="mt-1">{`headers = {"x-api-key": "au_your_key"}`}</p>
           <p className="mt-3 text-zinc-500"># Create an inbox</p>
-          <p>{`inbox = requests.post("https://agentutils.dev/api/webhook", headers=headers, json={`}</p>
+          <p>{`inbox = requests.post("https://www.agent-utils.com/api/webhook", headers=headers, json={`}</p>
           <p className="ml-4">{`"label": "GitHub webhooks",`}</p>
           <p className="ml-4">{`"forwardUrl": "https://myapp.com/handler"`}</p>
           <p>{`}).json()["data"]`}</p>
           <p className="mt-2">{`print(f"Webhook URL: {inbox['url']}")`}</p>
           <p className="mt-3 text-zinc-500"># Retrieve messages</p>
           <p>{`messages = requests.get(`}</p>
-          <p className="ml-4">{`f"https://agentutils.dev/api/webhook/{inbox['id']}",`}</p>
+          <p className="ml-4">{`f"https://www.agent-utils.com/api/webhook/{inbox['id']}",`}</p>
           <p className="ml-4">{`headers=headers`}</p>
           <p>{`).json()["data"]`}</p>
         </div>

@@ -9,11 +9,11 @@ Persistent key-value storage for AI agents. Remember data across runs.
 
 ## API Base
 
-`https://agentutils.dev/api`
+`https://www.agent-utils.com/api`
 
 ## Authentication
 
-All requests require `x-api-key` header. Get a key at https://agentutils.dev/dashboard.
+All requests require `x-api-key` header. Get a key at https://www.agent-utils.com/dashboard.
 
 ```
 x-api-key: au_YOUR_KEY
@@ -72,7 +72,7 @@ scripts/agentutils-kv.sh increment "batch-total" 10
 ### Set Example
 
 ```bash
-curl -X PUT https://agentutils.dev/api/kv \
+curl -X PUT https://www.agent-utils.com/api/kv \
   -H "x-api-key: au_YOUR_KEY" \
   -H "Content-Type: application/json" \
   -d '{"key": "last-run-id", "value": "abc123", "ttl": 3600}'
@@ -82,13 +82,13 @@ curl -X PUT https://agentutils.dev/api/kv \
 
 ```bash
 curl -H "x-api-key: au_YOUR_KEY" \
-  https://agentutils.dev/api/kv/last-run-id
+  https://www.agent-utils.com/api/kv/last-run-id
 ```
 
 ### Increment Example
 
 ```bash
-curl -X POST https://agentutils.dev/api/kv/api-call-count/increment \
+curl -X POST https://www.agent-utils.com/api/kv/api-call-count/increment \
   -H "x-api-key: au_YOUR_KEY" \
   -H "Content-Type: application/json" \
   -d '{"amount": 1}'

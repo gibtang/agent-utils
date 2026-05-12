@@ -85,7 +85,7 @@ export async function validateApiKey(
         if (tierConfig.overageRate === 0) {
           return {
             success: false,
-            error: `Monthly quota exceeded (${tierConfig.callsPerMonth.toLocaleString()} calls on ${tier} tier). Upgrade at https://agentutils.dev/profile`,
+            error: `Monthly quota exceeded (${tierConfig.callsPerMonth.toLocaleString()} calls on ${tier} tier). Upgrade at https://www.agent-utils.com/profile`,
             statusCode: 429,
           };
         }

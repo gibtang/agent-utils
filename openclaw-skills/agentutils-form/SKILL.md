@@ -9,11 +9,11 @@ Create forms for AI agents to collect structured human input. Share a URL, get s
 
 ## API Base
 
-`https://agentutils.dev/api`
+`https://www.agent-utils.com/api`
 
 ## Authentication
 
-All requests require `x-api-key` header. Get a key at https://agentutils.dev/dashboard.
+All requests require `x-api-key` header. Get a key at https://www.agent-utils.com/dashboard.
 
 ```
 x-api-key: au_YOUR_KEY
@@ -62,7 +62,7 @@ scripts/agentutils-form.sh get abc123def456
 ### Create Example
 
 ```bash
-curl -X POST https://agentutils.dev/api/form \
+curl -X POST https://www.agent-utils.com/api/form \
   -H "x-api-key: au_YOUR_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -83,7 +83,7 @@ curl -X POST https://agentutils.dev/api/form \
 
 ```bash
 curl -H "x-api-key: au_YOUR_KEY" \
-  "https://agentutils.dev/api/form?limit=10"
+  "https://www.agent-utils.com/api/form?limit=10"
 ```
 
 ## Response Format
@@ -95,7 +95,7 @@ curl -H "x-api-key: au_YOUR_KEY" \
   "data": {
     "id": "abc123def456",
     "token": "uuid-token",
-    "url": "https://agentutils.dev/f/uuid-token",
+    "url": "https://www.agent-utils.com/f/uuid-token",
     "title": "User Feedback",
     "status": "active"
   }
@@ -113,7 +113,7 @@ curl -H "x-api-key: au_YOUR_KEY" \
         "title": "User Feedback",
         "status": "active",
         "responseCount": 5,
-        "url": "https://agentutils.dev/f/token",
+        "url": "https://www.agent-utils.com/f/token",
         "expiresAt": "2025-01-22T10:00:00Z"
       }
     ],

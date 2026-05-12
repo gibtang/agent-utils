@@ -22,7 +22,7 @@ describe('OpenAPI spec', () => {
   });
 
   it('has production server', () => {
-    expect(spec.servers[0].url).toBe('https://agentutils.dev');
+    expect(spec.servers[0].url).toBe('https://www.agent-utils.com');
   });
 
   it('defines ApiKeyAuth security scheme', () => {

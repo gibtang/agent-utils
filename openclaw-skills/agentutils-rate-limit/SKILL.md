@@ -9,11 +9,11 @@ Rate limiting as a service for AI agents. Check limits, enforce quotas.
 
 ## API Base
 
-`https://agentutils.dev/api`
+`https://www.agent-utils.com/api`
 
 ## Authentication
 
-All requests require `x-api-key` header. Get a key at https://agentutils.dev/dashboard.
+All requests require `x-api-key` header. Get a key at https://www.agent-utils.com/dashboard.
 
 ```
 x-api-key: au_YOUR_KEY
@@ -61,7 +61,7 @@ scripts/agentutils-rate-limit.sh reset "api-calls"
 ### Check Example
 
 ```bash
-curl -X POST https://agentutils.dev/api/rate-limit/check \
+curl -X POST https://www.agent-utils.com/api/rate-limit/check \
   -H "x-api-key: au_YOUR_KEY" \
   -H "Content-Type: application/json" \
   -d '{"key": "api-calls", "limit": 100, "windowSeconds": 3600}'
@@ -70,7 +70,7 @@ curl -X POST https://agentutils.dev/api/rate-limit/check \
 ### Reset Example
 
 ```bash
-curl -X POST https://agentutils.dev/api/rate-limit/reset \
+curl -X POST https://www.agent-utils.com/api/rate-limit/reset \
   -H "x-api-key: au_YOUR_KEY" \
   -H "Content-Type: application/json" \
   -d '{"key": "api-calls"}'
@@ -80,7 +80,7 @@ curl -X POST https://agentutils.dev/api/rate-limit/reset \
 
 ```bash
 curl -H "x-api-key: au_YOUR_KEY" \
-  https://agentutils.dev/api/rate-limit/api-calls
+  https://www.agent-utils.com/api/rate-limit/api-calls
 ```
 
 ## Response Format

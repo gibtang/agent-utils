@@ -9,11 +9,11 @@ Temporary webhook inboxes for AI agents. Capture, inspect, and forward webhooks.
 
 ## API Base
 
-`https://agentutils.dev/api`
+`https://www.agent-utils.com/api`
 
 ## Authentication
 
-All requests require `x-api-key` header. Get a key at https://agentutils.dev/dashboard.
+All requests require `x-api-key` header. Get a key at https://www.agent-utils.com/dashboard.
 
 ```
 x-api-key: au_YOUR_KEY
@@ -71,7 +71,7 @@ scripts/agentutils-webhook.sh delete abc123def456
 ### Create Example
 
 ```bash
-curl -X POST https://agentutils.dev/api/webhook \
+curl -X POST https://www.agent-utils.com/api/webhook \
   -H "x-api-key: au_YOUR_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -85,7 +85,7 @@ curl -X POST https://agentutils.dev/api/webhook \
 
 ```bash
 curl -H "x-api-key: au_YOUR_KEY" \
-  "https://agentutils.dev/api/webhook?limit=10"
+  "https://www.agent-utils.com/api/webhook?limit=10"
 ```
 
 ## Response Format
@@ -97,7 +97,7 @@ curl -H "x-api-key: au_YOUR_KEY" \
   "data": {
     "id": "abc123def456",
     "token": "uuid-token",
-    "url": "https://agentutils.dev/hook/uuid-token",
+    "url": "https://www.agent-utils.com/hook/uuid-token",
     "label": "Stripe webhooks",
     "expiresAt": "2025-01-16T10:00:00Z"
   }
@@ -112,7 +112,7 @@ curl -H "x-api-key: au_YOUR_KEY" \
     "items": [
       {
         "id": "abc123",
-        "url": "https://agentutils.dev/hook/token",
+        "url": "https://www.agent-utils.com/hook/token",
         "label": "Stripe webhooks",
         "messageCount": 15,
         "expiresAt": "2025-01-16T10:00:00Z"

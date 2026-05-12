@@ -123,10 +123,10 @@ Track per-workflow tokens and costs with automated budget alerts.
 
 ## Deployment Strategy
 
-All tools should live under a **single platform domain** (e.g. `agentutils.dev`) with individual domains reserved as SEO redirects.
+All tools should live under a **single platform domain** (e.g. `www.agent-utils.com`) with individual domains reserved as SEO redirects.
 
 ```
-agentutils.dev
+www.agent-utils.com
 ├── /file-host        → ephemeral file storage
 ├── /webhook          → webhook catcher / relay
 ├── /checkpoint       → human-in-the-loop gate

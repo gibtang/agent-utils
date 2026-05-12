@@ -9,6 +9,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ['/api/', '/dashboard/', '/profile/', '/hook/'],
       },
     ],
-    sitemap: 'https://agentutils.dev/sitemap.xml',
+    sitemap: 'https://www.agent-utils.com/sitemap.xml',
   };
 }

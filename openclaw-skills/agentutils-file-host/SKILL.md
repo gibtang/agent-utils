@@ -9,11 +9,11 @@ Ephemeral file hosting for AI agents. Upload files, get a URL, files auto-expire
 
 ## API Base
 
-`https://agentutils.dev/api`
+`https://www.agent-utils.com/api`
 
 ## Authentication
 
-All requests require `x-api-key` header. Get a key at https://agentutils.dev/dashboard.
+All requests require `x-api-key` header. Get a key at https://www.agent-utils.com/dashboard.
 
 ```
 x-api-key: au_YOUR_KEY
@@ -52,7 +52,7 @@ scripts/agentutils-file-host.sh get abc123def456
 ### Upload Example
 
 ```bash
-curl -X POST https://agentutils.dev/api/file-host \
+curl -X POST https://www.agent-utils.com/api/file-host \
   -H "x-api-key: au_YOUR_KEY" \
   -F "file=@report.csv" \
   -F "ttl=2"
@@ -62,7 +62,7 @@ curl -X POST https://agentutils.dev/api/file-host \
 
 ```bash
 curl -H "x-api-key: au_YOUR_KEY" \
-  https://agentutils.dev/api/file-host/abc123def456
+  https://www.agent-utils.com/api/file-host/abc123def456
 ```
 
 ## Response Format
@@ -73,7 +73,7 @@ curl -H "x-api-key: au_YOUR_KEY" \
   "success": true,
   "data": {
     "id": "abc123def456",
-    "url": "https://agentutils.dev/api/file-host/abc123def456",
+    "url": "https://www.agent-utils.com/api/file-host/abc123def456",
     "expiresAt": "2025-01-15T10:00:00Z"
   }
 }

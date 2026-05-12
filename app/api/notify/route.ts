@@ -13,7 +13,7 @@ function getResend(): Resend {
   return new Resend(key);
 }
 
-const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'notify@agentutils.dev';
+const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'notify@agent-utils.com';
 
 // POST /api/notify — Send an email notification
 export async function POST(request: NextRequest) {
@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
         <p style="font-size:16px;line-height:1.6;color:#111;white-space:pre-wrap">${escapeHtml(message)}</p>
         ${metadata ? `<pre style="background:#f4f4f5;padding:12px;border-radius:6px;font-size:12px;overflow:auto">${escapeHtml(JSON.stringify(metadata, null, 2))}</pre>` : ''}
         <hr style="border:none;border-top:1px solid #e4e4e7;margin:24px 0"/>
-        <p style="font-size:12px;color:#71717a">Sent via <a href="https://agentutils.dev" style="color:#71717a">AgentUtils</a> Notification Router</p>
+        <p style="font-size:12px;color:#71717a">Sent via <a href="https://www.agent-utils.com" style="color:#71717a">AgentUtils</a> Notification Router</p>
       </div>
     `;
 

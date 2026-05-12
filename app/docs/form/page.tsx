@@ -24,22 +24,22 @@ export default function FormDocs() {
       <section className="mt-8">
         <h2 className="text-xl font-semibold mb-3">Create a form</h2>
         <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4 text-sm font-mono text-zinc-300 overflow-x-auto">
-          <p>curl -X POST https://agentutils.dev/api/form \</p>
+          <p>curl -X POST https://www.agent-utils.com/api/form \</p>
           <p className="ml-4">-H &quot;x-api-key: au_your_key&quot; \</p>
           <p className="ml-4">-H &quot;Content-Type: application/json&quot; \</p>
           <p className="ml-4">{`-d '{"title":"Customer Feedback","fields":[{"name":"name","label":"Your Name","type":"text","required":true},{"name":"email","label":"Email","type":"email","required":true},{"name":"rating","label":"Rating","type":"select","options":["Excellent","Good","Fair","Poor"]},{"name":"comments","label":"Comments","type":"textarea","placeholder":"Tell us more..."}],"webhookUrl":"https://myapp.com/webhook","ttl":604800}'`}</p>
           <p className="mt-3 text-zinc-500"># Response (201)</p>
-          <p>{`{"success":true,"data":{"id":"...","token":"a1b2c3...","url":"https://agentutils.dev/f/a1b2c3...","title":"Customer Feedback","status":"active"}}`}</p>
+          <p>{`{"success":true,"data":{"id":"...","token":"a1b2c3...","url":"https://www.agent-utils.com/f/a1b2c3...","title":"Customer Feedback","status":"active"}}`}</p>
         </div>
       </section>
 
       <section className="mt-8">
         <h2 className="text-xl font-semibold mb-3">List forms</h2>
         <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4 text-sm font-mono text-zinc-300 overflow-x-auto">
-          <p>curl https://agentutils.dev/api/form \</p>
+          <p>curl https://www.agent-utils.com/api/form \</p>
           <p className="ml-4">-H &quot;x-api-key: au_your_key&quot;</p>
           <p className="mt-3 text-zinc-500"># Response</p>
-          <p>{`{"success":true,"data":{"items":[{"id":"...","title":"Customer Feedback","status":"active","responseCount":5,"url":"https://agentutils.dev/f/a1b2c3...","expiresAt":"..."}],"total":1}}`}</p>
+          <p>{`{"success":true,"data":{"items":[{"id":"...","title":"Customer Feedback","status":"active","responseCount":5,"url":"https://www.agent-utils.com/f/a1b2c3...","expiresAt":"..."}],"total":1}}`}</p>
         </div>
       </section>
 
@@ -47,7 +47,7 @@ export default function FormDocs() {
         <h2 className="text-xl font-semibold mb-3">Get form + responses</h2>
         <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4 text-sm font-mono text-zinc-300 overflow-x-auto">
           <p className="text-zinc-500"># Get form details + latest 100 responses</p>
-          <p>curl https://agentutils.dev/api/form/{`{form_id}`} \</p>
+          <p>curl https://www.agent-utils.com/api/form/{`{form_id}`} \</p>
           <p className="ml-4">-H &quot;x-api-key: au_your_key&quot;</p>
           <p className="mt-3 text-zinc-500"># Response</p>
           <p>{`{"success":true,"data":{"form":{...},"responses":[{"id":"...","data":{"name":"Alice","email":"alice@example.com","rating":"Excellent","comments":"Great service!"},"sourceIp":"1.2.3.4","createdAt":"..."}]}}`}</p>
@@ -57,7 +57,7 @@ export default function FormDocs() {
       <section className="mt-8">
         <h2 className="text-xl font-semibold mb-3">Delete a form</h2>
         <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4 text-sm font-mono text-zinc-300 overflow-x-auto">
-          <p>curl -X DELETE https://agentutils.dev/api/form/{`{form_id}`} \</p>
+          <p>curl -X DELETE https://www.agent-utils.com/api/form/{`{form_id}`} \</p>
           <p className="ml-4">-H &quot;x-api-key: au_your_key&quot;</p>
           <p className="mt-3 text-zinc-500"># Response</p>
           <p>{`{"success":true,"data":{"deleted":true}}`}</p>
@@ -71,9 +71,9 @@ export default function FormDocs() {
         </p>
         <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4 text-sm font-mono text-zinc-300 overflow-x-auto">
           <p className="text-zinc-500"># Open in any browser — no auth needed</p>
-          <p>https://agentutils.dev/f/{`{token}`}</p>
+          <p>https://www.agent-utils.com/f/{`{token}`}</p>
           <p className="mt-3 text-zinc-500"># Submit programmatically</p>
-          <p>curl -X POST https://agentutils.dev/api/form-submit/{`{token}`} \</p>
+          <p>curl -X POST https://www.agent-utils.com/api/form-submit/{`{token}`} \</p>
           <p className="ml-4">-H &quot;Content-Type: application/json&quot; \</p>
           <p className="ml-4">{`-d '{"name":"Alice","email":"alice@example.com","rating":"Excellent","comments":"Great!"}'`}</p>
           <p className="mt-3 text-zinc-500"># Returns HTML thank-you page</p>
@@ -180,7 +180,7 @@ export default function FormDocs() {
           <p>{`import requests`}</p>
           <p className="mt-1">{`headers = {"x-api-key": "au_your_key"}`}</p>
           <p className="mt-3 text-zinc-500"># Create a form</p>
-          <p>{`form = requests.post("https://agentutils.dev/api/form", headers=headers, json={`}</p>
+          <p>{`form = requests.post("https://www.agent-utils.com/api/form", headers=headers, json={`}</p>
           <p className="ml-4">{`"title": "Customer Feedback",`}</p>
           <p className="ml-4">{`"fields": [`}</p>
           <p className="ml-8">{`{"name": "name", "label": "Your Name", "type": "text", "required": True},`}</p>
@@ -191,7 +191,7 @@ export default function FormDocs() {
           <p className="mt-2">{`print(f"Form URL: {form['url']}")`}</p>
           <p className="mt-3 text-zinc-500"># Retrieve responses</p>
           <p>{`result = requests.get(`}</p>
-          <p className="ml-4">{`f"https://agentutils.dev/api/form/{form['id']}",`}</p>
+          <p className="ml-4">{`f"https://www.agent-utils.com/api/form/{form['id']}",`}</p>
           <p className="ml-4">{`headers=headers`}</p>
           <p>{`).json()["data"]`}</p>
           <p className="mt-2">{`for resp in result["responses"]:`}</p>

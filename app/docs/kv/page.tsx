@@ -21,7 +21,7 @@ export default function KvDocs() {
       <section className="mt-8">
         <h2 className="text-xl font-semibold mb-3">Set a value</h2>
         <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4 text-sm font-mono text-zinc-300 overflow-x-auto">
-          <p>curl -X PUT https://agentutils.dev/api/kv \</p>
+          <p>curl -X PUT https://www.agent-utils.com/api/kv \</p>
           <p className="ml-4">-H &quot;x-api-key: au_your_key&quot; \</p>
           <p className="ml-4">-H &quot;Content-Type: application/json&quot; \</p>
           <p className="ml-4">{`-d '{"key":"session:abc123","value":{"step":3,"status":"running"},"ttl":3600}'`}</p>
@@ -33,7 +33,7 @@ export default function KvDocs() {
       <section className="mt-8">
         <h2 className="text-xl font-semibold mb-3">Get a value</h2>
         <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4 text-sm font-mono text-zinc-300 overflow-x-auto">
-          <p>curl https://agentutils.dev/api/kv/session:abc123 \</p>
+          <p>curl https://www.agent-utils.com/api/kv/session:abc123 \</p>
           <p className="ml-4">-H &quot;x-api-key: au_your_key&quot;</p>
           <p className="mt-3 text-zinc-500"># Response</p>
           <p>{`{"success":true,"data":{"key":"session:abc123","value":{"step":3,"status":"running"},"expiresAt":"2025-01-15T12:00:00Z"}}`}</p>
@@ -44,10 +44,10 @@ export default function KvDocs() {
         <h2 className="text-xl font-semibold mb-3">List keys</h2>
         <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4 text-sm font-mono text-zinc-300 overflow-x-auto">
           <p className="text-zinc-500"># List all keys (values omitted)</p>
-          <p>curl https://agentutils.dev/api/kv \</p>
+          <p>curl https://www.agent-utils.com/api/kv \</p>
           <p className="ml-4">-H &quot;x-api-key: au_your_key&quot;</p>
           <p className="mt-2 text-zinc-500"># With pagination</p>
-          <p>{`curl "https://agentutils.dev/api/kv?limit=10&offset=20" \\`}</p>
+          <p>{`curl "https://www.agent-utils.com/api/kv?limit=10&offset=20" \\`}</p>
           <p className="ml-4">-H &quot;x-api-key: au_your_key&quot;</p>
           <p className="mt-3 text-zinc-500"># Response</p>
           <p>{`{"success":true,"data":{"items":[{"key":"session:abc123","expiresAt":"..."}],"total":1,"limit":50,"offset":0}}`}</p>
@@ -57,7 +57,7 @@ export default function KvDocs() {
       <section className="mt-8">
         <h2 className="text-xl font-semibold mb-3">Delete a key</h2>
         <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4 text-sm font-mono text-zinc-300 overflow-x-auto">
-          <p>curl -X DELETE https://agentutils.dev/api/kv/session:abc123 \</p>
+          <p>curl -X DELETE https://www.agent-utils.com/api/kv/session:abc123 \</p>
           <p className="ml-4">-H &quot;x-api-key: au_your_key&quot;</p>
           <p className="mt-3 text-zinc-500"># Response</p>
           <p>{`{"success":true,"data":{"deleted":true}}`}</p>
@@ -71,11 +71,11 @@ export default function KvDocs() {
         </p>
         <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4 text-sm font-mono text-zinc-300 overflow-x-auto">
           <p className="text-zinc-500"># Increment by 1 (default)</p>
-          <p>curl -X POST https://agentutils.dev/api/kv/counter:emails/increment \</p>
+          <p>curl -X POST https://www.agent-utils.com/api/kv/counter:emails/increment \</p>
           <p className="ml-4">-H &quot;x-api-key: au_your_key&quot; \</p>
           <p className="ml-4">-H &quot;Content-Type: application/json&quot;</p>
           <p className="mt-2 text-zinc-500"># Increment by a custom amount</p>
-          <p>curl -X POST https://agentutils.dev/api/kv/counter:emails/increment \</p>
+          <p>curl -X POST https://www.agent-utils.com/api/kv/counter:emails/increment \</p>
           <p className="ml-4">-H &quot;x-api-key: au_your_key&quot; \</p>
           <p className="ml-4">-H &quot;Content-Type: application/json&quot; \</p>
           <p className="ml-4">{`-d '{"amount": 5}'`}</p>
@@ -144,15 +144,15 @@ export default function KvDocs() {
           <p>{`import requests`}</p>
           <p className="mt-1">{`headers = {"x-api-key": "au_your_key"}`}</p>
           <p className="mt-3 text-zinc-500"># Set a value</p>
-          <p>{`requests.put("https://agentutils.dev/api/kv", headers=headers, json={`}</p>
+          <p>{`requests.put("https://www.agent-utils.com/api/kv", headers=headers, json={`}</p>
           <p className="ml-4">{`"key": "agent:state",`}</p>
           <p className="ml-4">{`"value": {"step": 1, "data": "hello"},`}</p>
           <p className="ml-4">{`"ttl": 3600`}</p>
           <p>{`})`}</p>
           <p className="mt-3 text-zinc-500"># Get a value</p>
-          <p>{`requests.get("https://agentutils.dev/api/kv/agent:state", headers=headers)`}</p>
+          <p>{`requests.get("https://www.agent-utils.com/api/kv/agent:state", headers=headers)`}</p>
           <p className="mt-3 text-zinc-500"># Atomic increment</p>
-          <p>{`requests.post("https://agentutils.dev/api/kv/counter/increment",`}</p>
+          <p>{`requests.post("https://www.agent-utils.com/api/kv/counter/increment",`}</p>
           <p className="ml-4">{`headers=headers, json={"amount": 1})`}</p>
         </div>
       </section>

@@ -29,11 +29,11 @@ export default function DocsPage() {
         <h2 className="text-xl font-semibold mb-4">Quick Start</h2>
         <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-5 text-sm font-mono text-zinc-300 leading-relaxed overflow-x-auto">
           <p className="text-zinc-500"># 1. Create an account & get API key</p>
-          <p>curl -X POST https://agentutils.dev/api/user \</p>
+          <p>curl -X POST https://www.agent-utils.com/api/user \</p>
           <p className="ml-4">-H &quot;Content-Type: application/json&quot; \</p>
           <p className="ml-4">-d {`'{"kindeId":"...", "email":"you@example.com"}'`}</p>
           <p className="mt-3 text-zinc-500"># 2. Use any endpoint with your API key</p>
-          <p>curl https://agentutils.dev/api/health \</p>
+          <p>curl https://www.agent-utils.com/api/health \</p>
           <p className="ml-4">-H &quot;x-api-key: au_your_key_here&quot;</p>
           <p className="mt-3 text-zinc-500"># 3. All endpoints return JSON</p>
           <p>{`{"success": true, "data": {...}}`}</p>

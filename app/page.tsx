@@ -69,17 +69,17 @@ export default function Home() {
           <h2 className="text-2xl font-semibold mb-6">Quick start</h2>
           <pre className="rounded-lg border border-zinc-800 bg-zinc-900 p-5 text-sm leading-relaxed overflow-x-auto text-zinc-300">
 {`# 1. Get your API key
-curl -X POST https://agentutils.dev/api/keys \\
+curl -X POST https://www.agent-utils.com/api/keys \\
   -H "Authorization: Bearer YOUR_TOKEN" \\
   -d '{"name": "my-agent"}'
 
 # 2. Upload a file
-curl -X POST https://agentutils.dev/api/file-host \\
+curl -X POST https://www.agent-utils.com/api/file-host \\
   -H "x-api-key: au_..." \\
   -F "file=@report.csv"
 
 # 3. Send a notification
-curl -X POST https://agentutils.dev/api/notify \\
+curl -X POST https://www.agent-utils.com/api/notify \\
   -H "x-api-key: au_..." \\
   -d '{"message": "Task complete"}'`}
           </pre>

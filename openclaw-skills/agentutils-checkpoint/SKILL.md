@@ -9,11 +9,11 @@ Pause agents for human approval. Resume when approved.
 
 ## API Base
 
-`https://agentutils.dev/api`
+`https://www.agent-utils.com/api`
 
 ## Authentication
 
-All requests require `x-api-key` header. Get a key at https://agentutils.dev/dashboard.
+All requests require `x-api-key` header. Get a key at https://www.agent-utils.com/dashboard.
 
 ```
 x-api-key: au_YOUR_KEY
@@ -70,7 +70,7 @@ scripts/agentutils-checkpoint.sh resume abc123def456 reject "Wrong version"
 ### Create Example
 
 ```bash
-curl -X POST https://agentutils.dev/api/checkpoint \
+curl -X POST https://www.agent-utils.com/api/checkpoint \
   -H "x-api-key: au_YOUR_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -85,13 +85,13 @@ curl -X POST https://agentutils.dev/api/checkpoint \
 
 ```bash
 curl -H "x-api-key: au_YOUR_KEY" \
-  https://agentutils.dev/api/checkpoint/abc123def456
+  https://www.agent-utils.com/api/checkpoint/abc123def456
 ```
 
 ### Approve Example
 
 ```bash
-curl -X POST https://agentutils.dev/api/checkpoint/abc123def456/resume \
+curl -X POST https://www.agent-utils.com/api/checkpoint/abc123def456/resume \
   -H "x-api-key: au_YOUR_KEY" \
   -H "Content-Type: application/json" \
   -d '{"action": "approve", "reason": "Looks good"}'
