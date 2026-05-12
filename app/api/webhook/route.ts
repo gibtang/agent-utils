@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
 
     await incrementQuota(userId, tier, apiKeyId);
 
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://agentutils.dev';
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.agent-utils.com';
 
     return successResponse({
       id: inbox._id.toString(),
@@ -78,7 +78,7 @@ export async function GET(request: NextRequest) {
     const offset = parseInt(searchParams.get('offset') || '0');
 
     const filter = { userId: authResult.apiKey.userId };
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://agentutils.dev';
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.agent-utils.com';
 
     const [items, total] = await Promise.all([
       WebhookInbox.find(filter)

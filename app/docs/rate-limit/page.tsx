@@ -29,7 +29,7 @@ export default function RateLimitDocs() {
       <section className="mt-8">
         <h2 className="text-xl font-semibold mb-3">Check a rate limit</h2>
         <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4 text-sm font-mono text-zinc-300 overflow-x-auto">
-          <p>curl -X POST https://agentutils.dev/api/rate-limit/check \</p>
+          <p>curl -X POST https://www.agent-utils.com/api/rate-limit/check \</p>
           <p className="ml-4">-H &quot;x-api-key: au_your_key&quot; \</p>
           <p className="ml-4">-H &quot;Content-Type: application/json&quot; \</p>
           <p className="ml-4">{`-d '{"key":"openai:calls","limit":100,"windowSeconds":3600}'`}</p>
@@ -43,7 +43,7 @@ export default function RateLimitDocs() {
       <section className="mt-8">
         <h2 className="text-xl font-semibold mb-3">Reset a rate limit</h2>
         <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4 text-sm font-mono text-zinc-300 overflow-x-auto">
-          <p>curl -X POST https://agentutils.dev/api/rate-limit/reset \</p>
+          <p>curl -X POST https://www.agent-utils.com/api/rate-limit/reset \</p>
           <p className="ml-4">-H &quot;x-api-key: au_your_key&quot; \</p>
           <p className="ml-4">-H &quot;Content-Type: application/json&quot; \</p>
           <p className="ml-4">{`-d '{"key":"openai:calls"}'`}</p>
@@ -55,7 +55,7 @@ export default function RateLimitDocs() {
       <section className="mt-8">
         <h2 className="text-xl font-semibold mb-3">Get rate limit status</h2>
         <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4 text-sm font-mono text-zinc-300 overflow-x-auto">
-          <p>curl https://agentutils.dev/api/rate-limit/openai:calls \</p>
+          <p>curl https://www.agent-utils.com/api/rate-limit/openai:calls \</p>
           <p className="ml-4">-H &quot;x-api-key: au_your_key&quot;</p>
           <p className="mt-3 text-zinc-500"># Response</p>
           <p>{`{"success":true,"data":{"key":"openai:calls","count":42,"remaining":58,"resetAt":"2025-01-15T13:00:00Z","windowExpired":false}}`}</p>
@@ -110,7 +110,7 @@ export default function RateLimitDocs() {
           <p>{`import requests`}</p>
           <p className="mt-1">{`headers = {"x-api-key": "au_your_key"}`}</p>
           <p className="mt-3 text-zinc-500"># Check rate limit before calling external API</p>
-          <p>{`resp = requests.post("https://agentutils.dev/api/rate-limit/check",`}</p>
+          <p>{`resp = requests.post("https://www.agent-utils.com/api/rate-limit/check",`}</p>
           <p className="ml-4">{`headers=headers, json={`}</p>
           <p className="ml-4">{`"key": "openai:calls",`}</p>
           <p className="ml-4">{`"limit": 100,`}</p>
@@ -123,7 +123,7 @@ export default function RateLimitDocs() {
           <p>{`else:`}</p>
           <p className="ml-4">{`print(f"Rate limited. Retry after {data['retryAfter']}s")`}</p>
           <p className="mt-3 text-zinc-500"># Reset counter</p>
-          <p>{`requests.post("https://agentutils.dev/api/rate-limit/reset",`}</p>
+          <p>{`requests.post("https://www.agent-utils.com/api/rate-limit/reset",`}</p>
           <p className="ml-4">{`headers=headers, json={"key": "openai:calls"})`}</p>
         </div>
       </section>

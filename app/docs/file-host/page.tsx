@@ -15,12 +15,12 @@ export default function FileHostDocs() {
         <h2 className="text-xl font-semibold mb-3">Upload a File</h2>
         <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4 text-sm font-mono text-zinc-300 overflow-x-auto">
           <p className="text-zinc-500"># Upload a file</p>
-          <p>curl -X POST https://agentutils.dev/api/file-host \</p>
+          <p>curl -X POST https://www.agent-utils.com/api/file-host \</p>
           <p className="ml-4">-H &quot;x-api-key: au_your_key&quot; \</p>
           <p className="ml-4">-F &quot;file=@report.csv&quot;</p>
           <p className="mt-3 text-zinc-500"># Response</p>
           <p>{`{"success":true,"data":{`}</p>
-          <p className="ml-4">{`"url":"https://agentutils.dev/api/file-host/abc123-report.csv",`}</p>
+          <p className="ml-4">{`"url":"https://www.agent-utils.com/api/file-host/abc123-report.csv",`}</p>
           <p className="ml-4">{`"id":"abc123",`}</p>
           <p className="ml-4">{`"expiresAt":"2025-01-15T10:00:00Z"`}</p>
           <p>{`}}`}</p>
@@ -30,7 +30,7 @@ export default function FileHostDocs() {
       <section className="mt-8">
         <h2 className="text-xl font-semibold mb-3">Retrieve a File</h2>
         <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4 text-sm font-mono text-zinc-300 overflow-x-auto">
-          <p>curl https://agentutils.dev/api/file-host/{`{id}`} \</p>
+          <p>curl https://www.agent-utils.com/api/file-host/{`{id}`} \</p>
           <p className="ml-4">-H &quot;x-api-key: au_your_key&quot;</p>
         </div>
       </section>
@@ -70,7 +70,7 @@ export default function FileHostDocs() {
         <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4 text-sm font-mono text-zinc-300 overflow-x-auto">
           <p>{`import requests`}</p>
           <p className="mt-1">{`resp = requests.post(`}</p>
-          <p className="ml-4">{`"https://agentutils.dev/api/file-host",`}</p>
+          <p className="ml-4">{`"https://www.agent-utils.com/api/file-host",`}</p>
           <p className="ml-4">{`headers={"x-api-key": "au_your_key"},`}</p>
           <p className="ml-4">{`files={"file": open("report.csv", "rb")}`}</p>
           <p>{`)`}</p>

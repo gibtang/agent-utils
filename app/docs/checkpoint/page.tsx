@@ -14,7 +14,7 @@ export default function CheckpointDocs() {
       <section className="mt-8">
         <h2 className="text-xl font-semibold mb-3">Create Checkpoint</h2>
         <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4 text-sm font-mono text-zinc-300 overflow-x-auto">
-          <p>curl -X POST https://agentutils.dev/api/checkpoint \</p>
+          <p>curl -X POST https://www.agent-utils.com/api/checkpoint \</p>
           <p className="ml-4">-H &quot;x-api-key: au_your_key&quot; \</p>
           <p className="ml-4">-H &quot;Content-Type: application/json&quot; \</p>
           <p className="ml-4">-d {`'{`}</p>
@@ -30,7 +30,7 @@ export default function CheckpointDocs() {
         <h2 className="text-xl font-semibold mb-3">Poll for Approval</h2>
         <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4 text-sm font-mono text-zinc-300 overflow-x-auto">
           <p className="text-zinc-500"># Agent polls until status changes from &quot;pending&quot;</p>
-          <p>curl https://agentutils.dev/api/checkpoint/{`{id}`} \</p>
+          <p>curl https://www.agent-utils.com/api/checkpoint/{`{id}`} \</p>
           <p className="ml-4">-H &quot;x-api-key: au_your_key&quot;</p>
           <p className="mt-2 text-zinc-500"># Response (still waiting)</p>
           <p>{`{"success":true,"data":{"status":"pending","state":null}}`}</p>
@@ -43,12 +43,12 @@ export default function CheckpointDocs() {
         <h2 className="text-xl font-semibold mb-3">Resume (Human Action)</h2>
         <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4 text-sm font-mono text-zinc-300 overflow-x-auto">
           <p className="text-zinc-500"># Approve</p>
-          <p>curl -X POST https://agentutils.dev/api/checkpoint/{`{id}`}/resume \</p>
+          <p>curl -X POST https://www.agent-utils.com/api/checkpoint/{`{id}`}/resume \</p>
           <p className="ml-4">-H &quot;x-api-key: au_your_key&quot; \</p>
           <p className="ml-4">-H &quot;Content-Type: application/json&quot; \</p>
           <p className="ml-4">{`-d '{"action": "approve"}'`}</p>
           <p className="mt-2 text-zinc-500"># Reject</p>
-          <p>curl -X POST https://agentutils.dev/api/checkpoint/{`{id}`}/resume \</p>
+          <p>curl -X POST https://www.agent-utils.com/api/checkpoint/{`{id}`}/resume \</p>
           <p className="ml-4">-d {`'{"action": "reject", "reason": "Not ready yet"}'`}</p>
         </div>
       </section>

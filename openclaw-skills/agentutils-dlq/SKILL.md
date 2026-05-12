@@ -9,11 +9,11 @@ Catch failed agent tasks. Inspect payloads. Retry with one call.
 
 ## API Base
 
-`https://agentutils.dev/api`
+`https://www.agent-utils.com/api`
 
 ## Authentication
 
-All requests require `x-api-key` header. Get a key at https://agentutils.dev/dashboard.
+All requests require `x-api-key` header. Get a key at https://www.agent-utils.com/dashboard.
 
 ```
 x-api-key: au_YOUR_KEY
@@ -79,7 +79,7 @@ scripts/agentutils-dlq.sh dismiss abc123def456
 ### Capture Example
 
 ```bash
-curl -X POST https://agentutils.dev/api/dlq \
+curl -X POST https://www.agent-utils.com/api/dlq \
   -H "x-api-key: au_YOUR_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -95,7 +95,7 @@ curl -X POST https://agentutils.dev/api/dlq \
 
 ```bash
 curl -H "x-api-key: au_YOUR_KEY" \
-  "https://agentutils.dev/api/dlq?status=pending&page=1&limit=20"
+  "https://www.agent-utils.com/api/dlq?status=pending&page=1&limit=20"
 ```
 
 ## Response Format

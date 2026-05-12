@@ -24,7 +24,7 @@ export default function AuditDocs() {
       <section className="mt-8">
         <h2 className="text-xl font-semibold mb-3">Log an action</h2>
         <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4 text-sm font-mono text-zinc-300 overflow-x-auto">
-          <p>curl -X POST https://agentutils.dev/api/audit \</p>
+          <p>curl -X POST https://www.agent-utils.com/api/audit \</p>
           <p className="ml-4">-H &quot;x-api-key: au_your_key&quot; \</p>
           <p className="ml-4">-H &quot;Content-Type: application/json&quot; \</p>
           <p className="ml-4">{`-d '{"agentName":"billing-agent","action":"refund_issued"}'`}</p>
@@ -37,10 +37,10 @@ export default function AuditDocs() {
         <h2 className="text-xl font-semibold mb-3">List logs with filters</h2>
         <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4 text-sm font-mono text-zinc-300 overflow-x-auto">
           <p className="text-zinc-500"># List all (paginated)</p>
-          <p>curl https://agentutils.dev/api/audit \</p>
+          <p>curl https://www.agent-utils.com/api/audit \</p>
           <p className="ml-4">-H &quot;x-api-key: au_your_key&quot;</p>
           <p className="mt-2 text-zinc-500"># Filter by agent, action, severity, date range</p>
-          <p>{`curl "https://agentutils.dev/api/audit?agent=billing-agent&severity=warn&limit=20"`} \</p>
+          <p>{`curl "https://www.agent-utils.com/api/audit?agent=billing-agent&severity=warn&limit=20"`} \</p>
           <p className="ml-4">-H &quot;x-api-key: au_your_key&quot;</p>
         </div>
       </section>
@@ -48,7 +48,7 @@ export default function AuditDocs() {
       <section className="mt-8">
         <h2 className="text-xl font-semibold mb-3">Get a single entry</h2>
         <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4 text-sm font-mono text-zinc-300 overflow-x-auto">
-          <p>curl https://agentutils.dev/api/audit/{'${id}'} \</p>
+          <p>curl https://www.agent-utils.com/api/audit/{'${id}'} \</p>
           <p className="ml-4">-H &quot;x-api-key: au_your_key&quot;</p>
         </div>
       </section>
@@ -136,7 +136,7 @@ export default function AuditDocs() {
         <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4 text-sm font-mono text-zinc-300 overflow-x-auto">
           <p>{`import requests`}</p>
           <p className="mt-1">{`requests.post(`}</p>
-          <p className="ml-4">{`"https://agentutils.dev/api/audit",`}</p>
+          <p className="ml-4">{`"https://www.agent-utils.com/api/audit",`}</p>
           <p className="ml-4">{`headers={"x-api-key": "au_your_key"},`}</p>
           <p className="ml-4">{`json={`}</p>
           <p className="ml-8">{`"agentName": "billing-agent",`}</p>

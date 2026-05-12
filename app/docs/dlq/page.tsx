@@ -14,7 +14,7 @@ export default function DlqDocs() {
       <section className="mt-8">
         <h2 className="text-xl font-semibold mb-3">Capture a Failure</h2>
         <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4 text-sm font-mono text-zinc-300 overflow-x-auto">
-          <p>curl -X POST https://agentutils.dev/api/dlq \</p>
+          <p>curl -X POST https://www.agent-utils.com/api/dlq \</p>
           <p className="ml-4">-H &quot;x-api-key: au_your_key&quot; \</p>
           <p className="ml-4">-H &quot;Content-Type: application/json&quot; \</p>
           <p className="ml-4">-d {`'{`}</p>
@@ -31,10 +31,10 @@ export default function DlqDocs() {
         <h2 className="text-xl font-semibold mb-3">List Failures</h2>
         <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4 text-sm font-mono text-zinc-300 overflow-x-auto">
           <p className="text-zinc-500"># List all (paginated)</p>
-          <p>curl https://agentutils.dev/api/dlq \</p>
+          <p>curl https://www.agent-utils.com/api/dlq \</p>
           <p className="ml-4">-H &quot;x-api-key: au_your_key&quot;</p>
           <p className="mt-2 text-zinc-500"># Filter by status</p>
-          <p>curl &quot;https://agentutils.dev/api/dlq?status=pending&quot; \</p>
+          <p>curl &quot;https://www.agent-utils.com/api/dlq?status=pending&quot; \</p>
           <p className="ml-4">-H &quot;x-api-key: au_your_key&quot;</p>
         </div>
       </section>
@@ -43,7 +43,7 @@ export default function DlqDocs() {
         <h2 className="text-xl font-semibold mb-3">Retry</h2>
         <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4 text-sm font-mono text-zinc-300 overflow-x-auto">
           <p className="text-zinc-500"># Forward original payload to retry webhook</p>
-          <p>curl -X POST https://agentutils.dev/api/dlq/{`{id}`}/retry \</p>
+          <p>curl -X POST https://www.agent-utils.com/api/dlq/{`{id}`}/retry \</p>
           <p className="ml-4">-H &quot;x-api-key: au_your_key&quot;</p>
         </div>
       </section>

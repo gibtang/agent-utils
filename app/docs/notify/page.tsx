@@ -18,7 +18,7 @@ export default function NotifyDocs() {
           If <code className="rounded bg-zinc-800 px-1.5 py-0.5 text-xs">to</code> is omitted, the email is delivered to your AgentUtils account email automatically.
         </p>
         <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4 text-sm font-mono text-zinc-300 overflow-x-auto">
-          <p>curl -X POST https://agentutils.dev/api/notify \</p>
+          <p>curl -X POST https://www.agent-utils.com/api/notify \</p>
           <p className="ml-4">-H &quot;x-api-key: au_your_key&quot; \</p>
           <p className="ml-4">-H &quot;Content-Type: application/json&quot; \</p>
           <p className="ml-4">{`-d '{"message":"Wire transfer of $5,000 is pending approval.","priority":"urgent"}'`}</p>
@@ -91,16 +91,16 @@ export default function NotifyDocs() {
         </p>
         <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4 text-sm font-mono text-zinc-300 overflow-x-auto">
           <p className="text-zinc-500"># 1. Create checkpoint</p>
-          <p>{`CHECKPOINT=$(curl -sX POST https://agentutils.dev/api/checkpoint \\`}</p>
+          <p>{`CHECKPOINT=$(curl -sX POST https://www.agent-utils.com/api/checkpoint \\`}</p>
           <p className="ml-4">{`-H "x-api-key: au_your_key" \\`}</p>
           <p className="ml-4">{`-H "Content-Type: application/json" \\`}</p>
           <p className="ml-4">{`-d '{"agentName":"finance-bot","taskDescription":"Wire $5,000","state":{...},"webhookUrl":"https://your-server.com/resume"}')`}</p>
           <p className="mt-3 text-zinc-500"># 2. Notify the human immediately</p>
           <p>{`ID=$(echo $CHECKPOINT | jq -r '.data.id')`}</p>
-          <p>{`curl -sX POST https://agentutils.dev/api/notify \\`}</p>
+          <p>{`curl -sX POST https://www.agent-utils.com/api/notify \\`}</p>
           <p className="ml-4">{`-H "x-api-key: au_your_key" \\`}</p>
           <p className="ml-4">{`-H "Content-Type: application/json" \\`}</p>
-          <p className="ml-4">{`-d "{\"message\":\"Agent wants to wire \\$5,000. Approve here: https://agentutils.dev/dashboard/checkpoints/$ID\",\"priority\":\"urgent\"}"`}</p>
+          <p className="ml-4">{`-d "{\"message\":\"Agent wants to wire \\$5,000. Approve here: https://www.agent-utils.com/dashboard/checkpoints/$ID\",\"priority\":\"urgent\"}"`}</p>
         </div>
       </section>
 
@@ -108,10 +108,10 @@ export default function NotifyDocs() {
       <section className="mt-8">
         <h2 className="text-xl font-semibold mb-3">List notification history</h2>
         <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4 text-sm font-mono text-zinc-300 overflow-x-auto">
-          <p>curl https://agentutils.dev/api/notify \</p>
+          <p>curl https://www.agent-utils.com/api/notify \</p>
           <p className="ml-4">-H &quot;x-api-key: au_your_key&quot;</p>
           <p className="mt-2 text-zinc-500"># Filter by status or priority</p>
-          <p>curl &quot;https://agentutils.dev/api/notify?status=failed&priority=urgent&quot; \</p>
+          <p>curl &quot;https://www.agent-utils.com/api/notify?status=failed&priority=urgent&quot; \</p>
           <p className="ml-4">-H &quot;x-api-key: au_your_key&quot;</p>
         </div>
       </section>
@@ -122,7 +122,7 @@ export default function NotifyDocs() {
         <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4 text-sm font-mono text-zinc-300 overflow-x-auto">
           <p>{`import requests`}</p>
           <p className="mt-1">{`requests.post(`}</p>
-          <p className="ml-4">{`"https://agentutils.dev/api/notify",`}</p>
+          <p className="ml-4">{`"https://www.agent-utils.com/api/notify",`}</p>
           <p className="ml-4">{`headers={"x-api-key": "au_your_key"},`}</p>
           <p className="ml-4">{`json={`}</p>
           <p className="ml-8">{`"message": "Task complete: report.pdf is ready.",`}</p>
@@ -151,7 +151,7 @@ export default function NotifyDocs() {
               </tr>
               <tr>
                 <td className="py-3 pr-4 font-mono text-xs">RESEND_FROM_EMAIL</td>
-                <td className="py-3">Sender address — defaults to <code className="rounded bg-zinc-800 px-1 text-xs">notify@agentutils.dev</code></td>
+                <td className="py-3">Sender address — defaults to <code className="rounded bg-zinc-800 px-1 text-xs">notify@www.agent-utils.com</code></td>
               </tr>
             </tbody>
           </table>

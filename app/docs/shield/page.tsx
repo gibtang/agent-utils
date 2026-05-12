@@ -23,7 +23,7 @@ export default function ShieldDocs() {
       <section className="mt-8">
         <h2 className="text-xl font-semibold mb-3">Clean (Redact)</h2>
         <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4 text-sm font-mono text-zinc-300 overflow-x-auto">
-          <p>curl -X POST https://agentutils.dev/api/shield/clean \</p>
+          <p>curl -X POST https://www.agent-utils.com/api/shield/clean \</p>
           <p className="ml-4">-H &quot;x-api-key: au_your_key&quot; \</p>
           <p className="ml-4">-H &quot;Content-Type: application/json&quot; \</p>
           <p className="ml-4">{`-d '{"text": "Call John at 555-1234 or john@example.com"}'`}</p>
@@ -39,7 +39,7 @@ export default function ShieldDocs() {
       <section className="mt-8">
         <h2 className="text-xl font-semibold mb-3">Hydrate (Restore)</h2>
         <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4 text-sm font-mono text-zinc-300 overflow-x-auto">
-          <p>curl -X POST https://agentutils.dev/api/shield/hydrate \</p>
+          <p>curl -X POST https://www.agent-utils.com/api/shield/hydrate \</p>
           <p className="ml-4">-H &quot;x-api-key: au_your_key&quot; \</p>
           <p className="ml-4">-H &quot;Content-Type: application/json&quot; \</p>
           <p className="ml-4">{`-d '{"text": "I emailed [EMAIL_1] for [NAME_1]", "sessionId": "abc123"}'`}</p>

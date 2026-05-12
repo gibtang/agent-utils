@@ -45,14 +45,14 @@ export const tools: ToolSEO[] = [
       { title: 'Data pipeline handoff', description: 'Agent A processes data, uploads it, Agent B picks it up via URL' },
     ],
     codeExample: {
-      curl: `curl -X POST https://agentutils.dev/api/file-host \\
+      curl: `curl -X POST https://www.agent-utils.com/api/file-host \\
   -H "x-api-key: au_your_key" \\
   -F "file=@report.csv" \\
   -F "ttl=2"`,
       python: `import requests
 
 resp = requests.post(
-    "https://agentutils.dev/api/file-host",
+    "https://www.agent-utils.com/api/file-host",
     headers={"x-api-key": "au_your_key"},
     files={"file": open("report.csv", "rb")},
     data={"ttl": "2"},
@@ -62,13 +62,13 @@ file_url = resp.json()["data"]["url"]`,
 form.append("file", fs.createReadStream("report.csv"));
 form.append("ttl", "2");
 
-const res = await fetch("https://agentutils.dev/api/file-host", {
+const res = await fetch("https://www.agent-utils.com/api/file-host", {
   method: "POST",
   headers: { "x-api-key": "au_your_key" },
   body: form,
 });
 const { data } = await res.json();
-console.log(data.url); // https://agentutils.dev/api/file-host/abc123`,
+console.log(data.url); // https://www.agent-utils.com/api/file-host/abc123`,
     },
     apiEndpoint: 'POST /api/file-host',
     competitors: ['AWS S3', 'Cloudflare R2', 'Filestack', 'Transfer.sh'],
@@ -98,7 +98,7 @@ console.log(data.url); // https://agentutils.dev/api/file-host/abc123`,
       { title: 'Multi-step pipeline failures', description: 'Step 3 of 5 fails — capture which step, what input, and the error for targeted retry' },
     ],
     codeExample: {
-      curl: `curl -X POST https://agentutils.dev/api/dlq \\
+      curl: `curl -X POST https://www.agent-utils.com/api/dlq \\
   -H "x-api-key: au_your_key" \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -110,7 +110,7 @@ console.log(data.url); // https://agentutils.dev/api/file-host/abc123`,
       python: `import requests
 
 requests.post(
-    "https://agentutils.dev/api/dlq",
+    "https://www.agent-utils.com/api/dlq",
     headers={"x-api-key": "au_your_key"},
     json={
         "agentName": "data-pipeline",
@@ -119,7 +119,7 @@ requests.post(
         "payload": {"fileId": "abc123", "rows": 5000},
     },
 )`,
-      js: `const res = await fetch("https://agentutils.dev/api/dlq", {
+      js: `const res = await fetch("https://www.agent-utils.com/api/dlq", {
   method: "POST",
   headers: {
     "x-api-key": "au_your_key",
@@ -161,7 +161,7 @@ requests.post(
       { title: 'Email sending', description: 'Agent composed an email to a customer — pause for manager approval' },
     ],
     codeExample: {
-      curl: `curl -X POST https://agentutils.dev/api/checkpoint \\
+      curl: `curl -X POST https://www.agent-utils.com/api/checkpoint \\
   -H "x-api-key: au_your_key" \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -173,7 +173,7 @@ requests.post(
       python: `import requests
 
 resp = requests.post(
-    "https://agentutils.dev/api/checkpoint",
+    "https://www.agent-utils.com/api/checkpoint",
     headers={"x-api-key": "au_your_key"},
     json={
         "agentName": "finance-bot",
@@ -183,7 +183,7 @@ resp = requests.post(
     },
 )
 checkpoint_id = resp.json()["data"]["id"]`,
-      js: `const res = await fetch("https://agentutils.dev/api/checkpoint", {
+      js: `const res = await fetch("https://www.agent-utils.com/api/checkpoint", {
   method: "POST",
   headers: {
     "x-api-key": "au_your_key",
@@ -226,7 +226,7 @@ const { data } = await res.json();`,
       { title: 'HR automation', description: 'Agent processes employee records — redact personal details before summarization' },
     ],
     codeExample: {
-      curl: `curl -X POST https://agentutils.dev/api/shield \\
+      curl: `curl -X POST https://www.agent-utils.com/api/shield \\
   -H "x-api-key: au_your_key" \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -235,13 +235,13 @@ const { data } = await res.json();`,
       python: `import requests
 
 resp = requests.post(
-    "https://agentutils.dev/api/shield",
+    "https://www.agent-utils.com/api/shield",
     headers={"x-api-key": "au_your_key"},
     json={"text": "Hi, I am John Doe (john@example.com). My SSN is 123-45-6789."},
 )
 redacted = resp.json()["data"]["redacted"]
 # "Hi, I am [NAME_1] ([EMAIL_1]). My SSN is [SSN_1]."`,
-      js: `const res = await fetch("https://agentutils.dev/api/shield", {
+      js: `const res = await fetch("https://www.agent-utils.com/api/shield", {
   method: "POST",
   headers: {
     "x-api-key": "au_your_key",
@@ -284,20 +284,20 @@ console.log(data.redacted);
     ],
     codeExample: {
       curl: `# 1. Provision a number
-curl -X POST https://agentutils.dev/api/otp \\
+curl -X POST https://www.agent-utils.com/api/otp \\
   -H "x-api-key: au_your_key" \\
   -H "Content-Type: application/json" \\
   -d '{"countryCode": "US"}'
 
 # 2. Use the number to trigger SMS
 # 3. Read the OTP code
-curl https://agentutils.dev/api/otp/{sessionId} \\
+curl https://www.agent-utils.com/api/otp/{sessionId} \\
   -H "x-api-key: au_your_key"`,
       python: `import requests
 
 # Provision a number
 resp = requests.post(
-    "https://agentutils.dev/api/otp",
+    "https://www.agent-utils.com/api/otp",
     headers={"x-api-key": "au_your_key"},
     json={"countryCode": "US"},
 )
@@ -306,12 +306,12 @@ phone_number = session["phoneNumber"]
 
 # Later: check for OTP code
 resp = requests.get(
-    f"https://agentutils.dev/api/otp/{session['id']}",
+    f"https://www.agent-utils.com/api/otp/{session['id']}",
     headers={"x-api-key": "au_your_key"},
 )
 code = resp.json()["data"]["code"]`,
       js: `// Provision a number
-const res = await fetch("https://agentutils.dev/api/otp", {
+const res = await fetch("https://www.agent-utils.com/api/otp", {
   method: "POST",
   headers: { "x-api-key": "au_your_key", "Content-Type": "application/json" },
   body: JSON.stringify({ countryCode: "US" }),
@@ -320,7 +320,7 @@ const { data: session } = await res.json();
 
 // Later: check for OTP code
 const otp = await fetch(
-  \`https://agentutils.dev/api/otp/\${session.id}\`,
+  \`https://www.agent-utils.com/api/otp/\${session.id}\`,
   { headers: { "x-api-key": "au_your_key" } }
 );
 const { data } = await otp.json();
@@ -354,7 +354,7 @@ console.log(data.code); // "482917"`,
       { title: 'Scheduled reports', description: 'Agent generates a daily/weekly summary and delivers it to stakeholders' },
     ],
     codeExample: {
-      curl: `curl -X POST https://agentutils.dev/api/notify \\
+      curl: `curl -X POST https://www.agent-utils.com/api/notify \\
   -H "x-api-key: au_your_key" \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -364,7 +364,7 @@ console.log(data.code); // "482917"`,
       python: `import requests
 
 requests.post(
-    "https://agentutils.dev/api/notify",
+    "https://www.agent-utils.com/api/notify",
     headers={"x-api-key": "au_your_key"},
     json={
         "message": "Wire transfer of $5,000 is pending approval.",
@@ -372,7 +372,7 @@ requests.post(
         "metadata": {"transferId": "tx_abc123"},
     },
 )`,
-      js: `const res = await fetch("https://agentutils.dev/api/notify", {
+      js: `const res = await fetch("https://www.agent-utils.com/api/notify", {
   method: "POST",
   headers: {
     "x-api-key": "au_your_key",
@@ -413,7 +413,7 @@ const { data } = await res.json();`,
       { title: 'Performance analysis', description: 'Analyze agent action patterns to optimize latency and cost' },
     ],
     codeExample: {
-      curl: `curl -X POST https://agentutils.dev/api/audit \\
+      curl: `curl -X POST https://www.agent-utils.com/api/audit \\
   -H "x-api-key: au_your_key" \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -425,7 +425,7 @@ const { data } = await res.json();`,
       python: `import requests
 
 requests.post(
-    "https://agentutils.dev/api/audit",
+    "https://www.agent-utils.com/api/audit",
     headers={"x-api-key": "au_your_key"},
     json={
         "agentName": "support-bot",
@@ -434,7 +434,7 @@ requests.post(
         "metadata": {"customerId": "cus_abc", "amount": 49.99},
     },
 )`,
-      js: `await fetch("https://agentutils.dev/api/audit", {
+      js: `await fetch("https://www.agent-utils.com/api/audit", {
   method: "POST",
   headers: {
     "x-api-key": "au_your_key",
@@ -477,38 +477,38 @@ requests.post(
     ],
     codeExample: {
       curl: `# Set a value
-curl -X POST https://agentutils.dev/api/kv \\
+curl -X POST https://www.agent-utils.com/api/kv \\
   -H "x-api-key: au_your_key" \\
   -H "Content-Type: application/json" \\
   -d '{"key": "user:123:preferences", "value": {"lang": "en", "tz": "UTC"}}'
 
 # Get a value
-curl https://agentutils.dev/api/kv/user:123:preferences \\
+curl https://www.agent-utils.com/api/kv/user:123:preferences \\
   -H "x-api-key: au_your_key"`,
       python: `import requests
 
 headers = {"x-api-key": "au_your_key"}
 
 # Set
-requests.post("https://agentutils.dev/api/kv",
+requests.post("https://www.agent-utils.com/api/kv",
     headers=headers,
     json={"key": "counter", "value": 42},
 )
 
 # Get
-resp = requests.get("https://agentutils.dev/api/kv/counter",
+resp = requests.get("https://www.agent-utils.com/api/kv/counter",
     headers=headers,
 )
 print(resp.json()["data"]["value"])  # 42`,
       js: `// Set
-await fetch("https://agentutils.dev/api/kv", {
+await fetch("https://www.agent-utils.com/api/kv", {
   method: "POST",
   headers: { "x-api-key": "au_your_key", "Content-Type": "application/json" },
   body: JSON.stringify({ key: "counter", value: 42 }),
 });
 
 // Get
-const res = await fetch("https://agentutils.dev/api/kv/counter", {
+const res = await fetch("https://www.agent-utils.com/api/kv/counter", {
   headers: { "x-api-key": "au_your_key" },
 });
 const { data } = await res.json();
@@ -543,7 +543,7 @@ console.log(data.value); // 42`,
     ],
     codeExample: {
       curl: `# Check if allowed
-curl "https://agentutils.dev/api/rate-limit/check?key=stripe-api&limit=100&window=60" \\
+curl "https://www.agent-utils.com/api/rate-limit/check?key=stripe-api&limit=100&window=60" \\
   -H "x-api-key: au_your_key"
 
 # Response: {"allowed": true, "remaining": 73, "resetAt": "2025-01-15T10:01:00Z"}`,
@@ -553,7 +553,7 @@ headers = {"x-api-key": "au_your_key"}
 
 # Check rate limit before calling external API
 resp = requests.get(
-    "https://agentutils.dev/api/rate-limit/check",
+    "https://www.agent-utils.com/api/rate-limit/check",
     headers=headers,
     params={"key": "stripe-api", "limit": 100, "window": 60},
 )
@@ -565,7 +565,7 @@ if result["allowed"]:
 else:
     print(f"Rate limited. Retry after {result['resetAt']}")`,
       js: `const res = await fetch(
-  "https://agentutils.dev/api/rate-limit/check?key=stripe-api&limit=100&window=60",
+  "https://www.agent-utils.com/api/rate-limit/check?key=stripe-api&limit=100&window=60",
   { headers: { "x-api-key": "au_your_key" } }
 );
 const { data } = await res.json();
@@ -605,17 +605,17 @@ if (data.allowed) {
     ],
     codeExample: {
       curl: `# Create a webhook inbox
-curl -X POST https://agentutils.dev/api/webhook \\
+curl -X POST https://www.agent-utils.com/api/webhook \\
   -H "x-api-key: au_your_key" \\
   -H "Content-Type: application/json" \\
   -d '{"label": "stripe-payments", "forwardUrl": "https://your-server.com/process"}'
 
 # Use the returned URL as your Stripe webhook endpoint
-# https://agentutils.dev/hook/abc123`,
+# https://www.agent-utils.com/hook/abc123`,
       python: `import requests
 
 resp = requests.post(
-    "https://agentutils.dev/api/webhook",
+    "https://www.agent-utils.com/api/webhook",
     headers={"x-api-key": "au_your_key"},
     json={
         "label": "stripe-payments",
@@ -624,7 +624,7 @@ resp = requests.post(
 )
 webhook_url = resp.json()["data"]["url"]
 # Use webhook_url as your Stripe webhook endpoint`,
-      js: `const res = await fetch("https://agentutils.dev/api/webhook", {
+      js: `const res = await fetch("https://www.agent-utils.com/api/webhook", {
   method: "POST",
   headers: {
     "x-api-key": "au_your_key",
@@ -636,7 +636,7 @@ webhook_url = resp.json()["data"]["url"]
   }),
 });
 const { data } = await res.json();
-// data.url = "https://agentutils.dev/hook/abc123"`,
+// data.url = "https://www.agent-utils.com/hook/abc123"`,
     },
     apiEndpoint: 'POST /api/webhook',
     competitors: ['ngrok', 'Hookdeck', 'Svix', 'RequestBin'],
@@ -666,7 +666,7 @@ const { data } = await res.json();
       { title: 'Approval with notes', description: 'Human approves or rejects an action and adds contextual notes' },
     ],
     codeExample: {
-      curl: `curl -X POST https://agentutils.dev/api/form \\
+      curl: `curl -X POST https://www.agent-utils.com/api/form \\
   -H "x-api-key: au_your_key" \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -680,7 +680,7 @@ const { data } = await res.json();
       python: `import requests
 
 resp = requests.post(
-    "https://agentutils.dev/api/form",
+    "https://www.agent-utils.com/api/form",
     headers={"x-api-key": "au_your_key"},
     json={
         "title": "Shipping Details",
@@ -693,7 +693,7 @@ resp = requests.post(
 )
 form_url = resp.json()["data"]["url"]
 # Send form_url to the human`,
-      js: `const res = await fetch("https://agentutils.dev/api/form", {
+      js: `const res = await fetch("https://www.agent-utils.com/api/form", {
   method: "POST",
   headers: {
     "x-api-key": "au_your_key",
@@ -709,7 +709,7 @@ form_url = resp.json()["data"]["url"]
   }),
 });
 const { data } = await res.json();
-// data.url = "https://agentutils.dev/f/abc123"`,
+// data.url = "https://www.agent-utils.com/f/abc123"`,
     },
     apiEndpoint: 'POST /api/form',
     competitors: ['Typeform API', 'Jotform API', 'Formspree', 'Google Forms'],

@@ -6,9 +6,9 @@ const spec = {
     title: 'AgentUtils API',
     version: '1.0.0',
     description: 'One API key. 24 agent-native utilities. File hosting, PII redaction, dead letter queues, and more.',
-    contact: { name: 'AgentUtils', url: 'https://agentutils.dev' },
+    contact: { name: 'AgentUtils', url: 'https://www.agent-utils.com' },
   },
-  servers: [{ url: 'https://agentutils.dev', description: 'Production' }],
+  servers: [{ url: 'https://www.agent-utils.com', description: 'Production' }],
   security: [{ ApiKeyAuth: [] }],
   components: {
     securitySchemes: {

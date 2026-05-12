@@ -9,11 +9,11 @@ Audit trails for AI agent actions. Record, query, and debug agent behavior.
 
 ## API Base
 
-`https://agentutils.dev/api`
+`https://www.agent-utils.com/api`
 
 ## Authentication
 
-All requests require `x-api-key` header. Get a key at https://agentutils.dev/dashboard.
+All requests require `x-api-key` header. Get a key at https://www.agent-utils.com/dashboard.
 
 ```
 x-api-key: au_YOUR_KEY
@@ -55,7 +55,7 @@ scripts/agentutils-audit.sh list "" "deploy" "" 50
 ### Log Example
 
 ```bash
-curl -X POST https://agentutils.dev/api/audit \
+curl -X POST https://www.agent-utils.com/api/audit \
   -H "x-api-key: au_YOUR_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -71,7 +71,7 @@ curl -X POST https://agentutils.dev/api/audit \
 
 ```bash
 curl -H "x-api-key: au_YOUR_KEY" \
-  "https://agentutils.dev/api/audit?agent=deploy-bot&severity=error&limit=20"
+  "https://www.agent-utils.com/api/audit?agent=deploy-bot&severity=error&limit=20"
 ```
 
 ## Response Format

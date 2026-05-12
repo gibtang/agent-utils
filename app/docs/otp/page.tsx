@@ -27,7 +27,7 @@ export default function OtpDocs() {
       <section className="mt-8">
         <h2 className="text-xl font-semibold mb-3">Request a Number</h2>
         <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4 text-sm font-mono text-zinc-300 overflow-x-auto">
-          <p>curl -X POST https://agentutils.dev/api/otp \</p>
+          <p>curl -X POST https://www.agent-utils.com/api/otp \</p>
           <p className="ml-4">-H &quot;x-api-key: au_your_key&quot; \</p>
           <p className="ml-4">-H &quot;Content-Type: application/json&quot; \</p>
           <p className="ml-4">{`-d '{"countryCode": "US"}'`}</p>
@@ -46,7 +46,7 @@ export default function OtpDocs() {
         <h2 className="text-xl font-semibold mb-3">Poll for Code</h2>
         <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4 text-sm font-mono text-zinc-300 overflow-x-auto">
           <p className="text-zinc-500"># Poll until status = &quot;received&quot;</p>
-          <p>curl https://agentutils.dev/api/otp/{`{sessionId}`} \</p>
+          <p>curl https://www.agent-utils.com/api/otp/{`{sessionId}`} \</p>
           <p className="ml-4">-H &quot;x-api-key: au_your_key&quot;</p>
           <p className="mt-3 text-zinc-500"># Response (code received)</p>
           <p>{`{"success":true,"data":{`}</p>
@@ -60,7 +60,7 @@ export default function OtpDocs() {
       <section className="mt-8">
         <h2 className="text-xl font-semibold mb-3">Cancel Session</h2>
         <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4 text-sm font-mono text-zinc-300 overflow-x-auto">
-          <p>curl -X DELETE https://agentutils.dev/api/otp/{`{sessionId}`} \</p>
+          <p>curl -X DELETE https://www.agent-utils.com/api/otp/{`{sessionId}`} \</p>
           <p className="ml-4">-H &quot;x-api-key: au_your_key&quot;</p>
         </div>
       </section>
@@ -110,12 +110,12 @@ export default function OtpDocs() {
           <p>{`import requests, time`}</p>
           <p className="mt-1">{`headers = {"x-api-key": "au_your_key"}`}</p>
           <p className="mt-1">{`# Request number`}</p>
-          <p>{`resp = requests.post("https://agentutils.dev/api/otp",`}</p>
+          <p>{`resp = requests.post("https://www.agent-utils.com/api/otp",`}</p>
           <p className="ml-4">{`headers=headers, json={"countryCode": "US"})`}</p>
           <p>{`session_id = resp.json()["data"]["sessionId"]`}</p>
           <p className="mt-1">{`# Poll for code`}</p>
           <p>{`while True:`}</p>
-          <p className="ml-4">{`r = requests.get(f"https://agentutils.dev/api/otp/{session_id}",`}</p>
+          <p className="ml-4">{`r = requests.get(f"https://www.agent-utils.com/api/otp/{session_id}",`}</p>
           <p className="ml-8">{`headers=headers)`}</p>
           <p className="ml-4">{`data = r.json()["data"]`}</p>
           <p className="ml-4">{`if data["status"] == "received":`}</p>

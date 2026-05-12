@@ -9,11 +9,11 @@ PII redaction and hydration for AI agents. Redact sensitive data before LLM call
 
 ## API Base
 
-`https://agentutils.dev/api`
+`https://www.agent-utils.com/api`
 
 ## Authentication
 
-All requests require `x-api-key` header. Get a key at https://agentutils.dev/dashboard. Requires **Pro** plan or higher.
+All requests require `x-api-key` header. Get a key at https://www.agent-utils.com/dashboard. Requires **Pro** plan or higher.
 
 ```
 x-api-key: au_YOUR_KEY
@@ -60,7 +60,7 @@ scripts/agentutils-shield.sh info
 ### Clean Example
 
 ```bash
-curl -X POST https://agentutils.dev/api/shield/clean \
+curl -X POST https://www.agent-utils.com/api/shield/clean \
   -H "x-api-key: au_YOUR_KEY" \
   -H "Content-Type: application/json" \
   -d '{"text": "Hi, I'\''m John Doe. My SSN is 123-45-6789."}'
@@ -69,7 +69,7 @@ curl -X POST https://agentutils.dev/api/shield/clean \
 ### Hydrate Example
 
 ```bash
-curl -X POST https://agentutils.dev/api/shield/hydrate \
+curl -X POST https://www.agent-utils.com/api/shield/hydrate \
   -H "x-api-key: au_YOUR_KEY" \
   -H "Content-Type: application/json" \
   -d '{"text": "Hello [REDACTED], your info is ready", "sessionId": "sess_abc123"}'

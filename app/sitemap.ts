@@ -1,7 +1,7 @@
 import { type MetadataRoute } from 'next';
 import { getAllToolSlugs } from '@/lib/seo-tools';
 
-const BASE_URL = 'https://agentutils.dev';
+const BASE_URL = 'https://www.agent-utils.com';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const toolPages = getAllToolSlugs().map((slug) => ({

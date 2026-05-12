@@ -105,7 +105,7 @@ describe('Resend Integration (SDK-verified mocks)', () => {
     const payload = mockResendSend.mock.calls[0][0];
 
     // Verify the SDK call matches Resend's expected interface
-    expect(payload.from).toBe('notify@agentutils.dev');
+    expect(payload.from).toBe('notify@www.agent-utils.com');
     expect(payload.to).toBe('user@example.com');
     expect(payload.subject).toBe('Test Subject');
     expect(payload.html).toBeDefined();

@@ -9,11 +9,11 @@ Temporary phone numbers for OTP verification. Receive SMS codes programmatically
 
 ## API Base
 
-`https://agentutils.dev/api`
+`https://www.agent-utils.com/api`
 
 ## Authentication
 
-All requests require `x-api-key` header. Get a key at https://agentutils.dev/dashboard. Requires **Pro** plan or higher.
+All requests require `x-api-key` header. Get a key at https://www.agent-utils.com/dashboard. Requires **Pro** plan or higher.
 
 ```
 x-api-key: au_YOUR_KEY
@@ -70,7 +70,7 @@ scripts/agentutils-otp.sh cancel abc123def456
 ### Provision Example
 
 ```bash
-curl -X POST https://agentutils.dev/api/otp \
+curl -X POST https://www.agent-utils.com/api/otp \
   -H "x-api-key: au_YOUR_KEY" \
   -H "Content-Type: application/json" \
   -d '{"countryCode": "US"}'
@@ -80,7 +80,7 @@ curl -X POST https://agentutils.dev/api/otp \
 
 ```bash
 curl -H "x-api-key: au_YOUR_KEY" \
-  https://agentutils.dev/api/otp/abc123def456
+  https://www.agent-utils.com/api/otp/abc123def456
 ```
 
 ## Response Format

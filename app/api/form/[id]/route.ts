@@ -31,7 +31,7 @@ export async function GET(
       .limit(100)
       .lean();
 
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://agentutils.dev';
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.agent-utils.com';
 
     return successResponse({
       form: {

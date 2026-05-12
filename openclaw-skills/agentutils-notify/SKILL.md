@@ -9,11 +9,11 @@ Send email notifications from AI agents. One API call, delivered to any inbox.
 
 ## API Base
 
-`https://agentutils.dev/api`
+`https://www.agent-utils.com/api`
 
 ## Authentication
 
-All requests require `x-api-key` header. Get a key at https://agentutils.dev/dashboard.
+All requests require `x-api-key` header. Get a key at https://www.agent-utils.com/dashboard.
 
 ```
 x-api-key: au_YOUR_KEY
@@ -62,7 +62,7 @@ scripts/agentutils-notify.sh get abc123def456
 ### Send Example
 
 ```bash
-curl -X POST https://agentutils.dev/api/notify \
+curl -X POST https://www.agent-utils.com/api/notify \
   -H "x-api-key: au_YOUR_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -78,7 +78,7 @@ curl -X POST https://agentutils.dev/api/notify \
 
 ```bash
 curl -H "x-api-key: au_YOUR_KEY" \
-  "https://agentutils.dev/api/notify?status=delivered&limit=10"
+  "https://www.agent-utils.com/api/notify?status=delivered&limit=10"
 ```
 
 ## Response Format

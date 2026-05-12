@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       title: tool.metaTitle,
       description: tool.metaDescription,
       type: 'website',
-      url: `https://agentutils.dev/tools/${tool.slug}`,
+      url: `https://www.agent-utils.com/tools/${tool.slug}`,
       siteName: 'AgentUtils',
     },
     twitter: {
@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       description: tool.metaDescription,
     },
     alternates: {
-      canonical: `https://agentutils.dev/tools/${tool.slug}`,
+      canonical: `https://www.agent-utils.com/tools/${tool.slug}`,
     },
   };
 }
@@ -52,7 +52,7 @@ function SchemaMarkup({ tool }: { tool: ReturnType<typeof getToolBySlug> & {} })
     '@type': 'SoftwareApplication',
     name: `${tool.name} — AgentUtils`,
     description: tool.metaDescription,
-    url: `https://agentutils.dev/tools/${tool.slug}`,
+    url: `https://www.agent-utils.com/tools/${tool.slug}`,
     applicationCategory: 'DeveloperApplication',
     operatingSystem: 'Any',
     offers: {
@@ -65,7 +65,7 @@ function SchemaMarkup({ tool }: { tool: ReturnType<typeof getToolBySlug> & {} })
     provider: {
       '@type': 'Organization',
       name: 'AgentUtils',
-      url: 'https://agentutils.dev',
+      url: 'https://www.agent-utils.com',
     },
   };
 
