@@ -95,6 +95,72 @@ const spec = {
           countryCode: { type: 'string', default: 'US', description: 'Country code (US only)' },
         },
       },
+      AuditCreate: {
+        type: 'object',
+        required: ['agentName', 'action'],
+        properties: {
+          agentName: { type: 'string', description: 'Name of the agent' },
+          action: { type: 'string', description: 'Action performed' },
+          target: { type: 'string', description: 'Target of the action' },
+          metadata: { type: 'object', description: 'Additional context' },
+          severity: { type: 'string', enum: ['debug', 'info', 'warn', 'error'], default: 'info' },
+        },
+      },
+      KvSetRequest: {
+        type: 'object',
+        required: ['key', 'value'],
+        properties: {
+          key: { type: 'string', maxLength: 256, description: 'Key name' },
+          value: { description: 'Any JSON value' },
+          ttl: { type: 'integer', description: 'Time-to-live in seconds' },
+        },
+      },
+      RateLimitCheckRequest: {
+        type: 'object',
+        required: ['key', 'limit', 'windowSeconds'],
+        properties: {
+          key: { type: 'string', description: 'Rate limit key' },
+          limit: { type: 'integer', description: 'Max requests in window' },
+          windowSeconds: { type: 'integer', description: 'Window duration in seconds' },
+        },
+      },
+      RateLimitResetRequest: {
+        type: 'object',
+        required: ['key'],
+        properties: {
+          key: { type: 'string', description: 'Rate limit key to reset' },
+        },
+      },
+      WebhookCreate: {
+        type: 'object',
+        required: ['label'],
+        properties: {
+          label: { type: 'string', description: 'Human-readable inbox label' },
+          forwardUrl: { type: 'string', format: 'uri', description: 'URL to forward incoming webhooks' },
+          ttl: { type: 'integer', description: 'Time-to-live in seconds' },
+        },
+      },
+      FormCreate: {
+        type: 'object',
+        required: ['title', 'fields', 'webhookUrl'],
+        properties: {
+          title: { type: 'string', description: 'Form title shown to humans' },
+          fields: {
+            type: 'array',
+            items: {
+              type: 'object',
+              required: ['name', 'type'],
+              properties: {
+                name: { type: 'string' },
+                type: { type: 'string', description: 'Field type (text, boolean, number, etc.)' },
+                required: { type: 'boolean', default: false },
+              },
+            },
+          },
+          webhookUrl: { type: 'string', format: 'uri', description: 'URL to POST form responses' },
+          ttl: { type: 'integer', description: 'Time-to-live in seconds' },
+        },
+      },
     },
   },
   paths: {
@@ -374,6 +440,148 @@ const spec = {
         },
       },
     },
+    '/api/audit': {
+      post: {
+        tags: ['Audit Log'],
+        summary: 'Log an audit event',
+        description: 'Record an agent action for compliance and debugging.',
+        requestBody: {
+          required: true,
+          content: { 'application/json': { schema: { $ref: '#/components/schemas/AuditCreate' } } },
+        },
+        responses: {
+          '201': { description: 'Audit entry created' },
+        },
+      },
+      get: {
+        tags: ['Audit Log'],
+        summary: 'List audit entries',
+        parameters: [
+          { name: 'agentName', in: 'query', schema: { type: 'string' } },
+          { name: 'action', in: 'query', schema: { type: 'string' } },
+          { name: 'severity', in: 'query', schema: { type: 'string', enum: ['debug', 'info', 'warn', 'error'] } },
+          { name: 'limit', in: 'query', schema: { type: 'integer', default: 50 } },
+          { name: 'offset', in: 'query', schema: { type: 'integer', default: 0 } },
+        ],
+        responses: { '200': { description: 'Paginated audit log' } },
+      },
+    },
+    '/api/audit/{id}': {
+      get: {
+        tags: ['Audit Log'],
+        summary: 'Get audit entry detail',
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: {
+          '200': { description: 'Full audit entry' },
+          '404': { description: 'Not found' },
+        },
+      },
+    },
+    '/api/kv': {
+      put: {
+        tags: ['KV Store'],
+        summary: 'Set a key-value pair',
+        description: 'Store or update a JSON value. Supports optional TTL.',
+        requestBody: {
+          required: true,
+          content: { 'application/json': { schema: { $ref: '#/components/schemas/KvSetRequest' } } },
+        },
+        responses: { '200': { description: 'Value stored' } },
+      },
+    },
+    '/api/kv/{key}': {
+      get: {
+        tags: ['KV Store'],
+        summary: 'Get value by key',
+        parameters: [{ name: 'key', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: {
+          '200': { description: 'Stored value' },
+          '404': { description: 'Key not found' },
+        },
+      },
+      delete: {
+        tags: ['KV Store'],
+        summary: 'Delete a key',
+        parameters: [{ name: 'key', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: { '200': { description: 'Key deleted' } },
+      },
+    },
+    '/api/rate-limit/check': {
+      post: {
+        tags: ['Rate Limiter'],
+        summary: 'Check rate limit',
+        description: 'Atomically increment counter and check if limit is exceeded.',
+        requestBody: {
+          required: true,
+          content: { 'application/json': { schema: { $ref: '#/components/schemas/RateLimitCheckRequest' } } },
+        },
+        responses: {
+          '200': { description: 'Rate limit check result (allowed, remaining, retryAfter)' },
+        },
+      },
+    },
+    '/api/rate-limit/reset': {
+      post: {
+        tags: ['Rate Limiter'],
+        summary: 'Reset rate limit counter',
+        requestBody: {
+          required: true,
+          content: { 'application/json': { schema: { $ref: '#/components/schemas/RateLimitResetRequest' } } },
+        },
+        responses: { '200': { description: 'Counter reset' } },
+      },
+    },
+    '/api/webhook': {
+      post: {
+        tags: ['Webhook Inbox'],
+        summary: 'Create a webhook inbox',
+        description: 'Create a temporary endpoint that captures incoming webhooks.',
+        requestBody: {
+          required: true,
+          content: { 'application/json': { schema: { $ref: '#/components/schemas/WebhookCreate' } } },
+        },
+        responses: { '201': { description: 'Inbox created with URL' } },
+      },
+      get: {
+        tags: ['Webhook Inbox'],
+        summary: 'List webhook inboxes',
+        responses: { '200': { description: 'List of inboxes' } },
+      },
+    },
+    '/api/webhook/{id}': {
+      get: {
+        tags: ['Webhook Inbox'],
+        summary: 'Get inbox and captured payloads',
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: {
+          '200': { description: 'Inbox details with payloads' },
+          '404': { description: 'Inbox not found or expired' },
+        },
+      },
+    },
+    '/api/form': {
+      post: {
+        tags: ['Agent Form'],
+        summary: 'Create a form for humans',
+        description: 'Create a web form that collects structured input from humans and POSTs responses to your webhook.',
+        requestBody: {
+          required: true,
+          content: { 'application/json': { schema: { $ref: '#/components/schemas/FormCreate' } } },
+        },
+        responses: { '201': { description: 'Form created with URL' } },
+      },
+    },
+    '/api/form/{id}': {
+      get: {
+        tags: ['Agent Form'],
+        summary: 'Get form status and responses',
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: {
+          '200': { description: 'Form details and responses' },
+          '404': { description: 'Form not found or expired' },
+        },
+      },
+    },
   },
   tags: [
     { name: 'System', description: 'Health and status' },
@@ -384,6 +592,11 @@ const spec = {
     { name: 'Agent Shield', description: 'PII redaction and hydration' },
     { name: 'AgentVerify OTP', description: 'Temporary phone numbers for verification. Virtual numbers blocked by WhatsApp, Google, Meta, and major crypto exchanges. Works for niche platforms and internal systems.' },
     { name: 'Notification Router', description: 'Email notifications for agents' },
+    { name: 'Audit Log', description: 'Compliance-grade audit trail for agent actions' },
+    { name: 'KV Store', description: 'Persistent key-value storage for agents' },
+    { name: 'Rate Limiter', description: 'Token-bucket rate limiting for agent workflows' },
+    { name: 'Webhook Inbox', description: 'Temporary endpoints to capture incoming webhooks' },
+    { name: 'Agent Form', description: 'Create forms for humans, collect structured responses' },
   ],
 };
 
