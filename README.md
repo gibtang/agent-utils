@@ -1,32 +1,76 @@
-# AgentUtils
+# AgentUtils — API Utilities for AI Agents
 
-A centralized API platform providing 11 specialized utilities designed for AI agents. A single API key gives access to multiple tools that solve common pain points in agent development — file handling, error recovery, human oversight, privacy, and notifications.
+> One API key. 11 tools. Ship agents faster.
 
-## Tools
+[![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL%203.0-blue.svg)](LICENSE)
+[![GitHub Stars](https://img.shields.io/github/stars/gibtang/agent-utils)](https://github.com/gibtang/agent-utils/stargazers)
+[![GitHub Issues](https://img.shields.io/github/issues/gibtang/agent-utils)](https://github.com/gibtang/agent-utils/issues)
 
-1. **Ephemeral File Host** — Temporary file storage for agents with auto-expiration (1–72 hours by tier)
-2. **Dead Letter Queue** — Catches failed agent tasks, stores payloads for inspection/retry
-3. **Human-in-the-Loop Gate** — Pauses agents for human approval via webhooks
-4. **Agent Shield** — PII redaction proxy (clean before LLM, hydrate after)
-5. **AgentVerify OTP** — Temporary phone numbers for agent 2FA verification
-6. **Notification Router** — Unified notifications (email, SMS, Slack)
-7. **KV Store** — Key-value storage for agent state/memory
-8. **Audit Log** — Compliance logging for agent actions
-9. **Rate Limiter** — Rate limiting and queuing for API calls
-10. **Webhook Inbox** — Webhook catching and forwarding
-11. **Agent Form** — Dynamic form generation for human input
+**The missing infrastructure layer for AI agents.** File hosting, PII redaction, dead letter queues, human-in-the-loop gates, and 7 more tools — all behind one API key.
 
-## Tech Stack
+## Why AgentUtils?
 
-- **Framework:** Next.js 16 (App Router), React 19, TypeScript
-- **Styling:** Tailwind CSS 4
-- **Database:** MongoDB (Mongoose)
-- **Auth:** Firebase (client + admin SDKs)
-- **Storage:** AWS S3
-- **Payments:** Stripe (subscriptions + usage-based billing)
-- **Notifications:** Twilio (SMS), Resend (email)
+Building agents? You keep reimplementing the same plumbing:
 
-## Pricing
+- 🗂️ File handling — upload, temp storage, expiry
+- 🛡️ PII redaction — clean before LLM, restore after
+- 🚨 Error recovery — catch failures, inspect, retry
+- 👤 Human approval — pause agents until approved
+- 🔔 Notifications — reach a human in one call
+
+AgentUtils gives you all of this as API calls. No infrastructure to manage.
+
+## 🤖 Agent-First
+
+Designed for AI agents, by AI agents:
+
+- [`/llms.txt`](https://www.agent-utils.com/llms.txt) — LLM-discoverable index
+- [`/llms-full.txt`](https://www.agent-utils.com/llms-full.txt) — Full API reference in plain text
+- [`/openapi.json`](https://www.agent-utils.com/openapi.json) — OpenAPI 3.0 spec
+- [MCP Server](https://github.com/gibtang/agent-utils/tree/master/mcp) — Native tool integration for Claude, Cursor, Windsurf
+
+When a developer asks an AI agent *"I need file hosting for my agent"*, the agent finds AgentUtils and knows exactly how to integrate.
+
+## 60-Second Setup
+
+```bash
+# 1. Get your API key
+curl -X POST https://www.agent-utils.com/api/keys \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -d '{"name": "my-agent"}'
+
+# 2. Upload a file
+curl -X POST https://www.agent-utils.com/api/file-host \
+  -H "x-api-key: au_..." \
+  -F "file=@report.csv"
+
+# 3. Send a notification
+curl -X POST https://www.agent-utils.com/api/notify \
+  -H "x-api-key: au_..." \
+  -d '{"message": "Task complete"}'
+```
+
+→ [Full API docs](https://www.agent-utils.com/docs)
+
+## 11 Tools
+
+| Tool | Description |
+|------|-------------|
+| 🗂️ [Ephemeral File Host](https://www.agent-utils.com/tools/file-host) | Temporary file storage with auto-expiration |
+| 🪤 [Dead Letter Queue](https://www.agent-utils.com/tools/dlq) | Catch, inspect, and retry failed agent tasks |
+| ✋ [Human-in-the-Loop Gate](https://www.agent-utils.com/tools/checkpoint) | Pause agents until humans approve |
+| 🛡️ [Agent Shield](https://www.agent-utils.com/tools/shield) | PII redaction proxy — clean before LLM, hydrate after |
+| 📱 [AgentVerify OTP](https://www.agent-utils.com/tools/otp) | Temporary phone numbers for agent 2FA |
+| 🔔 [Notification Router](https://www.agent-utils.com/tools/notify) | One API call to reach a human (email, SMS, Slack) |
+| 🧠 [KV Store](https://www.agent-utils.com/tools/kv) | Key-value storage for agent state and memory |
+| 📋 [Audit Log](https://www.agent-utils.com/tools/audit) | Immutable compliance logging for agent actions |
+| ⏱️ [Rate Limiter](https://www.agent-utils.com/tools/rate-limiter) | Outbound API rate limiting and queuing |
+| 🪝 [Webhook Inbox](https://www.agent-utils.com/tools/webhook) | Pre-provisioned HTTPS endpoints for webhooks |
+| 📝 [Agent Form](https://www.agent-utils.com/tools/form) | Dynamic forms for human-in-the-loop data collection |
+
+## Self-Host or Cloud
+
+AgentUtils is open source (AGPL-3.0). Self-host for free, or use our cloud:
 
 | Tier | Price | Calls/mo | Overage |
 |------|-------|----------|---------|
@@ -35,29 +79,34 @@ A centralized API platform providing 11 specialized utilities designed for AI ag
 | Pro | $49/mo | 100,000 | $0.001/call |
 | Enterprise | Custom | Unlimited | — |
 
-## Getting Started
+→ [Start building free](https://www.agent-utils.com/signup)
+
+## Tech Stack
+
+- **Framework:** Next.js 16 (App Router), React 19, TypeScript
+- **Database:** MongoDB (Mongoose)
+- **Auth:** Firebase
+- **Storage:** AWS S3
+- **Payments:** Stripe
+- **Notifications:** Twilio (SMS), Resend (email)
+
+## Development
 
 ```bash
+git clone https://github.com/gibtang/agent-utils.git
+cd agent-utils
 npm install
 cp .env.example .env.local
 # Fill in Firebase, MongoDB, Stripe, S3, Twilio, Resend credentials
 npm run dev
 ```
 
-## Project Structure
+## Contributing
 
-```
-app/          # Next.js pages (landing, dashboard, tool docs, auth)
-app/api/      # REST API endpoints for all tools + billing
-lib/          # Core utilities (auth, pricing, storage, rate limiting)
-models/       # Mongoose schemas (User, ApiKey, DeadLetter, Checkpoint, etc.)
-contexts/     # React context providers
-```
+We love contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
-## Functionality
-Utilities and tools for AI agent development.
+Good first issues are labeled [`good first issue`](https://github.com/gibtang/agent-utils/labels/good%20first%20issue).
 
 ## License
 
-AgentUtils is licensed under the GNU Affero General Public License v3.0 only
-(AGPL-3.0-only). See [LICENSE](LICENSE) for the full license text.
+AGPL-3.0 — use freely, contribute back, or use our cloud to skip self-hosting. See [LICENSE](LICENSE).
