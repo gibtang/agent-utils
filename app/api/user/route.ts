@@ -28,7 +28,18 @@ export async function POST(request: NextRequest) {
       if (Object.keys(updates).length > 0) {
         await User.updateOne({ firebaseUid }, updates);
       }
-      return successResponse({ user: { ...existing, ...updates }, isNew: false });
+      // Return default API key — auto-create if missing
+      let defaultKey = await ApiKey.findOne({ userId: existing._id, active: true })
+        .sort({ createdAt: 1 })
+        .select('key')
+        .lean();
+
+      if (!defaultKey) {
+        const created = await ApiKey.create({ userId: existing._id, name: 'default', tier: existing.tier });
+        defaultKey = { key: created.key };
+      }
+
+      return successResponse({ user: { ...existing, ...updates }, isNew: false, apiKey: defaultKey.key });
     }
 
     const user = await User.create({ firebaseUid, email, name: name || '' });
