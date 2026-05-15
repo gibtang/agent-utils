@@ -10,7 +10,6 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
   updateProfile as firebaseUpdateProfile,
-  Auth,
 } from 'firebase/auth';
 import { firebaseInitializationPromise } from '@/lib/firebase';
 
@@ -53,28 +52,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<FirebaseUser | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [firebaseAuth, setFirebaseAuth] = useState<Auth | null>(null);
 
-  // Initialize Firebase Auth — matches check-mcc pattern
-  useEffect(() => {
-    const initAuth = async () => {
-      try {
-        const { auth } = await firebaseInitializationPromise;
-        if (!auth) {
-          setLoading(false);
-          return;
-        }
-        setFirebaseAuth(auth);
-      } catch (error) {
-        console.error('Error initializing auth:', error);
-        setLoading(false);
-      }
-    };
-
-    initAuth();
-  }, []);
-
-  const upsertUser = useCallback(async (firebaseUser: FirebaseUser) => {
+  const upsertUser = async (firebaseUser: FirebaseUser) => {
     try {
       const token = await firebaseUser.getIdToken();
       const res = await fetch('/api/user', {
@@ -98,26 +77,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.error('User upsert error:', err);
     }
     return false;
-  }, []);
+  };
 
-  // Auth state listener — only after firebaseAuth is ready
+  // Single useEffect — init Firebase + register onAuthStateChanged (matches check-mcc)
   useEffect(() => {
-    if (!firebaseAuth) return;
+    const initAuth = async () => {
+      try {
+        const { auth } = await firebaseInitializationPromise;
+        if (!auth) {
+          setLoading(false);
+          return;
+        }
 
-    const unsubscribe = onAuthStateChanged(firebaseAuth, async (firebaseUser) => {
-      setUser(firebaseUser);
+        const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+          setUser(firebaseUser);
 
-      if (firebaseUser) {
-        await upsertUser(firebaseUser);
-      } else {
-        setProfile(null);
+          if (firebaseUser) {
+            await upsertUser(firebaseUser);
+          } else {
+            setProfile(null);
+          }
+
+          setLoading(false);
+        });
+
+        return () => unsubscribe();
+      } catch (error) {
+        console.error('Error initializing auth:', error);
+        setLoading(false);
       }
+    };
 
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, [firebaseAuth, upsertUser]);
+    initAuth();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const refreshProfile = useCallback(async () => {
     if (!user) return;
@@ -139,31 +131,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!profile && user) {
       await upsertUser(user);
     }
-  }, [profile, user, upsertUser]);
+  }, [profile, user]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const signIn = useCallback(async (email: string, password: string) => {
-    if (!firebaseAuth) throw new Error('Auth not initialized');
-    await signInWithEmailAndPassword(firebaseAuth, email, password);
-  }, [firebaseAuth]);
+    const { auth } = await firebaseInitializationPromise;
+    if (!auth) throw new Error('Auth not initialized');
+    await signInWithEmailAndPassword(auth, email, password);
+  }, []);
 
   const signUp = useCallback(async (email: string, password: string, name: string) => {
-    if (!firebaseAuth) throw new Error('Auth not initialized');
-    const credential = await createUserWithEmailAndPassword(firebaseAuth, email, password);
+    const { auth } = await firebaseInitializationPromise;
+    if (!auth) throw new Error('Auth not initialized');
+    const credential = await createUserWithEmailAndPassword(auth, email, password);
     await firebaseUpdateProfile(credential.user, { displayName: name });
     await upsertUser(credential.user);
-  }, [firebaseAuth, upsertUser]);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const signInWithGoogle = useCallback(async () => {
-    if (!firebaseAuth) throw new Error('Auth not initialized');
+    const { auth } = await firebaseInitializationPromise;
+    if (!auth) throw new Error('Auth not initialized');
     const provider = new GoogleAuthProvider();
-    await signInWithPopup(firebaseAuth, provider);
-  }, [firebaseAuth]);
+    await signInWithPopup(auth, provider);
+  }, []);
 
   const logout = useCallback(async () => {
-    if (!firebaseAuth) throw new Error('Auth not initialized');
-    await firebaseSignOut(firebaseAuth);
+    const { auth } = await firebaseInitializationPromise;
+    if (!auth) throw new Error('Auth not initialized');
+    await firebaseSignOut(auth);
     setProfile(null);
-  }, [firebaseAuth]);
+  }, []);
 
   const value = {
     user,
