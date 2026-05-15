@@ -1,17 +1,17 @@
 'use client';
 
-import { createContext, useContext, useState, useCallback, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react';
 import {
-  onAuthStateChanged,
+  User as FirebaseUser,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  signInWithPopup,
-  GoogleAuthProvider,
   signOut as firebaseSignOut,
+  onAuthStateChanged,
+  GoogleAuthProvider,
+  signInWithPopup,
   updateProfile as firebaseUpdateProfile,
-  User as FirebaseUser,
+  Auth,
 } from 'firebase/auth';
-import { Auth } from 'firebase/auth';
 import { firebaseInitializationPromise } from '@/lib/firebase';
 
 interface UserProfile {
@@ -39,21 +39,14 @@ interface AuthContextType {
   logout: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType>({
-  user: null,
-  profile: null,
-  loading: true,
-  isAuthenticated: false,
-  refreshProfile: async () => {},
-  ensureProfile: async () => {},
-  signIn: async () => {},
-  signUp: async () => {},
-  signInWithGoogle: async () => {},
-  logout: async () => {},
-});
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function useAuth() {
-  return useContext(AuthContext);
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -62,36 +55,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [firebaseAuth, setFirebaseAuth] = useState<Auth | null>(null);
 
-  // Lazy Firebase init — like dramasub pattern
+  // Initialize Firebase Auth — matches check-mcc pattern
   useEffect(() => {
-    const init = async () => {
-      const { auth } = await firebaseInitializationPromise;
-      if (!auth) {
-        console.error('Firebase Auth failed to initialize');
+    const initAuth = async () => {
+      try {
+        const { auth } = await firebaseInitializationPromise;
+        if (!auth) {
+          setLoading(false);
+          return;
+        }
+        setFirebaseAuth(auth);
+      } catch (error) {
+        console.error('Error initializing auth:', error);
         setLoading(false);
-        return;
       }
-      setFirebaseAuth(auth);
     };
-    init();
+
+    initAuth();
   }, []);
-
-  // Auth state listener — only after firebaseAuth is ready
-  useEffect(() => {
-    if (!firebaseAuth) return;
-
-    const unsubscribe = onAuthStateChanged(firebaseAuth, async (firebaseUser) => {
-      setUser(firebaseUser);
-      if (firebaseUser) {
-        await upsertUser(firebaseUser);
-      } else {
-        setProfile(null);
-      }
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, [firebaseAuth]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const upsertUser = useCallback(async (firebaseUser: FirebaseUser) => {
     try {
@@ -119,6 +100,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return false;
   }, []);
 
+  // Auth state listener — only after firebaseAuth is ready
+  useEffect(() => {
+    if (!firebaseAuth) return;
+
+    const unsubscribe = onAuthStateChanged(firebaseAuth, async (firebaseUser) => {
+      setUser(firebaseUser);
+
+      if (firebaseUser) {
+        await upsertUser(firebaseUser);
+      } else {
+        setProfile(null);
+      }
+
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, [firebaseAuth, upsertUser]);
+
   const refreshProfile = useCallback(async () => {
     if (!user) return;
     try {
@@ -142,44 +142,41 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [profile, user, upsertUser]);
 
   const signIn = useCallback(async (email: string, password: string) => {
-    if (!firebaseAuth) throw new Error('Firebase Auth not initialized');
+    if (!firebaseAuth) throw new Error('Auth not initialized');
     await signInWithEmailAndPassword(firebaseAuth, email, password);
   }, [firebaseAuth]);
 
   const signUp = useCallback(async (email: string, password: string, name: string) => {
-    if (!firebaseAuth) throw new Error('Firebase Auth not initialized');
+    if (!firebaseAuth) throw new Error('Auth not initialized');
     const credential = await createUserWithEmailAndPassword(firebaseAuth, email, password);
     await firebaseUpdateProfile(credential.user, { displayName: name });
     await upsertUser(credential.user);
   }, [firebaseAuth, upsertUser]);
 
   const signInWithGoogle = useCallback(async () => {
-    if (!firebaseAuth) throw new Error('Firebase Auth not initialized');
-    // Create fresh provider each call — matches dramasub pattern
+    if (!firebaseAuth) throw new Error('Auth not initialized');
     const provider = new GoogleAuthProvider();
     await signInWithPopup(firebaseAuth, provider);
   }, [firebaseAuth]);
 
   const logout = useCallback(async () => {
-    if (!firebaseAuth) throw new Error('Firebase Auth not initialized');
+    if (!firebaseAuth) throw new Error('Auth not initialized');
     await firebaseSignOut(firebaseAuth);
     setProfile(null);
   }, [firebaseAuth]);
 
-  return (
-    <AuthContext.Provider value={{
-      user,
-      profile,
-      loading,
-      isAuthenticated: !!user,
-      refreshProfile,
-      ensureProfile,
-      signIn,
-      signUp,
-      signInWithGoogle,
-      logout,
-    }}>
-      {children}
-    </AuthContext.Provider>
-  );
+  const value = {
+    user,
+    profile,
+    loading,
+    isAuthenticated: !!user,
+    refreshProfile,
+    ensureProfile,
+    signIn,
+    signUp,
+    signInWithGoogle,
+    logout,
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
