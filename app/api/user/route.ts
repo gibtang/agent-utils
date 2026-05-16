@@ -19,14 +19,24 @@ export async function POST(request: NextRequest) {
 
     await connectDB();
 
-    const existing = await User.findOne({ firebaseUid }).lean();
+    // Find by firebaseUid, or fall back to email (migrates legacy Kinde users)
+    let existing = await User.findOne({ firebaseUid }).lean();
+
+    if (!existing && email) {
+      existing = await User.findOne({ email }).lean();
+      if (existing) {
+        // Migrate: add firebaseUid to legacy user
+        await User.updateOne({ _id: existing._id }, { firebaseUid });
+        existing = { ...existing, firebaseUid };
+      }
+    }
 
     if (existing) {
       const updates: Record<string, string> = {};
       if (existing.email !== email) updates.email = email;
       if (name && existing.name !== name) updates.name = name;
       if (Object.keys(updates).length > 0) {
-        await User.updateOne({ firebaseUid }, updates);
+        await User.updateOne({ _id: existing._id }, updates);
       }
       // Return default API key — auto-create if missing
       let defaultKey = await ApiKey.findOne({ userId: existing._id, active: true })
