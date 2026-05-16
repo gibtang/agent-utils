@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
+import { Toast } from '@/components/Toast';
 
 interface ApiKeyData {
   _id: string;
@@ -38,6 +39,7 @@ export default function DashboardPage() {
   const [error, setError] = useState('');
   const [usage, setUsage] = useState<UsageData | null>(null);
   const [copied, setCopied] = useState(false);
+  const [toastVisible, setToastVisible] = useState(false);
   const fetchedRef = useRef(false);
 
   const fetchKeys = useCallback(async () => {
@@ -134,6 +136,7 @@ export default function DashboardPage() {
   const copyKey = (key: string) => {
     navigator.clipboard.writeText(key);
     setCopied(true);
+    setToastVisible(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
@@ -369,6 +372,7 @@ export default function DashboardPage() {
           </div>
         )}
       </div>
+      <Toast message="Copied to clipboard!" visible={toastVisible} onHide={() => setToastVisible(false)} />
     </div>
   );
 }

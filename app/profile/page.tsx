@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
+import { Toast } from '@/components/Toast';
 
 export default function ProfilePage() {
   const { user, profile, loading, isAuthenticated, refreshProfile } = useAuth();
@@ -16,6 +17,7 @@ export default function ProfilePage() {
   const [deleting, setDeleting] = useState(false);
   const [copied, setCopied] = useState(false);
   const [copiedSnippet, setCopiedSnippet] = useState<string | null>(null);
+  const [toastVisible, setToastVisible] = useState(false);
 
   const [billingLoading, setBillingLoading] = useState(false);
 
@@ -137,6 +139,7 @@ export default function ProfilePage() {
     if (profile?.defaultKey) {
       navigator.clipboard.writeText(profile.defaultKey);
       setCopied(true);
+      setToastVisible(true);
       setTimeout(() => setCopied(false), 2000);
     }
   };
@@ -144,6 +147,7 @@ export default function ProfilePage() {
   const copySnippet = (id: string, text: string) => {
     navigator.clipboard.writeText(text);
     setCopiedSnippet(id);
+    setToastVisible(true);
     setTimeout(() => setCopiedSnippet(null), 2000);
   };
 
@@ -503,6 +507,7 @@ Full OpenAPI spec: https://agentutils.dev/api/docs`}</pre>
           )}
         </div>
       </div>
+      <Toast message="Copied to clipboard!" visible={toastVisible} onHide={() => setToastVisible(false)} />
     </div>
   );
 }
