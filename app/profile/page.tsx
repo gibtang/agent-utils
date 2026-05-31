@@ -306,17 +306,8 @@ export default function ProfilePage() {
 Authentication: All requests require header "x-api-key: ${apiKey}"
 
 Available tools:
-- File Host: POST /api/file-host (upload), GET /api/file-host/{id} (retrieve)
 - Dead Letter Queue: POST /api/dlq (capture failure), GET /api/dlq (list), POST /api/dlq/{id}/retry (retry)
 - Human-in-the-Loop: POST /api/checkpoint (pause for approval), POST /api/checkpoint/{id}/resume (approve/reject)
-- PII Shield: POST /api/shield/clean (redact PII), POST /api/shield/hydrate (restore PII)
-- OTP Verify: POST /api/otp (provision number), GET /api/otp/{id} (poll for code)
-- Notifications: POST /api/notify (send email), GET /api/notify (list history)
-- Audit Log: POST /api/audit (log event), GET /api/audit (list entries)
-- KV Store: PUT /api/kv (set), GET /api/kv/{key} (get), DELETE /api/kv/{key} (delete)
-- Rate Limiter: POST /api/rate-limit/check, POST /api/rate-limit/reset
-- Webhook Inbox: POST /api/webhook (create inbox), GET /api/webhook/{id} (get payloads)
-- Forms: POST /api/form (create form), GET /api/form/{id} (get responses)
 
 All endpoints return: { success: boolean, data?: any, error?: string }
 Full OpenAPI spec: https://agentutils.dev/api/docs`)}
@@ -330,17 +321,8 @@ Full OpenAPI spec: https://agentutils.dev/api/docs`)}
 Authentication: All requests require header "x-api-key: ${apiKey}"
 
 Available tools:
-- File Host: POST /api/file-host (upload), GET /api/file-host/{id} (retrieve)
 - Dead Letter Queue: POST /api/dlq (capture failure), GET /api/dlq (list), POST /api/dlq/{id}/retry (retry)
 - Human-in-the-Loop: POST /api/checkpoint (pause for approval), POST /api/checkpoint/{id}/resume (approve/reject)
-- PII Shield: POST /api/shield/clean (redact PII), POST /api/shield/hydrate (restore PII)
-- OTP Verify: POST /api/otp (provision number), GET /api/otp/{id} (poll for code)
-- Notifications: POST /api/notify (send email), GET /api/notify (list history)
-- Audit Log: POST /api/audit (log event), GET /api/audit (list entries)
-- KV Store: PUT /api/kv (set), GET /api/kv/{key} (get), DELETE /api/kv/{key} (delete)
-- Rate Limiter: POST /api/rate-limit/check, POST /api/rate-limit/reset
-- Webhook Inbox: POST /api/webhook (create inbox), GET /api/webhook/{id} (get payloads)
-- Forms: POST /api/form (create form), GET /api/form/{id} (get responses)
 
 All endpoints return: { success: boolean, data?: any, error?: string }
 Full OpenAPI spec: https://agentutils.dev/api/docs`}</pre>

@@ -84,15 +84,15 @@ curl -X POST https://www.agent-utils.com/api/keys \\
   -H "Authorization: Bearer YOUR_TOKEN" \\
   -d '{"name": "my-agent"}'
 
-# 2. Upload a file
-curl -X POST https://www.agent-utils.com/api/file-host \\
-  -H "x-api-key: au_..." \\
-  -F "file=@report.csv"
+# 2. Pause for human approval
+curl -X POST https://www.agent-utils.com/api/checkpoint \
+  -H "x-api-key: au_..." \
+  -d '{"agentName": "deploy-bot", "payload": {"env": "prod"}}'
 
-# 3. Send a notification
-curl -X POST https://www.agent-utils.com/api/notify \\
-  -H "x-api-key: au_..." \\
-  -d '{"message": "Task complete"}'`}
+# 3. Catch failed tasks in DLQ
+curl -X POST https://www.agent-utils.com/api/dlq \
+  -H "x-api-key: au_..." \
+  -d '{"agentName": "data-pipeline", "error": "Timeout", "payload": {}}'
           </pre>
         </div>
       </section>
