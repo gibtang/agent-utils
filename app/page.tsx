@@ -2,11 +2,8 @@ import Link from "next/link";
 import { tools as allTools } from "@/lib/seo-tools";
 
 const featuredTools = [
-  { name: "Ephemeral File Host", desc: "Park files for agents. Auto-expires.", slug: "file-host" },
   { name: "Dead Letter Queue", desc: "Catch, inspect, and retry failed agent tasks.", slug: "dlq" },
   { name: "Human-in-the-Loop Gate", desc: "Pause agents until humans approve.", slug: "checkpoint" },
-  { name: "Agent Shield", desc: "PII redaction proxy. Clean before LLM, hydrate after.", slug: "shield" },
-  { name: "AgentVerify OTP", desc: "Temporary phone numbers for agent 2FA.", slug: "otp" },
 ];
 
 export default function Home() {
@@ -18,6 +15,9 @@ export default function Home() {
           AgentUtils
         </Link>
         <div className="flex items-center gap-4 text-sm text-zinc-400">
+          <Link href="/docs" className="hover:text-zinc-100 transition-colors">
+            Docs
+          </Link>
           <a
             href="https://github.com/gibtang/agent-utils"
             target="_blank"
@@ -45,7 +45,7 @@ export default function Home() {
       <section className="flex flex-col items-center text-center px-6 pt-24 pb-16">
         <h1 className="text-5xl font-bold tracking-tight">AgentUtils</h1>
         <p className="mt-4 text-xl text-zinc-400 max-w-xl">
-          One API key. 6 agent-native utilities.
+          One API key. 2 agent-native utilities.
         </p>
         <Link
           href="/signup"
@@ -84,15 +84,15 @@ curl -X POST https://www.agent-utils.com/api/keys \\
   -H "Authorization: Bearer YOUR_TOKEN" \\
   -d '{"name": "my-agent"}'
 
-# 2. Upload a file
-curl -X POST https://www.agent-utils.com/api/file-host \\
-  -H "x-api-key: au_..." \\
-  -F "file=@report.csv"
+# 2. Pause for human approval
+curl -X POST https://www.agent-utils.com/api/checkpoint \
+  -H "x-api-key: au_..." \
+  -d '{"agentName": "deploy-bot", "payload": {"env": "prod"}}'
 
-# 3. Send a notification
-curl -X POST https://www.agent-utils.com/api/notify \\
-  -H "x-api-key: au_..." \\
-  -d '{"message": "Task complete"}'`}
+# 3. Catch failed tasks in DLQ
+curl -X POST https://www.agent-utils.com/api/dlq \
+  -H "x-api-key: au_..." \
+  -d '{"agentName": "data-pipeline", "error": "Timeout", "payload": {}}'
           </pre>
         </div>
       </section>

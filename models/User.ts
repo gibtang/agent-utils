@@ -20,7 +20,7 @@ export interface IUser extends Document {
 }
 
 const UserSchema = new Schema<IUser>({
-  firebaseUid: { type: String, required: true, unique: true, index: true },
+  firebaseUid: { type: String, sparse: true, unique: true, index: true },
   email: { type: String, required: true, unique: true },
   name: { type: String, default: '' },
   tier: { type: String, enum: ['free', 'builder', 'pro', 'enterprise'], default: 'free' },

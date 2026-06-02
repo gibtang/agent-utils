@@ -6,6 +6,7 @@
     "description": "One API key. Agent-native utilities. File hosting, PII redaction, dead letter queues, audit logs, KV store, rate limiting, webhook inboxes, forms, and more.",
     "contact": {
       "name": "AgentUtils",
+      "email": "admin@a2z-soft.com",
       "url": "https://www.agent-utils.com"
     }
   },

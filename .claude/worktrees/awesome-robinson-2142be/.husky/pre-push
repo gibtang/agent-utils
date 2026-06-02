@@ -1,0 +1,9 @@
+node scripts/generate-llms-txt.mjs
+if git diff --quiet public/llms.txt; then
+  echo "✅ llms.txt up to date"
+else
+  echo "📝 llms.txt changed, committing update..."
+  git add public/llms.txt
+  git commit -m "chore: regenerate llms.txt"
+  echo "✅ llms.txt committed"
+fi

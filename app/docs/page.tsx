@@ -3,17 +3,8 @@ import Link from 'next/link';
 export const dynamic = 'force-static';
 
 const tools = [
-  { slug: 'file-host', name: 'Ephemeral File Host', desc: 'Park files for agents with auto-expiry. Upload, retrieve, done.', icon: '📎' },
   { slug: 'dlq', name: 'Dead Letter Queue', desc: 'Catch failed agent tasks, inspect payloads, retry with webhooks.', icon: '📬' },
   { slug: 'checkpoint', name: 'Human-in-the-Loop Gate', desc: 'Pause agents until a human approves or rejects.', icon: '👤' },
-  { slug: 'shield', name: 'Agent Shield (PII)', desc: 'Redact PII before LLM calls, hydrate it back after.', icon: '🛡️' },
-  { slug: 'otp', name: 'AgentVerify OTP', desc: 'Temporary phone numbers for agent 2FA/verification.', icon: '🔑' },
-  { slug: 'notify', name: 'Notification Router', desc: 'One API call to email a human. Priority routing, no SMTP config.', icon: '🔔' },
-  { slug: 'audit', name: 'Audit Log', desc: 'Immutable agent action history for user-facing accountability.', icon: '📋' },
-  { slug: 'kv', name: 'Key-Value Store', desc: 'Simple state persistence for stateless agents. API-key scoped, atomic increment.', icon: '🗄️' },
-  { slug: 'rate-limit', name: 'Rate Limiter', desc: 'Outbound API rate limiting for agents. Check-before-act pattern.', icon: '⚡' },
-  { slug: 'webhook', name: 'Webhook Inbox', desc: 'Pre-provisioned public HTTPS endpoints for agents with no public URL.', icon: '📩' },
-  { slug: 'form', name: 'Agent Form', desc: 'Hosted forms for human-in-the-loop data collection. Agent creates, human fills, webhook delivers.', icon: '📝' },
 ];
 
 export default function DocsPage() {
@@ -60,7 +51,6 @@ export default function DocsPage() {
               <tr className="border-b border-zinc-800 text-zinc-400">
                 <th className="pb-3 pr-4 font-medium">Tier</th>
                 <th className="pb-3 pr-4 font-medium">Requests/Day</th>
-                <th className="pb-3 pr-4 font-medium">Max File Size</th>
                 <th className="pb-3 font-medium">Retention</th>
               </tr>
             </thead>
@@ -68,19 +58,16 @@ export default function DocsPage() {
               <tr className="border-b border-zinc-800/50">
                 <td className="py-3 pr-4">Free</td>
                 <td className="py-3 pr-4">100</td>
-                <td className="py-3 pr-4">5 MB</td>
                 <td className="py-3">1 hour</td>
               </tr>
               <tr className="border-b border-zinc-800/50">
                 <td className="py-3 pr-4">Pro</td>
                 <td className="py-3 pr-4">10,000</td>
-                <td className="py-3 pr-4">50 MB</td>
                 <td className="py-3">24 hours</td>
               </tr>
               <tr>
                 <td className="py-3 pr-4">Enterprise</td>
                 <td className="py-3 pr-4">Unlimited</td>
-                <td className="py-3 pr-4">500 MB</td>
                 <td className="py-3">72 hours</td>
               </tr>
             </tbody>

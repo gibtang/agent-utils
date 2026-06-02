@@ -1,89 +1,96 @@
 # AgentUtils
 
-> One API key. Agent-native utilities for AI agents.
-
-https://www.agent-utils.com
+> One API key. Agent-native utilities. https://agentutils.dev
 
 ## Authentication
 
 All endpoints require `x-api-key` header with key starting with `au_`.
-Create key at https://www.agent-utils.com/dashboard after signup.
+Create key at https://agentutils.dev/dashboard after signup.
 
 ## Quick Start
 
 ```
-curl -H "x-api-key: au_YOUR_KEY" https://www.agent-utils.com/api/health
+curl -H "x-api-key: au_YOUR_KEY" https://agentutils.dev/api/health
 ```
 
 ## Tools
 
 ### File Host — Ephemeral file hosting
-- POST /api/file-host — Upload a file (multipart, field: "file")
+Ephemeral file hosting
+- POST /api/file-host — Upload a file — body:  (multipart, field: "file")
 - GET /api/file-host/{id} — Retrieve a file
 
 ### Dead Letter Queue — Capture and retry failures
-- POST /api/dlq — Capture a failure
-- GET /api/dlq — List failures (query: status, page, limit)
+Capture and retry failures
+- POST /api/dlq — Capture a failure — body: { agentName: string, taskType: string, payload: any, error: string, retryWebhook?: string }
+- GET /api/dlq?status=VALUE&page=VALUE&limit=VALUE — List failures
 - GET /api/dlq/{id} — Inspect failure (full payload)
 - DELETE /api/dlq/{id} — Dismiss failure
 - POST /api/dlq/{id}/retry — Retry — forward payload to webhook
 
 ### Human-in-the-Loop — Pause agents for human approval
-- POST /api/checkpoint — Create checkpoint (agent sleeps)
+Pause agents for human approval
+- POST /api/checkpoint — Create checkpoint (agent sleeps) — body: { agentName: string, taskDescription: string, state: any, webhookUrl: string }
 - GET /api/checkpoint — List checkpoints
 - GET /api/checkpoint/{id} — Poll checkpoint status
-- POST /api/checkpoint/{id}/resume — Approve or reject
+- POST /api/checkpoint/{id}/resume — Approve or reject checkpoint — body: { action: "approve|reject", reason?: string }
 
 ### Agent Shield — PII redaction and hydration (Pro+)
+PII redaction and hydration
 - GET /api/shield — Shield info
-- POST /api/shield/clean — Redact PII from text
-- POST /api/shield/hydrate — Restore original PII
+- POST /api/shield/clean — Redact PII from text — body: { text: string }
+- POST /api/shield/hydrate — Restore original PII values — body: { text: string, sessionId: string }
 
-### AgentVerify OTP — Temporary phone numbers (Pro+)
-- POST /api/otp — Provision phone number
-- GET /api/otp — List active sessions
+### AgentVerify OTP — Temporary phone numbers for verification. Virtual numbers blocked by WhatsApp, Google, Meta, and major crypto exchanges. Works for niche platforms and internal systems. (Pro+)
+Temporary phone numbers for verification. Virtual numbers blocked by WhatsApp, Google, Meta, and major crypto exchanges. Works for niche platforms and internal systems.
+- POST /api/otp — Provision temporary phone number — body: { countryCode?: string }
+- GET /api/otp — List active OTP sessions
 - GET /api/otp/{id} — Poll for OTP code
-- DELETE /api/otp/{id} — Cancel session
+- DELETE /api/otp/{id} — Cancel OTP session
 
-### Notification Router — Email notifications
-- POST /api/notify — Send notification
-- GET /api/notify — List notification history
+### Notification Router — Email notifications for agents
+Email notifications for agents
+- POST /api/notify — Send an email notification — body: { message: string, priority?: "urgent|normal|low", to?: string, subject?: string, metadata?: object }
+- GET /api/notify?status=VALUE&priority=VALUE&limit=VALUE&offset=VALUE — List notification history
 - GET /api/notify/{id} — Get notification detail
 
-### Audit Log — Immutable action history
-- POST /api/audit — Log an action
-- GET /api/audit — Query audit logs (filter: agent, action, severity, dates)
-- GET /api/audit/{id} — Get single entry
+### Audit Log — Compliance-grade audit trail for agent actions
+Compliance-grade audit trail for agent actions
+- POST /api/audit — Log an audit event — body: { agentName: string, action: string, target?: string, metadata?: object, severity?: "debug|info|warn|error" }
+- GET /api/audit?agentName=VALUE&action=VALUE&severity=VALUE&limit=VALUE&offset=VALUE — List audit entries
+- GET /api/audit/{id} — Get audit entry detail
 
-### Key-Value Store — Simple state persistence
-- PUT /api/kv — Set a key-value pair (body: key, value, ttl?)
-- GET /api/kv/{key} — Get value
-- DELETE /api/kv/{key} — Delete key
+### KV Store — Persistent key-value storage for agents
+Persistent key-value storage for agents
+- PUT /api/kv — Set a key-value pair — body: { key: string, value: any, ttl?: number }
+- GET /api/kv/{key} — Get value by key
+- DELETE /api/kv/{key} — Delete a key
 
-### Rate Limiter — Outbound rate limiting
-- POST /api/rate-limit/check — Check rate limit (body: key, limit, windowSeconds)
-- POST /api/rate-limit/reset — Reset counter (body: key)
+### Rate Limiter — Token-bucket rate limiting for agent workflows
+Token-bucket rate limiting for agent workflows
+- POST /api/rate-limit/check — Check rate limit — body: { key: string, limit: number, windowSeconds: number }
+- POST /api/rate-limit/reset — Reset rate limit counter — body: { key: string }
 
-### Webhook Inbox — Public HTTPS endpoints
-- POST /api/webhook — Create inbox (body: label, forwardUrl, ttl?)
-- GET /api/webhook — List inboxes
-- GET /api/webhook/{id} — Get inbox + latest 50 messages
+### Webhook Inbox — Temporary endpoints to capture incoming webhooks
+Temporary endpoints to capture incoming webhooks
+- POST /api/webhook — Create a webhook inbox — body: { label: string, forwardUrl?: string, ttl?: number }
+- GET /api/webhook — List webhook inboxes
+- GET /api/webhook/{id} — Get inbox and captured payloads
 
-### Agent Form — Human data collection
-- POST /api/form — Create form (body: title, fields[], webhookUrl, ttl?)
-- GET /api/form/{id} — Get form + latest 100 responses
+### Agent Form — Create forms for humans, collect structured responses
+Create forms for humans, collect structured responses
+- POST /api/form — Create a form for humans — body: { title: string, fields: array, webhookUrl: string, ttl?: number }
+- GET /api/form/{id} — Get form status and responses
 
-## Pricing
+## Rate Limits
 
-- Free: 100 calls/day, 5MB files, 1h retention — $0/mo
-- Pro: 10,000 calls/day, 50MB files, 24h retention — $49/mo
-- Enterprise: Unlimited, 500MB files, 72h retention — custom
+- Free: 500 calls/mo, 5MB files, 1h retention — $0/mo
+- Builder: 10,000 calls/mo, $0.002/call overage, 25MB files, 12h retention — $19/mo
+- Pro: 100,000 calls/mo, $0.001/call overage, 50MB files, 24h retention — $49/mo
+- Enterprise: Unlimited, 500MB files, 72h retention — $0/mo
+
+## OpenAPI Spec
+Full machine-readable spec: https://agentutils.dev/api/docs
 
 ## Response Format
-
-All endpoints return: `{ success: boolean, data?: any, error?: string }`
-
-## Specs
-
-=> /llms-full.txt Full API reference with request/response examples
-=> /openapi.json OpenAPI 3.0 specification
+All endpoints return: `{ success: boolean, data?: any, error?: string, code?: string }`

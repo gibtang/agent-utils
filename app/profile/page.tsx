@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
+import { Toast } from '@/components/Toast';
 
 export default function ProfilePage() {
   const { user, profile, loading, isAuthenticated, refreshProfile } = useAuth();
@@ -14,7 +15,15 @@ export default function ProfilePage() {
   const [error, setError] = useState('');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [copiedSnippet, setCopiedSnippet] = useState<string | null>(null);
+  const [toastVisible, setToastVisible] = useState(false);
+
   const [billingLoading, setBillingLoading] = useState(false);
+
+  useEffect(() => {
+    if (profile?.name) setName(profile.name);
+  }, [profile?.name]);
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -126,6 +135,24 @@ export default function ProfilePage() {
     }
   };
 
+  const copyKey = () => {
+    if (profile?.defaultKey) {
+      navigator.clipboard.writeText(profile.defaultKey);
+      setCopied(true);
+      setToastVisible(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  const copySnippet = (id: string, text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedSnippet(id);
+    setToastVisible(true);
+    setTimeout(() => setCopiedSnippet(null), 2000);
+  };
+
+  const apiKey = profile?.defaultKey || 'au_YOUR_KEY';
+
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-zinc-950">
@@ -162,6 +189,145 @@ export default function ProfilePage() {
             {error}
           </div>
         )}
+
+        {/* API Key */}
+        <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-6 mb-6">
+          <h2 className="text-lg font-semibold mb-4">API Key</h2>
+          {profile?.defaultKey ? (
+            <div className="flex items-center gap-3">
+              <p className="rounded bg-zinc-800 px-3 py-2 font-mono text-sm text-zinc-200 select-all flex-1 overflow-x-auto">
+                {profile.defaultKey}
+              </p>
+              <button
+                onClick={copyKey}
+                className="shrink-0 rounded-md border border-zinc-700 p-2 text-zinc-300 transition-colors hover:border-zinc-500 hover:text-zinc-100"
+                title="Copy API key"
+              >
+                {copied ? (
+                  <svg className="h-5 w-5 text-emerald-400" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                  </svg>
+                ) : (
+                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9.75a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184" />
+                  </svg>
+                )}
+              </button>
+            </div>
+          ) : (
+            <p className="text-sm text-zinc-500">No API key found.</p>
+          )}
+        </div>
+
+        {/* For Your AI Agents */}
+        <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-6 mb-6">
+          <h2 className="text-lg font-semibold mb-4">For Your AI Agents</h2>
+          <p className="text-sm text-zinc-400 mb-5">
+            Copy these snippets to tell your AI agents how to use AgentUtils.
+          </p>
+
+          {/* cURL Quick Start */}
+          <div className="mb-5">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-medium text-zinc-300">cURL — Quick Test</h3>
+              <button
+                onClick={() => copySnippet('curl', `curl -H "x-api-key: ${apiKey}" https://agentutils.dev/api/health`)}
+                className="text-xs text-zinc-500 hover:text-zinc-200 transition-colors"
+              >
+                {copiedSnippet === 'curl' ? 'Copied!' : 'Copy'}
+              </button>
+            </div>
+            <pre className="rounded bg-zinc-800 p-3 font-mono text-xs text-zinc-300 overflow-x-auto">{`curl -H "x-api-key: ${apiKey}" https://agentutils.dev/api/health`}</pre>
+          </div>
+
+          {/* Claude Code MCP */}
+          <div className="mb-5">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-medium text-zinc-300">Claude Code — MCP Config</h3>
+              <button
+                onClick={() => copySnippet('claude', JSON.stringify({
+                  mcpServers: {
+                    "agent-utils": {
+                      command: "npx",
+                      args: ["-y", "@agent-utils/mcp-server"],
+                      env: { AGENT_UTILS_API_KEY: apiKey }
+                    }
+                  }
+                }, null, 2))}
+                className="text-xs text-zinc-500 hover:text-zinc-200 transition-colors"
+              >
+                {copiedSnippet === 'claude' ? 'Copied!' : 'Copy'}
+              </button>
+            </div>
+            <pre className="rounded bg-zinc-800 p-3 font-mono text-xs text-zinc-300 overflow-x-auto">{JSON.stringify({
+              mcpServers: {
+                "agent-utils": {
+                  command: "npx",
+                  args: ["-y", "@agent-utils/mcp-server"],
+                  env: { AGENT_UTILS_API_KEY: apiKey }
+                }
+              }
+            }, null, 2)}</pre>
+          </div>
+
+          {/* Cursor MCP */}
+          <div className="mb-5">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-medium text-zinc-300">Cursor — MCP Config</h3>
+              <button
+                onClick={() => copySnippet('cursor', JSON.stringify({
+                  "agent-utils": {
+                    command: "npx",
+                    args: ["-y", "@agent-utils/mcp-server"],
+                    env: { AGENT_UTILS_API_KEY: apiKey }
+                  }
+                }, null, 2))}
+                className="text-xs text-zinc-500 hover:text-zinc-200 transition-colors"
+              >
+                {copiedSnippet === 'cursor' ? 'Copied!' : 'Copy'}
+              </button>
+            </div>
+            <pre className="rounded bg-zinc-800 p-3 font-mono text-xs text-zinc-300 overflow-x-auto">{JSON.stringify({
+              "agent-utils": {
+                command: "npx",
+                args: ["-y", "@agent-utils/mcp-server"],
+                env: { AGENT_UTILS_API_KEY: apiKey }
+              }
+            }, null, 2)}</pre>
+          </div>
+
+          {/* System prompt snippet */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-medium text-zinc-300">System Prompt — Paste into your agent</h3>
+              <button
+                onClick={() => copySnippet('prompt', `You have access to AgentUtils (https://agentutils.dev) — a suite of agent-native utilities.
+
+Authentication: All requests require header "x-api-key: ${apiKey}"
+
+Available tools:
+- Dead Letter Queue: POST /api/dlq (capture failure), GET /api/dlq (list), POST /api/dlq/{id}/retry (retry)
+- Human-in-the-Loop: POST /api/checkpoint (pause for approval), POST /api/checkpoint/{id}/resume (approve/reject)
+
+All endpoints return: { success: boolean, data?: any, error?: string }
+Full OpenAPI spec: https://agentutils.dev/api/docs`)}
+                className="text-xs text-zinc-500 hover:text-zinc-200 transition-colors"
+              >
+                {copiedSnippet === 'prompt' ? 'Copied!' : 'Copy'}
+              </button>
+            </div>
+            <pre className="rounded bg-zinc-800 p-3 font-mono text-xs text-zinc-300 overflow-x-auto whitespace-pre-wrap">{`You have access to AgentUtils (https://agentutils.dev) — a suite of agent-native utilities.
+
+Authentication: All requests require header "x-api-key: ${apiKey}"
+
+Available tools:
+- Dead Letter Queue: POST /api/dlq (capture failure), GET /api/dlq (list), POST /api/dlq/{id}/retry (retry)
+- Human-in-the-Loop: POST /api/checkpoint (pause for approval), POST /api/checkpoint/{id}/resume (approve/reject)
+
+All endpoints return: { success: boolean, data?: any, error?: string }
+Full OpenAPI spec: https://agentutils.dev/api/docs`}</pre>
+          </div>
+        </div>
 
         {/* Account Info */}
         <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-6 mb-6">
@@ -323,6 +489,7 @@ export default function ProfilePage() {
           )}
         </div>
       </div>
+      <Toast message="Copied to clipboard!" visible={toastVisible} onHide={() => setToastVisible(false)} />
     </div>
   );
 }
