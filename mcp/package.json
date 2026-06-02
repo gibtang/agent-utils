@@ -1,0 +1,15 @@
+{
+  "name": "@agent-utils/mcp-server",
+  "version": "1.0.0",
+  "description": "MCP server exposing all 11 agent-utils.com tools",
+  "main": "server.mjs",
+  "type": "module",
+  "bin": { "agent-utils-mcp": "./server.mjs" },
+  "scripts": { "start": "node server.mjs" },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "zod": "^3.24.0"
+  },
+  "author": "A2Z Soft <admin@a2z-soft.com>",
+  "license": "AGPL-3.0-only"
+}

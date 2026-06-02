@@ -2,11 +2,8 @@ import Link from "next/link";
 import { tools as allTools } from "@/lib/seo-tools";
 
 const featuredTools = [
-  { name: "Ephemeral File Host", desc: "Park files for agents. Auto-expires.", slug: "file-host" },
   { name: "Dead Letter Queue", desc: "Catch, inspect, and retry failed agent tasks.", slug: "dlq" },
   { name: "Human-in-the-Loop Gate", desc: "Pause agents until humans approve.", slug: "checkpoint" },
-  { name: "Agent Shield", desc: "PII redaction proxy. Clean before LLM, hydrate after.", slug: "shield" },
-  { name: "AgentVerify OTP", desc: "Temporary phone numbers for agent 2FA.", slug: "otp" },
 ];
 
 export default function Home() {
@@ -18,6 +15,20 @@ export default function Home() {
           AgentUtils
         </Link>
         <div className="flex items-center gap-4 text-sm text-zinc-400">
+          <Link href="/docs" className="hover:text-zinc-100 transition-colors">
+            Docs
+          </Link>
+          <a
+            href="https://github.com/gibtang/agent-utils"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 hover:text-zinc-100 transition-colors"
+          >
+            <svg viewBox="0 0 16 16" className="w-4 h-4 fill-current" aria-hidden="true">
+              <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+            </svg>
+            Star
+          </a>
           <Link href="/login" className="hover:text-zinc-100 transition-colors">
             Sign in
           </Link>
@@ -34,7 +45,7 @@ export default function Home() {
       <section className="flex flex-col items-center text-center px-6 pt-24 pb-16">
         <h1 className="text-5xl font-bold tracking-tight">AgentUtils</h1>
         <p className="mt-4 text-xl text-zinc-400 max-w-xl">
-          One API key. 6 agent-native utilities.
+          One API key. 2 agent-native utilities.
         </p>
         <Link
           href="/signup"
@@ -73,15 +84,15 @@ curl -X POST https://www.agent-utils.com/api/keys \\
   -H "Authorization: Bearer YOUR_TOKEN" \\
   -d '{"name": "my-agent"}'
 
-# 2. Upload a file
-curl -X POST https://www.agent-utils.com/api/file-host \\
-  -H "x-api-key: au_..." \\
-  -F "file=@report.csv"
+# 2. Pause for human approval
+curl -X POST https://www.agent-utils.com/api/checkpoint \
+  -H "x-api-key: au_..." \
+  -d '{"agentName": "deploy-bot", "payload": {"env": "prod"}}'
 
-# 3. Send a notification
-curl -X POST https://www.agent-utils.com/api/notify \\
-  -H "x-api-key: au_..." \\
-  -d '{"message": "Task complete"}'`}
+# 3. Catch failed tasks in DLQ
+curl -X POST https://www.agent-utils.com/api/dlq \
+  -H "x-api-key: au_..." \
+  -d '{"agentName": "data-pipeline", "error": "Timeout", "payload": {}}'
           </pre>
         </div>
       </section>
@@ -106,8 +117,19 @@ curl -X POST https://www.agent-utils.com/api/notify \\
       </section>
 
       {/* Footer */}
-      <footer className="mt-auto border-t border-zinc-800 px-6 py-6 text-center text-sm text-zinc-500">
-        Built for agents. By humans.
+      <footer className="mt-auto border-t border-zinc-800 px-6 py-6 flex items-center justify-between text-sm text-zinc-500">
+        <span>Built for agents. By humans.</span>
+        <a
+          href="https://github.com/gibtang/agent-utils"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-1.5 hover:text-zinc-100 transition-colors"
+        >
+          <svg viewBox="0 0 16 16" className="w-4 h-4 fill-current" aria-hidden="true">
+            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+          </svg>
+          GitHub
+        </a>
       </footer>
     </div>
   );

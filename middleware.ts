@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const publicPaths = ['/', '/pricing', '/api/webhooks', '/api/auth', '/api/health', '/docs', '/llms.txt', '/hook', '/f', '/login', '/signup'];
+// Public paths that don't require auth
+const publicPaths = ['/', '/pricing', '/api/webhooks', '/api/auth', '/api/health', '/docs', '/llms.txt', '/hook', '/f', '/login', '/signup', '/api/firebase-config', '/api/user'];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -10,23 +11,10 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Check for session cookie
-  const session = request.cookies.get('session')?.value;
-
-  if (!session) {
-    const loginUrl = new URL('/login', request.url);
-    loginUrl.searchParams.set('redirect', pathname);
-    return NextResponse.redirect(loginUrl);
-  }
-
-  try {
-    // Verify session cookie server-side via API check
-    // The actual verification happens in API routes via firebase-admin
-    return NextResponse.next();
-  } catch {
-    const loginUrl = new URL('/login', request.url);
-    return NextResponse.redirect(loginUrl);
-  }
+  // No server-side session cookie check — Firebase Auth manages sessions client-side
+  // The AuthContext handles redirecting unauthenticated users
+  // Only protect routes that need server-side auth (e.g. admin) here
+  return NextResponse.next();
 }
 
 export const config = {

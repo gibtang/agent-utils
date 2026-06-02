@@ -1,11 +1,11 @@
 'use client';
 
-import { Suspense, useState } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 
 function LoginForm() {
-  const { signIn, signInWithGoogle } = useAuth();
+  const { user, signIn, signInWithGoogle } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
@@ -13,7 +13,14 @@ function LoginForm() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const redirect = searchParams.get('redirect') || '/dashboard';
+  const redirect = searchParams.get('redirect') || '/profile';
+
+  // Redirect when user becomes authenticated — handles Google popup flow
+  useEffect(() => {
+    if (user) {
+      router.push(redirect);
+    }
+  }, [user, router, redirect]);
 
   const handleEmailSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,7 +28,7 @@ function LoginForm() {
     setLoading(true);
     try {
       await signIn(email, password);
-      router.push(redirect);
+      // Redirect handled by useEffect above
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Sign in failed';
       setError(message);
@@ -32,12 +39,14 @@ function LoginForm() {
 
   const handleGoogleSignIn = async () => {
     setError('');
+    setLoading(true);
     try {
       await signInWithGoogle();
-      router.push(redirect);
+      // Redirect handled by useEffect above — onAuthStateChanged fires after popup closes
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Google sign in failed';
       setError(message);
+      setLoading(false);
     }
   };
 
@@ -88,7 +97,8 @@ function LoginForm() {
 
         <button
           onClick={handleGoogleSignIn}
-          className="flex w-full items-center justify-center gap-2 rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-2.5 text-sm font-medium text-zinc-100 hover:bg-zinc-700 transition-colors"
+          disabled={loading}
+          className="flex w-full items-center justify-center gap-2 rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-2.5 text-sm font-medium text-zinc-100 hover:bg-zinc-700 transition-colors disabled:opacity-50"
         >
           <svg className="h-4 w-4" viewBox="0 0 24 24">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>

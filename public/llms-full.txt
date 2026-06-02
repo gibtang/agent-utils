@@ -1,0 +1,414 @@
+# AgentUtils — Full API Reference
+
+> One API key. Agent-native utilities for AI agents.
+
+https://www.agent-utils.com
+
+Base URL: `https://www.agent-utils.com`
+
+All endpoints require header: `x-api-key: au_YOUR_KEY`
+
+All responses: `{ success: boolean, data?: any, error?: string }`
+
+---
+
+## File Host
+
+Ephemeral file hosting with auto-expiry based on tier.
+
+### POST /api/file-host — Upload a file
+
+```
+curl -X POST https://www.agent-utils.com/api/file-host \
+  -H "x-api-key: au_YOUR_KEY" \
+  -F "file=@report.pdf"
+```
+
+Response:
+```json
+{
+  "success": true,
+  "data": {
+    "url": "https://www.agent-utils.com/api/file-host/abc123/report.pdf",
+    "id": "abc123",
+    "expiresAt": "2026-05-13T00:00:00Z"
+  }
+}
+```
+
+### GET /api/file-host/{id} — Retrieve a file
+
+```
+curl https://www.agent-utils.com/api/file-host/abc123 \
+  -H "x-api-key: au_YOUR_KEY"
+```
+
+Returns the file binary with appropriate content-type.
+
+---
+
+## Dead Letter Queue
+
+Capture failed agent tasks, inspect payloads, retry with webhooks.
+
+### POST /api/dlq — Capture a failure
+
+```
+curl -X POST https://www.agent-utils.com/api/dlq \
+  -H "x-api-key: au_YOUR_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "agentName": "email-agent",
+    "taskType": "send_email",
+    "payload": {"to": "user@example.com", "body": "Hello"},
+    "error": "SMTP connection timeout",
+    "retryWebhook": "https://my-agent.com/retry"
+  }'
+```
+
+### GET /api/dlq — List failures
+
+```
+curl "https://www.agent-utils.com/api/dlq?status=pending&page=1&limit=20" \
+  -H "x-api-key: au_YOUR_KEY"
+```
+
+Query params: `status` (pending|retried|resolved|dismissed), `page`, `limit`
+
+### GET /api/dlq/{id} — Inspect failure (full payload)
+
+### DELETE /api/dlq/{id} — Dismiss failure
+
+### POST /api/dlq/{id}/retry — Retry
+
+Forwards original payload to `retryWebhook` URL.
+
+---
+
+## Human-in-the-Loop
+
+Pause agents until a human approves or rejects.
+
+### POST /api/checkpoint — Create checkpoint
+
+```
+curl -X POST https://www.agent-utils.com/api/checkpoint \
+  -H "x-api-key: au_YOUR_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "agentName": "deploy-bot",
+    "taskDescription": "Deploy v2.0 to production",
+    "state": {"version": "2.0", "env": "prod"},
+    "webhookUrl": "https://my-agent.com/resume"
+  }'
+```
+
+Response:
+```json
+{
+  "success": true,
+  "data": {
+    "id": "chk_abc123",
+    "status": "pending",
+    "url": "https://www.agent-utils.com/checkpoint/chk_abc123"
+  }
+}
+```
+
+### GET /api/checkpoint — List checkpoints
+
+### GET /api/checkpoint/{id} — Poll checkpoint status
+
+Returns `state` only when approved. Pending checkpoints return `state: null`.
+
+### POST /api/checkpoint/{id}/resume — Approve or reject
+
+```
+curl -X POST https://www.agent-utils.com/api/checkpoint/chk_abc123/resume \
+  -H "x-api-key: au_YOUR_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"action": "approve"}'
+```
+
+Body: `{ action: "approve"|"reject", reason?: string }`
+
+---
+
+## Agent Shield (Pro+)
+
+PII redaction and hydration. Redact before LLM calls, hydrate after.
+
+### GET /api/shield — Shield info
+
+### POST /api/shield/clean — Redact PII from text
+
+```
+curl -X POST https://www.agent-utils.com/api/shield/clean \
+  -H "x-api-key: au_YOUR_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"text": "Contact John at john@example.com or 555-1234"}'
+```
+
+Response:
+```json
+{
+  "success": true,
+  "data": {
+    "cleaned": "Contact [NAME_1] at [EMAIL_1] or [PHONE_1]",
+    "sessionId": "sess_abc123"
+  }
+}
+```
+
+### POST /api/shield/hydrate — Restore original PII
+
+```
+curl -X POST https://www.agent-utils.com/api/shield/hydrate \
+  -H "x-api-key: au_YOUR_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"text": "Contact [NAME_1] at [EMAIL_1]", "sessionId": "sess_abc123"}'
+```
+
+---
+
+## AgentVerify OTP (Pro+)
+
+Temporary phone numbers for SMS verification.
+
+### POST /api/otp — Provision phone number
+
+```
+curl -X POST https://www.agent-utils.com/api/otp \
+  -H "x-api-key: au_YOUR_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"countryCode": "US"}'
+```
+
+Response includes `phoneNumber` and `id` for polling.
+
+### GET /api/otp — List active sessions
+
+### GET /api/otp/{id} — Poll for OTP code
+
+Returns code when `status=received`.
+
+### DELETE /api/otp/{id} — Cancel session
+
+---
+
+## Notification Router
+
+One API call to email a human. No SMTP config needed.
+
+### POST /api/notify — Send notification
+
+```
+curl -X POST https://www.agent-utils.com/api/notify \
+  -H "x-api-key: au_YOUR_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "message": "Deploy v2.0 completed successfully",
+    "priority": "normal",
+    "subject": "Deploy Complete"
+  }'
+```
+
+Body: `{ message: string, priority?: "urgent"|"normal"|"low", to?: string, subject?: string, metadata?: object }`
+
+### GET /api/notify — List notification history
+
+Query params: `status` (sent|failed), `priority`, `limit`, `offset`
+
+### GET /api/notify/{id} — Get notification detail
+
+---
+
+## Audit Log
+
+Immutable agent action history for user-facing accountability.
+
+### POST /api/audit — Log an action
+
+```
+curl -X POST https://www.agent-utils.com/api/audit \
+  -H "x-api-key: au_YOUR_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "agentName": "data-pipeline",
+    "action": "export",
+    "target": "users.csv",
+    "metadata": {"rows": 1500, "format": "csv"},
+    "severity": "info"
+  }'
+```
+
+Body: `{ agentName: string, action: string, target?: string, metadata?: object, severity?: "debug"|"info"|"warn"|"error" }`
+
+### GET /api/audit — Query audit logs
+
+```
+curl "https://www.agent-utils.com/api/audit?agent=data-pipeline&severity=error&limit=50" \
+  -H "x-api-key: au_YOUR_KEY"
+```
+
+Query params: `agent`, `action`, `severity`, `startDate`, `endDate`, `limit`, `offset`
+
+### GET /api/audit/{id} — Get single entry
+
+---
+
+## Key-Value Store
+
+Simple state persistence for stateless agents. API-key scoped.
+
+### PUT /api/kv — Set a key-value pair
+
+```
+curl -X PUT https://www.agent-utils.com/api/kv \
+  -H "x-api-key: au_YOUR_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"key": "last_run", "value": "2026-05-12T00:00:00Z", "ttl": 3600}'
+```
+
+Body: `{ key: string, value: any, ttl?: number (seconds) }`
+- Max key length: 256 characters
+- Max value size varies by tier
+
+### GET /api/kv/{key} — Get value
+
+```
+curl https://www.agent-utils.com/api/kv/last_run \
+  -H "x-api-key: au_YOUR_KEY"
+```
+
+Response:
+```json
+{
+  "success": true,
+  "data": {
+    "key": "last_run",
+    "value": "2026-05-12T00:00:00Z",
+    "expiresAt": "2026-05-12T01:00:00Z"
+  }
+}
+```
+
+### DELETE /api/kv/{key} — Delete key
+
+---
+
+## Rate Limiter
+
+Outbound API rate limiting for agents. Check-before-act pattern.
+
+### POST /api/rate-limit/check — Check rate limit
+
+```
+curl -X POST https://www.agent-utils.com/api/rate-limit/check \
+  -H "x-api-key: au_YOUR_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"key": "external_api:twitter", "limit": 100, "windowSeconds": 3600}'
+```
+
+Body: `{ key: string, limit: number, windowSeconds: number }`
+
+Response:
+```json
+{
+  "success": true,
+  "data": {
+    "allowed": true,
+    "remaining": 95,
+    "resetAt": "2026-05-12T01:00:00Z"
+  }
+}
+```
+
+### POST /api/rate-limit/reset — Reset counter
+
+```
+curl -X POST https://www.agent-utils.com/api/rate-limit/reset \
+  -H "x-api-key: au_YOUR_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"key": "external_api:twitter"}'
+```
+
+---
+
+## Webhook Inbox
+
+Pre-provisioned public HTTPS endpoints for agents with no public URL.
+
+### POST /api/webhook — Create inbox
+
+```
+curl -X POST https://www.agent-utils.com/api/webhook \
+  -H "x-api-key: au_YOUR_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "label": "Stripe Webhooks",
+    "forwardUrl": "https://my-agent.com/stripe-handler",
+    "ttl": 86400
+  }'
+```
+
+Body: `{ label: string, forwardUrl?: string, ttl?: number }`
+
+Response:
+```json
+{
+  "success": true,
+  "data": {
+    "id": "inbox_abc123",
+    "token": "tok_xyz789",
+    "url": "https://www.agent-utils.com/hook/tok_xyz789"
+  }
+}
+```
+
+### GET /api/webhook — List inboxes
+
+### GET /api/webhook/{id} — Get inbox + latest 50 messages
+
+---
+
+## Agent Form
+
+Hosted forms for human-in-the-loop data collection. Agent creates, human fills, webhook delivers.
+
+### POST /api/form — Create form
+
+```
+curl -X POST https://www.agent-utils.com/api/form \
+  -H "x-api-key: au_YOUR_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Approve Expense Report",
+    "fields": [
+      {"name": "approved", "type": "boolean", "required": true},
+      {"name": "notes", "type": "text", "required": false}
+    ],
+    "webhookUrl": "https://my-agent.com/form-handler",
+    "ttl": 86400
+  }'
+```
+
+Body: `{ title: string, fields: [{name, type, required}], webhookUrl: string, ttl?: number }`
+
+Response includes `url` (e.g. `https://www.agent-utils.com/f/{token}`) for sharing with humans.
+
+### GET /api/form/{id} — Get form + latest 100 responses
+
+---
+
+## Rate Limits & Pricing
+
+| Tier | Requests/Day | Max File | Retention | Price |
+|------|-------------|----------|-----------|-------|
+| Free | 100 | 5 MB | 1 hour | $0/mo |
+| Pro | 10,000 | 50 MB | 24 hours | $49/mo |
+| Enterprise | Unlimited | 500 MB | 72 hours | Custom |
+
+## OpenAPI Spec
+
+Machine-readable spec: https://www.agent-utils.com/openapi.json
