@@ -61,7 +61,7 @@ export default function Home() {
           {featuredTools.map((tool) => (
             <Link
               key={tool.name}
-              href={`/tools/${tool.slug}`}
+              href={'/tools/' + tool.slug}
               className="rounded-lg border border-zinc-800 p-5 hover:border-zinc-600 transition-colors block"
             >
               <h3 className="font-semibold text-sm">{tool.name}</h3>
@@ -78,22 +78,7 @@ export default function Home() {
       <section className="px-6 pb-20">
         <div className="max-w-3xl mx-auto">
           <h2 className="text-2xl font-semibold mb-6">Quick start</h2>
-          <pre className="rounded-lg border border-zinc-800 bg-zinc-900 p-5 text-sm leading-relaxed overflow-x-auto text-zinc-300">
-{`# 1. Get your API key
-curl -X POST https://www.agent-utils.com/api/keys \\
-  -H "Authorization: Bearer YOUR_TOKEN" \\
-  -d '{"name": "my-agent"}'
-
-# 2. Pause for human approval
-curl -X POST https://www.agent-utils.com/api/checkpoint \
-  -H "x-api-key: au_..." \
-  -d '{"agentName": "deploy-bot", "payload": {"env": "prod"}}'
-
-# 3. Catch failed tasks in DLQ
-curl -X POST https://www.agent-utils.com/api/dlq \
-  -H "x-api-key: au_..." \
-  -d '{"agentName": "data-pipeline", "error": "Timeout", "payload": {}}'
-          </pre>
+          <pre className={"rounded-lg border border-zinc-800 bg-zinc-900 p-5 text-sm leading-relaxed overflow-x-auto text-zinc-300"}>{"# 1. Get your API key\ncurl -X POST https://www.agent-utils.com/api/keys \\\n  -H \"Authorization: Bearer YOUR_TOKEN\" \\\n  -d '{\"name\": \"my-agent\"}'\n\n# 2. Pause for human approval\ncurl -X POST https://www.agent-utils.com/api/checkpoint \\\n  -H \"x-api-key: au_...\" \\\n  -d '{\"agentName\": \"deploy-bot\", \"payload\": {\"env\": \"prod\"}}'\n\n# 3. Catch failed tasks in DLQ\ncurl -X POST https://www.agent-utils.com/api/dlq \\\n  -H \"x-api-key: au_...\" \\\n  -d '{\"agentName\": \"data-pipeline\", \"error\": \"Timeout\", \"payload\": {}}'"}</pre>
         </div>
       </section>
 
@@ -105,7 +90,7 @@ curl -X POST https://www.agent-utils.com/api/dlq \
             {allTools.map((tool) => (
               <Link
                 key={tool.slug}
-                href={`/tools/${tool.slug}`}
+                href={'/tools/' + tool.slug}
                 className="rounded-lg border border-zinc-800 p-4 hover:border-zinc-600 transition-colors block"
               >
                 <p className="text-sm font-medium">{tool.icon} {tool.name}</p>
@@ -134,3 +119,4 @@ curl -X POST https://www.agent-utils.com/api/dlq \
     </div>
   );
 }
+

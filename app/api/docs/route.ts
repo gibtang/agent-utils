@@ -65,8 +65,8 @@ DeadLetter: {
           action: { type: 'string', enum: ['approve', 'reject'] },
           reason: { type: 'string', description: 'Reason for rejection' },
         },
-      },      },      },      },      },
-},
+      },
+    },
   },
   paths: {
     '/api/health': {
