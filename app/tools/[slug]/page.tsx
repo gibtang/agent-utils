@@ -95,6 +95,7 @@ export default async function ToolPage({ params }: { params: Promise<{ slug: str
         <Link href="/" className="text-lg font-semibold tracking-tight">AgentUtils</Link>
         <div className="flex items-center gap-4 text-sm text-zinc-400">
           <Link href="/docs" className="hover:text-zinc-100 transition-colors">Docs</Link>
+          <Link href="/human-in-the-loop" className="hover:text-zinc-100 transition-colors">HITL</Link>
           <Link
             href="/signup"
             className="px-3 py-1.5 rounded-md bg-zinc-100 text-zinc-950 font-medium hover:bg-white transition-colors"

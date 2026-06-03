@@ -18,6 +18,9 @@ export default function Home() {
           <Link href="/docs" className="hover:text-zinc-100 transition-colors">
             Docs
           </Link>
+          <Link href="/human-in-the-loop" className="hover:text-zinc-100 transition-colors">
+            Human-in-the-Loop
+          </Link>
           <a
             href="https://github.com/gibtang/agent-utils"
             target="_blank"
