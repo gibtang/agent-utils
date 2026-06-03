@@ -1,6 +1,8 @@
 import { Metadata } from 'next'
 import Link from 'next/link'
 
+export const dynamic = 'force-static';
+
 export const metadata: Metadata = {
   title: 'Human-in-the-Loop API for AI Agents — Pause, Approve, Resume | AgentUtils',
   description: 'Add human approval gates to any AI agent workflow. One API call to pause agents, wait for human review, then resume. Free tier. No infrastructure needed.',

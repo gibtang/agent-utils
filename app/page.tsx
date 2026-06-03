@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { tools as allTools } from "@/lib/seo-tools";
 
+export const dynamic = 'force-static';
+
 const featuredTools = [
   { name: "Dead Letter Queue", desc: "Catch, inspect, and retry failed agent tasks.", slug: "dlq" },
   { name: "Human-in-the-Loop Gate", desc: "Pause agents until humans approve.", slug: "checkpoint" },
