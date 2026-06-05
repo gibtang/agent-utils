@@ -189,7 +189,7 @@ export async function POST(req: NextRequest) {
     const res = await fetch(NTFY_URL, {
       method: 'POST',
       body: JSON.stringify(ntfyPayload),
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json; charset=utf-8' },
     });
 
     if (!res.ok) {
