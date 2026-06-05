@@ -16,14 +16,14 @@ interface NtfyPayload {
   title: string;
   message: string;
   tags: string[];
-  priority: string;
+  priority: number;
   actions: NtfyAction[];
 }
 
 type EventConfig = {
   title: string;
   tag: string;
-  priority: string;
+  priority: number;
   errorMessage?: string;
 };
 
@@ -31,37 +31,37 @@ const EVENT_CONFIG: Record<string, EventConfig> = {
   'deployment.created': {
     title: '🚀 Deployment Started',
     tag: 'rocket',
-    priority: 'default',
+    priority: 3, // default
   },
   'deployment.succeeded': {
     title: '✅ Deployment Succeeded',
     tag: 'white_check_mark',
-    priority: 'default',
+    priority: 3, // default
   },
   'deployment.ready': {
     title: '✅ Deployment Ready',
     tag: 'white_check_mark',
-    priority: 'default',
+    priority: 3, // default
   },
   'deployment.error': {
     title: '❌ Deployment Failed',
     tag: 'x',
-    priority: 'high',
+    priority: 4, // high
   },
   'deployment.canceled': {
     title: '⏹️ Deployment Canceled',
     tag: 'no_entry_sign',
-    priority: 'low',
+    priority: 2, // low
   },
   'deployment.promoted': {
     title: '⬆️ Deployment Promoted',
     tag: 'arrow_up',
-    priority: 'default',
+    priority: 3, // default
   },
   'deployment.check-rerequested': {
     title: '🔄 Check Rerequested',
     tag: 'arrows_counterclockwise',
-    priority: 'default',
+    priority: 3, // default
   },
 };
 
@@ -109,12 +109,17 @@ function buildNtfyPayload(
   const config = EVENT_CONFIG[eventType] ?? {
     title: `📦 Deployment ${eventType}`,
     tag: 'package',
-    priority: 'default',
+    priority: 3,
   };
 
   const now = formatDate(new Date());
-  const branch = targetBranch ? ` on ${targetBranch}` : '';
-  let message = `${project}${branch}\n📅 ${now}`;
+  let message = '';
+  if (deploymentUrl) {
+    const url = deploymentUrl.startsWith('http') ? deploymentUrl : `https://${deploymentUrl}`;
+    message = `${url}\n📅 ${now}`;
+  } else {
+    message = `${project}\n📅 ${now}`;
+  }
   if (errorMessage) {
     message += `\n${errorMessage}`;
   }
