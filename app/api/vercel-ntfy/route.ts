@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 // Relay Vercel deployment webhooks → ntfy.sh/gibtang-vercel-events
 // Vercel webhook payload: https://vercel.com/docs/webhooks/webhooks-api
 
-const NTFY_URL = 'https://ntfy.sh/gibtang-vercel-events';
+const NTFY_URL = 'https://ntfy.sh';
 
 interface NtfyAction {
   action: string;
