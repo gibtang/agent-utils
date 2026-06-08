@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 // Public paths that don't require auth
-const publicPaths = ['/', '/pricing', '/api/webhooks', '/api/auth', '/api/health', '/docs', '/llms.txt', '/hook', '/f', '/login', '/signup', '/api/firebase-config', '/api/user'];
+const publicPaths = ['/', '/pricing', '/api/webhooks', '/api/auth', '/api/health', '/docs', '/llms.txt', '/hook', '/f', '/login', '/signup', '/api/firebase-config', '/api/user', '/approve', '/api/checkpoint/public'];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;

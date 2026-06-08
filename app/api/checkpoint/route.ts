@@ -32,13 +32,16 @@ export async function POST(request: NextRequest) {
       expiresAt,
     });
 
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+
     return successResponse({
       id: checkpoint._id,
       status: checkpoint.status,
       taskDescription: checkpoint.taskDescription,
       expiresAt: checkpoint.expiresAt,
+      approvalUrl: `${appUrl}/approve/${checkpoint.publicToken}`,
       // Poll this URL or use webhookUrl for wake-up
-      pollUrl: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/checkpoint/${checkpoint._id}`,
+      pollUrl: `${appUrl}/api/checkpoint/${checkpoint._id}`,
     }, 201);
   } catch (err) {
     console.error('Checkpoint create error:', err);

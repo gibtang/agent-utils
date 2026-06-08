@@ -1,11 +1,10 @@
 import Link from "next/link";
-import { tools as allTools } from "@/lib/seo-tools";
 
 export const dynamic = 'force-static';
 
 const featuredTools = [
+  { name: "Human-in-the-Loop Gate", desc: "Pause agents until humans approve. Prevent costly mistakes.", slug: "checkpoint" },
   { name: "Dead Letter Queue", desc: "Catch, inspect, and retry failed agent tasks.", slug: "dlq" },
-  { name: "Human-in-the-Loop Gate", desc: "Pause agents until humans approve.", slug: "checkpoint" },
 ];
 
 export default function Home() {
@@ -50,7 +49,10 @@ export default function Home() {
       <section className="flex flex-col items-center text-center px-6 pt-24 pb-16">
         <h1 className="text-5xl font-bold tracking-tight">AgentUtils</h1>
         <p className="mt-4 text-xl text-zinc-400 max-w-xl">
-          One API key. 2 agent-native utilities.
+          Safety, approval, and recovery for AI agent side effects.
+        </p>
+        <p className="mt-3 text-sm text-zinc-500 max-w-lg">
+          Redact PII before LLM calls. Gate dangerous actions behind human approval. Replay failed tasks without losing state.
         </p>
         <Link
           href="/signup"
@@ -87,21 +89,31 @@ export default function Home() {
         </div>
       </section>
 
-      {/* All Tools */}
+      {/* Flow */}
       <section className="px-6 pb-20">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-2xl font-semibold mb-6">All tools</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-            {allTools.map((tool) => (
-              <Link
-                key={tool.slug}
-                href={'/tools/' + tool.slug}
-                className="rounded-lg border border-zinc-800 p-4 hover:border-zinc-600 transition-colors block"
-              >
-                <p className="text-sm font-medium">{tool.icon} {tool.name}</p>
-                <p className="mt-1 text-xs text-zinc-500">{tool.tagline}</p>
-              </Link>
-            ))}
+          <h2 className="text-2xl font-semibold mb-8 text-center">How agents stay safe</h2>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
+            <div className="rounded-lg border border-zinc-800 p-5">
+              <div className="text-2xl mb-2">🔒</div>
+              <h3 className="text-sm font-semibold">Redact PII</h3>
+              <p className="text-xs text-zinc-500 mt-1">Scrub sensitive data before it reaches LLMs or tools</p>
+            </div>
+            <div className="rounded-lg border border-zinc-800 p-5">
+              <div className="text-2xl mb-2">👤</div>
+              <h3 className="text-sm font-semibold">Human approval</h3>
+              <p className="text-xs text-zinc-500 mt-1">Gate dangerous actions behind a human checkpoint</p>
+            </div>
+            <div className="rounded-lg border border-zinc-800 p-5">
+              <div className="text-2xl mb-2">⚡</div>
+              <h3 className="text-sm font-semibold">Execute safely</h3>
+              <p className="text-xs text-zinc-500 mt-1">Approved actions execute with full audit logging</p>
+            </div>
+            <div className="rounded-lg border border-zinc-800 p-5">
+              <div className="text-2xl mb-2">📬</div>
+              <h3 className="text-sm font-semibold">Recover failures</h3>
+              <p className="text-xs text-zinc-500 mt-1">Failed tasks land in a dead letter queue for replay</p>
+            </div>
           </div>
         </div>
       </section>
