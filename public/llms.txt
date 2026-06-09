@@ -15,11 +15,6 @@ curl -H "x-api-key: au_YOUR_KEY" https://agentutils.dev/api/health
 
 ## Tools
 
-### File Host — Ephemeral file hosting
-Ephemeral file hosting
-- POST /api/file-host — Upload a file — body:  (multipart, field: "file")
-- GET /api/file-host/{id} — Retrieve a file
-
 ### Dead Letter Queue — Capture and retry failures
 Capture and retry failures
 - POST /api/dlq — Capture a failure — body: { agentName: string, taskType: string, payload: any, error: string, retryWebhook?: string }
@@ -34,53 +29,6 @@ Pause agents for human approval
 - GET /api/checkpoint — List checkpoints
 - GET /api/checkpoint/{id} — Poll checkpoint status
 - POST /api/checkpoint/{id}/resume — Approve or reject checkpoint — body: { action: "approve|reject", reason?: string }
-
-### Agent Shield — PII redaction and hydration (Pro+)
-PII redaction and hydration
-- GET /api/shield — Shield info
-- POST /api/shield/clean — Redact PII from text — body: { text: string }
-- POST /api/shield/hydrate — Restore original PII values — body: { text: string, sessionId: string }
-
-### AgentVerify OTP — Temporary phone numbers for verification. Virtual numbers blocked by WhatsApp, Google, Meta, and major crypto exchanges. Works for niche platforms and internal systems. (Pro+)
-Temporary phone numbers for verification. Virtual numbers blocked by WhatsApp, Google, Meta, and major crypto exchanges. Works for niche platforms and internal systems.
-- POST /api/otp — Provision temporary phone number — body: { countryCode?: string }
-- GET /api/otp — List active OTP sessions
-- GET /api/otp/{id} — Poll for OTP code
-- DELETE /api/otp/{id} — Cancel OTP session
-
-### Notification Router — Email notifications for agents
-Email notifications for agents
-- POST /api/notify — Send an email notification — body: { message: string, priority?: "urgent|normal|low", to?: string, subject?: string, metadata?: object }
-- GET /api/notify?status=VALUE&priority=VALUE&limit=VALUE&offset=VALUE — List notification history
-- GET /api/notify/{id} — Get notification detail
-
-### Audit Log — Compliance-grade audit trail for agent actions
-Compliance-grade audit trail for agent actions
-- POST /api/audit — Log an audit event — body: { agentName: string, action: string, target?: string, metadata?: object, severity?: "debug|info|warn|error" }
-- GET /api/audit?agentName=VALUE&action=VALUE&severity=VALUE&limit=VALUE&offset=VALUE — List audit entries
-- GET /api/audit/{id} — Get audit entry detail
-
-### KV Store — Persistent key-value storage for agents
-Persistent key-value storage for agents
-- PUT /api/kv — Set a key-value pair — body: { key: string, value: any, ttl?: number }
-- GET /api/kv/{key} — Get value by key
-- DELETE /api/kv/{key} — Delete a key
-
-### Rate Limiter — Token-bucket rate limiting for agent workflows
-Token-bucket rate limiting for agent workflows
-- POST /api/rate-limit/check — Check rate limit — body: { key: string, limit: number, windowSeconds: number }
-- POST /api/rate-limit/reset — Reset rate limit counter — body: { key: string }
-
-### Webhook Inbox — Temporary endpoints to capture incoming webhooks
-Temporary endpoints to capture incoming webhooks
-- POST /api/webhook — Create a webhook inbox — body: { label: string, forwardUrl?: string, ttl?: number }
-- GET /api/webhook — List webhook inboxes
-- GET /api/webhook/{id} — Get inbox and captured payloads
-
-### Agent Form — Create forms for humans, collect structured responses
-Create forms for humans, collect structured responses
-- POST /api/form — Create a form for humans — body: { title: string, fields: array, webhookUrl: string, ttl?: number }
-- GET /api/form/{id} — Get form status and responses
 
 ## Rate Limits
 

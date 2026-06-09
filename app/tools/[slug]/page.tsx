@@ -270,6 +270,9 @@ export default async function ToolPage({ params }: { params: Promise<{ slug: str
       {/* Footer */}
       <footer className="mt-auto border-t border-zinc-800 px-6 py-6 text-center text-sm text-zinc-500">
         Built for agents. By humans.{' '}
+        <span className="text-xs ml-2">
+          Made by <a href="https://feedcode.dev" target="_blank" rel="noopener noreferrer" className="hover:text-zinc-100 transition-colors">feedcode</a>
+        </span>
         <Link href="/" className="hover:text-zinc-300 transition-colors">AgentUtils</Link>
       </footer>
     </>

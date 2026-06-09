@@ -121,6 +121,9 @@ export default function Home() {
       {/* Footer */}
       <footer className="mt-auto border-t border-zinc-800 px-6 py-6 flex items-center justify-between text-sm text-zinc-500">
         <span>Built for agents. By humans.</span>
+        <span className="text-xs">
+          Made by <a href="https://feedcode.dev" target="_blank" rel="noopener noreferrer" className="hover:text-zinc-100 transition-colors">feedcode</a>
+        </span>
         <a
           href="https://github.com/gibtang/agent-utils"
           target="_blank"
