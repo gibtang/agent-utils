@@ -1,8 +1,8 @@
 # AgentUtils — API Utilities for AI Agents
 
-> **One API key. 11 tools. Ship agents faster.**
+> **One API key. Infrastructure tools for AI agents. Ship faster.**
 
-**AgentUtils is the missing infrastructure layer for AI agents.** AI agents are stateless, sandboxed, and credential-less — they can't store files, handle errors after they crash, redact PII, or wait for human approval. AgentUtils provides 11 production-ready tools (file hosting, dead letter queues, PII redaction, human-in-the-loop gates, phone OTP, notifications, KV store, audit logging, rate limiting, webhook inboxes, and dynamic forms) as simple REST API calls behind a single API key.
+**AgentUtils is the missing infrastructure layer for AI agents.** AI agents are stateless, sandboxed, and credential-less — they can't handle errors after they crash, or wait for human approval. AgentUtils provides production-ready infrastructure tools as simple REST API calls behind a single API key. Two tools are live now (Dead Letter Queue and Human-in-the-Loop Checkpoints), with more on the roadmap.
 
 **Who is it for?** AI agent developers using OpenAI, Anthropic, LangChain, CrewAI, AutoGen, or any agent framework who need infrastructure primitives but don't want to manage servers, databases, or third-party accounts. No SDKs to install, no credentials to configure — just `curl` and go. Self-hostable under AGPL-3.0, or use the managed cloud at [agent-utils.com](https://www.agent-utils.com).
 
@@ -10,7 +10,7 @@
 [![GitHub Stars](https://img.shields.io/github/stars/gibtang/agent-utils)](https://github.com/gibtang/agent-utils/stargazers)
 [![GitHub Issues](https://img.shields.io/github/issues/gibtang/agent-utils)](https://github.com/gibtang/agent-utils/issues)
 
-**The missing infrastructure layer for AI agents.** File hosting, PII redaction, dead letter queues, human-in-the-loop gates, and 7 more tools — all behind one API key.
+**The missing infrastructure layer for AI agents.** Dead letter queues, human-in-the-loop gates, and more infrastructure tools — all behind one API key.
 
 **Website:** [agent-utils.com](https://www.agent-utils.com) · **GitHub:** [gibtang/agent-utils](https://github.com/gibtang/agent-utils) · **License:** AGPL-3.0-only · **Author:** A2Z Soft
 
@@ -18,20 +18,25 @@
 
 ## What It Does
 
-AI agents are **stateless, sandboxed, and credential-less**. Every agent developer ends up rebuilding the same infrastructure plumbing: file storage, error recovery, PII handling, notification delivery, human approval workflows. AgentUtils eliminates that by providing 11 production-ready tools as simple REST API calls. No infrastructure to manage, no SDKs to install, no credentials to configure.
+AI agents are **stateless, sandboxed, and credential-less**. Every agent developer ends up rebuilding the same infrastructure plumbing: file storage, error recovery, PII handling, notification delivery, human approval workflows. AgentUtils eliminates that by providing infrastructure tools as simple REST API calls. No infrastructure to manage, no SDKs to install, no credentials to configure.
 
 Each tool solves a problem that agents fundamentally cannot solve on their own because it requires one (or more) of:
 1. **Persistent state** — agents terminate between invocations
 2. **Network-accessible infrastructure** — agents can't open ports or register public URLs
 3. **Pre-provisioned credentials** — agents have no secure way to hold secrets
 
-### The 11 Tools
+### Live Tools
+
+| Tool | What It Does | Why Agents Need It |
+|------|-------------|-------------------|
+| 🪤 **Dead Letter Queue** | Catch, inspect, and retry failed agent tasks | Agent is already dead when failure occurs — platform holds the failure for post-hoc inspection |
+| ✋ **Human-in-the-Loop Gate** (Checkpoint) | Pause agents until humans approve via a web UI | Agents can't render UI or wait — platform holds state between the pause and resume calls |
+
+### Planned Tools
 
 | Tool | What It Does | Why Agents Need It |
 |------|-------------|-------------------|
 | 🗂️ **Ephemeral File Host** | Temporary file storage with auto-expiration (1–72h TTL) | Agents can't write to persistent filesystems; need to share files across invocations |
-| 🪤 **Dead Letter Queue** | Catch, inspect, and retry failed agent tasks | Agent is already dead when failure occurs — platform holds the failure for post-hoc inspection |
-| ✋ **Human-in-the-Loop Gate** (Checkpoint) | Pause agents until humans approve via a web UI | Agents can't render UI or wait — platform holds state between the pause and resume calls |
 | 🛡️ **Agent Shield** (PII Redaction) | Clean PII before sending to LLMs, hydrate it back after | Stateful round-trip: `clean()` → LLM call → `hydrate()` requires server-side session state |
 | 📱 **AgentVerify OTP** | Temporary phone numbers for agent 2FA/SMS verification | Agents can't hold Twilio credentials or register inbound SMS webhooks |
 | 🔔 **Notification Router** | One API call to reach a human via email (SMS/Slack planned) | Zero-config — platform knows the user's email, no SMTP setup needed |
@@ -45,15 +50,15 @@ Each tool solves a problem that agents fundamentally cannot solve on their own b
 
 ## Key Features
 
-- **Single API key** — all 11 tools behind one key, one billing account
+- **Single API key** — all tools behind one key, one billing account
 - **Agent-first design** — every endpoint is a single HTTP call with structured JSON in/out
 - **LLM-discoverable** — `/llms.txt`, `/llms-full.txt`, and OpenAPI 3.0 spec so AI agents can find and integrate autonomously
 - **MCP Server** — native Model Context Protocol server for Claude, Cursor, Windsurf, and any MCP-compatible tool
 - **Per-tool limits** — granular quotas per tier (KV keys, file size, webhook inboxes, form count, audit retention)
 - **Usage-based billing** — overage pricing beyond included monthly calls
 - **Self-hostable** — full source under AGPL-3.0, run it yourself for free
-- **SOC-ready audit logging** — immutable, user-visible action history
-- **Zero-config notifications** — platform handles SMTP/SMS; user just calls `/api/notify`
+- **SOC-ready audit logging** — immutable, user-visible action history *(planned)*
+- **Zero-config notifications** — platform handles SMTP/SMS; user just calls `/api/notify` *(planned)*
 
 ---
 
@@ -211,7 +216,7 @@ Each tool solves a problem that agents fundamentally cannot solve on their own b
 |------|-------|----------|---------|-----------|
 | **Free** | $0 | 500 | Hard cap | No PII Shield, no OTP |
 | **Builder** | $19/mo | 10,000 | $0.002/call | All except PII Shield + OTP |
-| **Pro** | $49/mo | 100,000 | $0.001/call | All 11 tools unlocked |
+| **Pro** | $49/mo | 100,000 | $0.001/call | All tools unlocked |
 | **Enterprise** | Custom | Unlimited | — | Full access, custom limits |
 
 ### Revenue Model
@@ -238,10 +243,10 @@ AgentUtils has strong defensibility because its deepest tools require **stateful
 ### 1. "The Missing Infrastructure Layer for AI Agents"
 Position as essential plumbing — every agent needs these tools, but nobody should have to build them.类比: "Stripe for agent infrastructure."
 
-### 2. "Stop Rebuilding the Same 11 Things"
+### 2. "Stop Rebuilding the Same Infrastructure"
 Content marketing angle: blog posts, videos, and social content around each tool. Every agent developer has rebuilt file handling, error queues, and PII redaction. Show them they don't have to.
 
-### 3. "One API Key, Not 11 Vendor Accounts"
+### 3. "One API Key, Not Multiple Vendor Accounts"
 Contrast with the alternative: sign up for S3, Twilio, Resend, Upstash, a queuing service, etc. AgentUtils collapses all of that into a single API key.
 
 ### 4. "Agents That Find Their Own Tools"
@@ -254,7 +259,7 @@ The landing page already has the 60-second setup flow. Lead with developer exper
 Trust signal: the entire platform is open source. Developers can audit the code, self-host for free, or use the managed cloud. This removes vendor lock-in concerns.
 
 ### 7. Tool-Specific Content
-Each of the 11 tools is a standalone marketing asset:
+Each tool is a standalone marketing asset:
 - **Dead Letter Queue** — "What happens when your agent crashes? Nothing. Unless you have a DLQ."
 - **PII Shield** — "Sending user data to OpenAI? Redact first, restore after. One API call."
 - **Human-in-the-Loop** — "Your agent wants to delete production. Should it ask first?"
