@@ -2,6 +2,10 @@
 
 > **One API key. 11 tools. Ship agents faster.**
 
+**AgentUtils is the missing infrastructure layer for AI agents.** AI agents are stateless, sandboxed, and credential-less — they can't store files, handle errors after they crash, redact PII, or wait for human approval. AgentUtils provides 11 production-ready tools (file hosting, dead letter queues, PII redaction, human-in-the-loop gates, phone OTP, notifications, KV store, audit logging, rate limiting, webhook inboxes, and dynamic forms) as simple REST API calls behind a single API key.
+
+**Who is it for?** AI agent developers using OpenAI, Anthropic, LangChain, CrewAI, AutoGen, or any agent framework who need infrastructure primitives but don't want to manage servers, databases, or third-party accounts. No SDKs to install, no credentials to configure — just `curl` and go. Self-hostable under AGPL-3.0, or use the managed cloud at [agent-utils.com](https://www.agent-utils.com).
+
 [![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL%203.0-blue.svg)](LICENSE)
 [![GitHub Stars](https://img.shields.io/github/stars/gibtang/agent-utils)](https://github.com/gibtang/agent-utils/stargazers)
 [![GitHub Issues](https://img.shields.io/github/issues/gibtang/agent-utils)](https://github.com/gibtang/agent-utils/issues)
