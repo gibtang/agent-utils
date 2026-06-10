@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// Relay Vercel deployment webhooks → ntfy.sh/gibtang-vercel-events
-// Vercel webhook payload: https://vercel.com/docs/webhooks/webhooks-api
+// Relay Vercel deployment webhooks → ntfy.sh + Telegram
 
 const NTFY_URL = 'https://ntfy.sh';
+const TELEGRAM_API = `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}`;
+const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID ?? '-1003669787601';
+const TELEGRAM_THREAD_ID = process.env.TELEGRAM_THREAD_ID ?? '1';
 
 interface NtfyAction {
   action: string;
@@ -22,46 +24,53 @@ interface NtfyPayload {
 
 type EventConfig = {
   title: string;
+  emoji: string;
   tag: string;
   priority: number;
-  errorMessage?: string;
 };
 
 const EVENT_CONFIG: Record<string, EventConfig> = {
   'deployment.created': {
-    title: '🚀 Deployment Started',
+    title: 'Deployment Started',
+    emoji: '🚀',
     tag: 'rocket',
-    priority: 3, // default
+    priority: 3,
   },
   'deployment.succeeded': {
-    title: '✅ Deployment Succeeded',
+    title: 'Deployment Succeeded',
+    emoji: '✅',
     tag: 'white_check_mark',
-    priority: 3, // default
+    priority: 3,
   },
   'deployment.ready': {
-    title: '✅ Deployment Ready',
+    title: 'Deployment Ready',
+    emoji: '✅',
     tag: 'white_check_mark',
-    priority: 3, // default
+    priority: 3,
   },
   'deployment.error': {
-    title: '❌ Deployment Failed',
+    title: 'Deployment Failed',
+    emoji: '❌',
     tag: 'x',
-    priority: 4, // high
+    priority: 4,
   },
   'deployment.canceled': {
-    title: '⏹️ Deployment Canceled',
+    title: 'Deployment Canceled',
+    emoji: '⏹️',
     tag: 'no_entry_sign',
-    priority: 2, // low
+    priority: 2,
   },
   'deployment.promoted': {
-    title: '⬆️ Deployment Promoted',
+    title: 'Deployment Promoted',
+    emoji: '⬆️',
     tag: 'arrow_up',
-    priority: 3, // default
+    priority: 3,
   },
   'deployment.check-rerequested': {
-    title: '🔄 Check Rerequested',
+    title: 'Check Rerequested',
+    emoji: '🔄',
     tag: 'arrows_counterclockwise',
-    priority: 3, // default
+    priority: 3,
   },
 };
 
@@ -96,6 +105,19 @@ function buildDashboardUrl(teamId: string | undefined, projectId: string | undef
   return `${base}/dashboard`;
 }
 
+function getProdUrl(productionDomains: string[]): string | undefined {
+  if (productionDomains.length === 0) return undefined;
+  const d = productionDomains[0];
+  return d.startsWith('http') ? d : `https://${d}`;
+}
+
+function getDepUrl(deploymentUrl: string | undefined): string | undefined {
+  if (!deploymentUrl) return undefined;
+  return deploymentUrl.startsWith('http') ? deploymentUrl : `https://${deploymentUrl}`;
+}
+
+// ── ntfy.sh ─────────────────────────────────────────────────────────────────
+
 function buildNtfyPayload(
   eventType: string,
   project: string,
@@ -108,81 +130,125 @@ function buildNtfyPayload(
   errorMessage: string | undefined,
 ): NtfyPayload {
   const config = EVENT_CONFIG[eventType] ?? {
-    title: `📦 Deployment ${eventType}`,
+    title: `Deployment ${eventType}`,
+    emoji: '📦',
     tag: 'package',
     priority: 3,
   };
 
   const now = formatDate(new Date());
-  let message = '';
+  const prodUrl = getProdUrl(productionDomains);
+  const depUrl = getDepUrl(deploymentUrl);
 
-  // Production domain first (if available)
-  if (productionDomains.length > 0) {
-    const prodUrl = productionDomains[0].startsWith('http')
-      ? productionDomains[0]
-      : `https://${productionDomains[0]}`;
+  let message = '';
+  if (prodUrl) {
     message = `🌐 ${prodUrl}`;
-    if (deploymentUrl) {
-      const depUrl = deploymentUrl.startsWith('http') ? deploymentUrl : `https://${deploymentUrl}`;
-      message += `\n🔗 ${depUrl}`;
-    }
-  } else if (deploymentUrl) {
-    const url = deploymentUrl.startsWith('http') ? deploymentUrl : `https://${deploymentUrl}`;
-    message = `${url}`;
+    if (depUrl) message += `\n🔗 ${depUrl}`;
+  } else if (depUrl) {
+    message = depUrl;
   } else {
-    message = `${project}`;
+    message = project;
   }
   message += `\n📅 ${now}`;
-
-  if (errorMessage) {
-    message += `\n${errorMessage}`;
-  }
+  if (errorMessage) message += `\n${errorMessage}`;
 
   const actions: NtfyAction[] = [];
-
-  // "view" action for production domain (succeeded/ready only)
-  if (
-    (eventType === 'deployment.succeeded' || eventType === 'deployment.ready') &&
-    productionDomains.length > 0
-  ) {
-    const prodUrl = productionDomains[0].startsWith('http')
-      ? productionDomains[0]
-      : `https://${productionDomains[0]}`;
-    actions.push({
-      action: 'view',
-      label: 'Visit Production',
-      url: prodUrl,
-    });
+  if ((eventType === 'deployment.succeeded' || eventType === 'deployment.ready')) {
+    if (prodUrl) actions.push({ action: 'view', label: 'Visit Production', url: prodUrl });
+    if (depUrl) actions.push({ action: 'view', label: 'Visit Preview', url: depUrl });
   }
-
-  // "view" action for deployment preview URL (succeeded/ready only)
-  if (
-    (eventType === 'deployment.succeeded' || eventType === 'deployment.ready') &&
-    deploymentUrl
-  ) {
-    actions.push({
-      action: 'view',
-      label: 'Visit Preview',
-      url: deploymentUrl.startsWith('http') ? deploymentUrl : `https://${deploymentUrl}`,
-    });
-  }
-
-  // Dashboard link for all events
-  actions.push({
-    action: 'view',
-    label: 'Open Dashboard',
-    url: buildDashboardUrl(teamId, projectId, deploymentId),
-  });
+  actions.push({ action: 'view', label: 'Open Dashboard', url: buildDashboardUrl(teamId, projectId, deploymentId) });
 
   return {
     topic: 'gibtang-vercel-events',
-    title: config.title,
+    title: `${config.emoji} ${config.title}`,
     message,
     tags: [config.tag],
     priority: config.priority,
     actions,
   };
 }
+
+// ── Telegram ────────────────────────────────────────────────────────────────
+
+function buildTelegramText(
+  eventType: string,
+  project: string,
+  teamId: string | undefined,
+  projectId: string | undefined,
+  deploymentId: string | undefined,
+  deploymentUrl: string | undefined,
+  productionDomains: string[],
+  targetBranch: string | undefined,
+  errorMessage: string | undefined,
+): string {
+  const config = EVENT_CONFIG[eventType] ?? {
+    title: `Deployment ${eventType}`,
+    emoji: '📦',
+    tag: 'package',
+    priority: 3,
+  };
+
+  const now = formatDate(new Date());
+  const prodUrl = getProdUrl(productionDomains);
+  const depUrl = getDepUrl(deploymentUrl);
+  const dashUrl = buildDashboardUrl(teamId, projectId, deploymentId);
+
+  let lines: string[] = [];
+  lines.push(`${config.emoji} **${config.title}**`);
+  lines.push(`📦 \`${project}\``);
+
+  if (targetBranch) {
+    lines.push(`🌿 Branch: \`${targetBranch}\``);
+  }
+
+  if (prodUrl) {
+    lines.push(`🌐 [Production](${prodUrl})`);
+  }
+  if (depUrl) {
+    lines.push(`🔗 [Preview](${depUrl})`);
+  }
+
+  lines.push(`🔗 [Dashboard](${dashUrl})`);
+  lines.push(`📅 ${now}`);
+
+  if (errorMessage) {
+    lines.push('');
+    lines.push(`⚠️ ${errorMessage}`);
+  }
+
+  return lines.join('\n');
+}
+
+async function sendToTelegram(text: string): Promise<void> {
+  if (!process.env.TELEGRAM_BOT_TOKEN) {
+    console.error('TELEGRAM_BOT_TOKEN not set, skipping Telegram notification');
+    return;
+  }
+
+  try {
+    const res = await fetch(`${TELEGRAM_API}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: TELEGRAM_CHAT_ID,
+        message_thread_id: Number(TELEGRAM_THREAD_ID),
+        text,
+        parse_mode: 'Markdown',
+        disable_web_page_preview: true,
+      }),
+    });
+
+    if (!res.ok) {
+      const errText = await res.text();
+      console.error(`Telegram sendMessage failed (${res.status}): ${errText}`);
+    }
+  } catch (err) {
+    console.error('Telegram send error:', err);
+  }
+}
+
+// ── Handler ─────────────────────────────────────────────────────────────────
 
 export async function POST(req: NextRequest) {
   try {
@@ -216,6 +282,7 @@ export async function POST(req: NextRequest) {
       productionDomains.push(...aliasedDomains);
     }
 
+    // Build ntfy payload
     const ntfyPayload = buildNtfyPayload(
       eventType,
       project,
@@ -228,15 +295,31 @@ export async function POST(req: NextRequest) {
       errorMessage,
     );
 
-    // Forward to ntfy.sh as JSON
-    const res = await fetch(NTFY_URL, {
-      method: 'POST',
-      body: JSON.stringify(ntfyPayload),
-      headers: { 'Content-Type': 'application/json; charset=utf-8' },
-    });
+    // Build Telegram text
+    const tgText = buildTelegramText(
+      eventType,
+      project,
+      teamId,
+      projectId,
+      deploymentId,
+      deploymentUrl,
+      productionDomains,
+      targetBranch,
+      errorMessage,
+    );
 
-    if (!res.ok) {
-      console.error(`ntfy.sh returned ${res.status}: ${await res.text()}`);
+    // Send to both in parallel
+    const [ntfyRes] = await Promise.all([
+      fetch(NTFY_URL, {
+        method: 'POST',
+        body: JSON.stringify(ntfyPayload),
+        headers: { 'Content-Type': 'application/json; charset=utf-8' },
+      }),
+      sendToTelegram(tgText),
+    ]);
+
+    if (!ntfyRes.ok) {
+      console.error(`ntfy.sh returned ${ntfyRes.status}: ${await ntfyRes.text()}`);
       return NextResponse.json({ error: 'ntfy.sh failed' }, { status: 502 });
     }
 
