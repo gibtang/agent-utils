@@ -1,19 +1,118 @@
 @import "tailwindcss";
 
 :root {
-  --background: #09090b;
-  --foreground: #fafafa;
+  --background: #050505;
+  --foreground: #e5e2e3;
 }
 
 @theme inline {
+  /* Surfaces */
+  --color-space-black: #050505;
+  --color-charcoal-gray: #121214;
+  --color-surface: #131314;
+  --color-surface-dim: #131314;
+  --color-surface-bright: #3a393a;
+  --color-surface-container-lowest: #0e0e0f;
+  --color-surface-container-low: #1c1b1c;
+  --color-surface-container: #201f20;
+  --color-surface-container-high: #2a2a2b;
+  --color-surface-container-highest: #353436;
+  --color-surface-variant: #353436;
+  --color-surface-tint: #00dbe9;
+
+  /* Text */
+  --color-on-surface: #e5e2e3;
+  --color-on-surface-variant: #b9cacb;
+  --color-on-background: #e5e2e3;
+  --color-inverse-surface: #e5e2e3;
+  --color-inverse-on-surface: #313031;
+
+  /* Primary (Electric Cyan) */
+  --color-primary: #dbfcff;
+  --color-on-primary: #00363a;
+  --color-primary-container: #00f0ff;
+  --color-on-primary-container: #006970;
+  --color-inverse-primary: #006970;
+  --color-primary-fixed: #7df4ff;
+  --color-primary-fixed-dim: #00dbe9;
+  --color-on-primary-fixed: #002022;
+  --color-on-primary-fixed-variant: #004f54;
+
+  /* Secondary (Neon Purple) */
+  --color-secondary: #d1bcff;
+  --color-on-secondary: #3c0090;
+  --color-secondary-container: #7000ff;
+  --color-on-secondary-container: #ddcdff;
+  --color-secondary-fixed: #e9ddff;
+  --color-secondary-fixed-dim: #d1bcff;
+  --color-on-secondary-fixed: #23005b;
+  --color-on-secondary-fixed-variant: #5700c9;
+
+  /* Tertiary */
+  --color-tertiary: #f5f5f5;
+  --color-on-tertiary: #2f3131;
+  --color-tertiary-container: #d9d9d9;
+  --color-on-tertiary-container: #5d5f5f;
+  --color-tertiary-fixed: #e2e2e2;
+  --color-tertiary-fixed-dim: #c6c6c7;
+  --color-on-tertiary-fixed: #1a1c1c;
+  --color-on-tertiary-fixed-variant: #454747;
+
+  /* Error */
+  --color-error: #ffb4ab;
+  --color-on-error: #690005;
+  --color-error-container: #93000a;
+  --color-on-error-container: #ffdad6;
+
+  /* Outlines & Borders */
+  --color-outline: #849495;
+  --color-outline-variant: #3b494b;
+  --color-border-subtle: #262629;
+
+  /* Syntax */
+  --color-syntax-comment: #6272A4;
+  --color-syntax-keyword: #FF79C6;
+
+  /* Backgrounds */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+
+  /* Spacing */
+  --spacing-gutter: 24px;
+  --spacing-container-max: 1200px;
+  --spacing-margin-mobile: 16px;
+
+  /* Font families */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* Border radius */
+  --radius-sm: 0.125rem;
+  --radius-md: 0.25rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Terminal glow effect */
+.terminal-glow {
+  box-shadow: 0 0 40px rgba(0, 240, 255, 0.05);
+}
+
+/* Glass nav */
+.glass-nav {
+  background: rgba(5, 5, 5, 0.8);
+  backdrop-filter: blur(12px);
+}
+
+/* Bento card hover */
+.bento-card {
+  transition: border-color 0.3s ease;
+}
+.bento-card:hover {
+  border-color: #00f0ff;
 }
