@@ -181,6 +181,7 @@ function buildTelegramText(
   productionDomains: string[],
   targetBranch: string | undefined,
   errorMessage: string | undefined,
+  isProduction: boolean,
 ): string {
   const config = EVENT_CONFIG[eventType] ?? {
     title: `Deployment ${eventType}`,
@@ -197,6 +198,10 @@ function buildTelegramText(
   let lines: string[] = [];
   lines.push(`${config.emoji} **${config.title}**`);
   lines.push(`📦 \`${project}\``);
+
+  if (isProduction) {
+    lines.push(`🔴 **Production Deployment**`);
+  }
 
   if (targetBranch) {
     lines.push(`🌿 Branch: \`${targetBranch}\``);
@@ -286,6 +291,10 @@ export async function POST(req: NextRequest) {
       productionDomains.push(...aliasedDomains);
     }
 
+    // Detect production deployment
+    const deployTarget: string | undefined = payload?.deployment?.target;
+    const isProduction = deployTarget === 'production';
+
     // Build ntfy payload
     const ntfyPayload = buildNtfyPayload(
       eventType,
@@ -310,6 +319,7 @@ export async function POST(req: NextRequest) {
       productionDomains,
       targetBranch,
       errorMessage,
+      isProduction,
     );
 
     // Send to both in parallel
