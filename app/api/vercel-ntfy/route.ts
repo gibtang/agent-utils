@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 const NTFY_URL = 'https://ntfy.sh';
 const TELEGRAM_API = `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}`;
 const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID ?? '-1003669787601';
-const TELEGRAM_THREAD_ID = process.env.TELEGRAM_THREAD_ID ?? '1';
+const TELEGRAM_THREAD_ID = process.env.TELEGRAM_THREAD_ID;
 
 interface NtfyAction {
   action: string;
@@ -227,16 +227,20 @@ async function sendToTelegram(text: string): Promise<void> {
   }
 
   try {
+    const payload: Record<string, unknown> = {
+      chat_id: TELEGRAM_CHAT_ID,
+      text,
+      parse_mode: 'Markdown',
+      disable_web_page_preview: true,
+    };
+    if (TELEGRAM_THREAD_ID) {
+      payload.message_thread_id = Number(TELEGRAM_THREAD_ID);
+    }
+
     const res = await fetch(`${TELEGRAM_API}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: TELEGRAM_CHAT_ID,
-        message_thread_id: Number(TELEGRAM_THREAD_ID),
-        text,
-        parse_mode: 'Markdown',
-        disable_web_page_preview: true,
-      }),
+      body: JSON.stringify(payload),
     });
 
     if (!res.ok) {
