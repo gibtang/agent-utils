@@ -103,6 +103,7 @@ function buildNtfyPayload(
   projectId: string | undefined,
   deploymentId: string | undefined,
   deploymentUrl: string | undefined,
+  productionDomains: string[],
   targetBranch: string | undefined,
   errorMessage: string | undefined,
 ): NtfyPayload {
@@ -114,26 +115,54 @@ function buildNtfyPayload(
 
   const now = formatDate(new Date());
   let message = '';
-  if (deploymentUrl) {
+
+  // Production domain first (if available)
+  if (productionDomains.length > 0) {
+    const prodUrl = productionDomains[0].startsWith('http')
+      ? productionDomains[0]
+      : `https://${productionDomains[0]}`;
+    message = `🌐 ${prodUrl}`;
+    if (deploymentUrl) {
+      const depUrl = deploymentUrl.startsWith('http') ? deploymentUrl : `https://${deploymentUrl}`;
+      message += `\n🔗 ${depUrl}`;
+    }
+  } else if (deploymentUrl) {
     const url = deploymentUrl.startsWith('http') ? deploymentUrl : `https://${deploymentUrl}`;
-    message = `${url}\n📅 ${now}`;
+    message = `${url}`;
   } else {
-    message = `${project}\n📅 ${now}`;
+    message = `${project}`;
   }
+  message += `\n📅 ${now}`;
+
   if (errorMessage) {
     message += `\n${errorMessage}`;
   }
 
   const actions: NtfyAction[] = [];
 
-  // "view" action for live site (succeeded/ready only)
+  // "view" action for production domain (succeeded/ready only)
+  if (
+    (eventType === 'deployment.succeeded' || eventType === 'deployment.ready') &&
+    productionDomains.length > 0
+  ) {
+    const prodUrl = productionDomains[0].startsWith('http')
+      ? productionDomains[0]
+      : `https://${productionDomains[0]}`;
+    actions.push({
+      action: 'view',
+      label: 'Visit Production',
+      url: prodUrl,
+    });
+  }
+
+  // "view" action for deployment preview URL (succeeded/ready only)
   if (
     (eventType === 'deployment.succeeded' || eventType === 'deployment.ready') &&
     deploymentUrl
   ) {
     actions.push({
       action: 'view',
-      label: 'Visit Site',
+      label: 'Visit Preview',
       url: deploymentUrl.startsWith('http') ? deploymentUrl : `https://${deploymentUrl}`,
     });
   }
@@ -179,6 +208,14 @@ export async function POST(req: NextRequest) {
     const errorMessage: string | undefined =
       payload?.deployment?.meta?.buildErrorMessage;
 
+    // Extract production domains from webhook payload
+    const productionDomains: string[] = [];
+    const aliasedDomains: string[] | undefined =
+      payload?.deployment?.meta?.aliasedDomains ?? payload?.deployment?.alias;
+    if (Array.isArray(aliasedDomains)) {
+      productionDomains.push(...aliasedDomains);
+    }
+
     const ntfyPayload = buildNtfyPayload(
       eventType,
       project,
@@ -186,6 +223,7 @@ export async function POST(req: NextRequest) {
       projectId,
       deploymentId,
       deploymentUrl,
+      productionDomains,
       targetBranch,
       errorMessage,
     );
