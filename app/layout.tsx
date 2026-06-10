@@ -20,8 +20,26 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://www.agent-utils.com"),
   title: "AgentUtils — API Utilities for AI Agents",
-  description: "One API key. 24 agent-native utilities. File hosting, PII redaction, dead letter queues, and more.",
+  description: "One API key. Production-ready dead letter queues, human-in-the-loop gates, and redactable memory. No SDKs, just curl and go.",
+  keywords: ["ai agents", "dead letter queue", "human in the loop", "agent infrastructure", "api utilities"],
+  openGraph: {
+    title: "AgentUtils — API Utilities for AI Agents",
+    description: "Production-ready dead letter queues, human-in-the-loop gates, and redactable memory—all behind a single API key.",
+    url: "https://www.agent-utils.com",
+    siteName: "AgentUtils",
+    type: "website",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "AgentUtils — API Utilities for AI Agents",
+    description: "Production-ready dead letter queues, human-in-the-loop gates, and redactable memory—all behind a single API key.",
+  },
+  alternates: {
+    canonical: "/",
+  },
 };
 
 export default function RootLayout({

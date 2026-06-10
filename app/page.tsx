@@ -9,9 +9,9 @@ export default function Home() {
       <nav className="fixed top-0 w-full z-50 bg-space-black/80 backdrop-blur-md border-b border-border-subtle">
         <div className="flex items-center justify-between px-[var(--spacing-gutter)] py-4 max-w-[var(--spacing-container-max)] mx-auto">
           <div className="flex items-center gap-3">
-            <span className="text-[32px] font-semibold tracking-tight text-on-surface font-[family-name:var(--font-geist-sans)]">
+            <Link href="/" className="text-[32px] font-semibold tracking-tight text-on-surface font-[family-name:var(--font-geist-sans)]">
               AgentUtils
-            </span>
+            </Link>
           </div>
           <div className="hidden md:flex items-center gap-8 text-base text-on-surface-variant">
             <Link href="/docs" className="text-primary-container font-bold hover:text-primary-fixed-dim transition-colors duration-200">
@@ -22,6 +22,10 @@ export default function Home() {
             </Link>
           </div>
           <div className="flex items-center gap-4">
+            {/* Mobile nav links */}
+            <Link href="/docs" className="md:hidden text-sm text-on-surface-variant hover:text-primary transition-colors">
+              Docs
+            </Link>
             <a
               href="https://github.com/gibtang/agent-utils"
               target="_blank"
@@ -318,10 +322,10 @@ export default function Home() {
             >
               Documentation
             </Link>
-            <span className="hover:text-primary transition-colors opacity-80 hover:opacity-100">
+            <span className="text-primary-fixed-dim opacity-80">
               Terms
             </span>
-            <span className="hover:text-primary transition-colors opacity-80 hover:opacity-100">
+            <span className="text-primary-fixed-dim opacity-80">
               Privacy
             </span>
           </div>
