@@ -136,7 +136,7 @@ function LoginForm() {
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300"
+              className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center justify-center min-w-[44px] min-h-[44px] text-zinc-500 hover:text-zinc-300"
             >
               {showPassword ? (
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -154,7 +154,7 @@ function LoginForm() {
             <button
               type="button"
               onClick={() => { setShowReset(!showReset); setResetSent(false); setError(''); }}
-              className="text-xs text-zinc-400 hover:text-zinc-200 transition-colors"
+              className="text-xs text-zinc-400 hover:text-zinc-200 transition-colors min-h-[44px] px-2 flex items-center"
             >
               Forgot password?
             </button>
@@ -229,7 +229,7 @@ function LoginForm() {
 
         <p className="mt-6 text-center text-sm text-zinc-400">
           Don&apos;t have an account?{' '}
-          <a href="/signup" className="text-zinc-200 underline hover:text-white">Create one</a>
+          <a href="/signup" className="text-zinc-200 underline hover:text-white min-h-[44px] px-2 inline-flex items-center">Create one</a>
         </p>
       </div>
     </div>
