@@ -95,33 +95,33 @@ export default function Home() {
                 <div className="pl-4 text-on-surface-variant">
                   -H{" "}
                   <span className="text-syntax-keyword">
-                    &quot;Authorization: Bearer $AGENT_KEY&quot;
+                    &quot;x-api-key: $AGENT_KEY&quot;
                   </span>{" "}
                   \
                 </div>
                 <div className="pl-4 text-on-surface-variant">-d {"{"}</div>
                 <div className="pl-8 flex gap-2">
                   <span className="text-primary-container">
-                    &quot;task_id&quot;:
+                    &quot;agentName&quot;:
                   </span>
                   <span className="text-syntax-keyword">
-                    &quot;9821-xk92-001&quot;
+                    &quot;trade-bot&quot;
                   </span>
                   ,
                 </div>
                 <div className="pl-8 flex gap-2">
                   <span className="text-primary-container">
-                    &quot;action&quot;:
+                    &quot;taskDescription&quot;:
                   </span>
                   <span className="text-syntax-keyword">
-                    &quot;execute_trade&quot;
+                    &quot;Execute AAPL trade&quot;
                   </span>
                   ,
                 </div>
                 <div className="pl-8 flex gap-2">
-                  <span className="text-primary-container">&quot;gate&quot;:</span>
+                  <span className="text-primary-container">&quot;state&quot;:</span>
                   <span className="text-syntax-keyword">
-                    &quot;require_human_approval&quot;
+                    {"{"}"symbol":"AAPL","action":"buy"{"}"}
                   </span>
                 </div>
                 <div className="pl-4 text-on-surface-variant">{"}"}</div>
