@@ -1,7 +1,5 @@
 import { ImageResponse } from 'next/og'
 
-export const runtime = 'edge'
-
 export const alt = 'AgentUtils — API Utilities for AI Agents'
 export const size = {
   width: 1200,
@@ -10,6 +8,10 @@ export const size = {
 export const contentType = 'image/png'
 
 export default async function Image() {
+  const fontData = await fetch(
+    'https://fonts.gstatic.com/s/inter/v18/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuLyfMZg.ttf'
+  ).then((res) => res.arrayBuffer())
+
   return new ImageResponse(
     (
       <div
@@ -21,27 +23,20 @@ export default async function Image() {
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          fontFamily: 'system-ui, sans-serif',
+          fontFamily: 'Inter',
         }}
       >
         <div
           style={{
+            fontSize: '72px',
+            fontWeight: 700,
+            color: '#fafafa',
             display: 'flex',
-            alignItems: 'center',
-            gap: '16px',
             marginBottom: '32px',
           }}
         >
-          <div
-            style={{
-              fontSize: '72px',
-              fontWeight: 700,
-              color: '#fafafa',
-            }}
-          >
-            Agent
-            <span style={{ color: '#71717a' }}>Utils</span>
-          </div>
+          {'Agent'}
+          <span style={{ color: '#71717a' }}>{'Utils'}</span>
         </div>
         <div
           style={{
@@ -59,6 +54,14 @@ export default async function Image() {
     ),
     {
       ...size,
+      fonts: [
+        {
+          name: 'Inter',
+          data: fontData,
+          style: 'normal',
+          weight: 400,
+        },
+      ],
     }
   )
 }
