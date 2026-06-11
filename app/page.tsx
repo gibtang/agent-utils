@@ -89,7 +89,7 @@ export default function Home() {
                   <span className="text-primary-container">curl</span>
                   <span className="text-on-surface">-X POST</span>
                   <span className="text-syntax-keyword">
-                    &quot;https://api.agentutils.com/v1/checkpoint&quot;
+                    &quot;https://www.agent-utils.com/api/checkpoint&quot;
                   </span>
                 </div>
                 <div className="pl-4 text-on-surface-variant">
