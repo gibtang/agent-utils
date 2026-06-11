@@ -30,6 +30,7 @@ export default function Home() {
               href="https://github.com/gibtang/agent-utils"
               target="_blank"
               rel="noopener noreferrer"
+              aria-label="GitHub"
               className="hidden sm:flex items-center gap-2 text-on-surface-variant hover:text-primary transition-all active:opacity-80"
             >
               <svg viewBox="0 0 16 16" className="w-5 h-5 fill-current" aria-hidden="true">
