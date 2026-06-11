@@ -59,6 +59,8 @@ function LoginForm() {
           <span className="text-2xl font-bold text-zinc-100">Agent<span className="text-zinc-500">Utils</span></span>
         </Link>
 
+        <h1 className="text-xl font-semibold text-zinc-100 text-center mb-6">Sign In</h1>
+
         {error && (
           <div className="mb-4 rounded-lg bg-red-900/30 border border-red-800 px-4 py-2 text-sm text-red-300">
             {error}
