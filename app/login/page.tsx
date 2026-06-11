@@ -122,7 +122,7 @@ function LoginForm() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-2.5 min-h-[44px] text-sm text-zinc-100 placeholder-zinc-500 focus:border-zinc-500 focus:outline-none"
+            className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-3 min-h-[44px] text-sm text-zinc-100 placeholder-zinc-500 focus:border-zinc-500 focus:outline-none"
           />
           <div className="relative">
             <input
@@ -131,7 +131,7 @@ function LoginForm() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-2.5 pr-10 min-h-[44px] text-sm text-zinc-100 placeholder-zinc-500 focus:border-zinc-500 focus:outline-none"
+              className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-3 pr-10 min-h-[44px] text-sm text-zinc-100 placeholder-zinc-500 focus:border-zinc-500 focus:outline-none"
             />
             <button
               type="button"
@@ -162,7 +162,7 @@ function LoginForm() {
           <button
             type="submit"
             disabled={loading}
-            className="flex w-full items-center justify-center rounded-lg bg-zinc-100 px-4 py-2.5 min-h-[44px] text-sm font-semibold text-zinc-900 hover:bg-white transition-colors disabled:opacity-50"
+            className="flex w-full items-center justify-center rounded-lg bg-zinc-100 px-4 py-3 min-h-[44px] text-sm font-semibold text-zinc-900 hover:bg-white transition-colors disabled:opacity-50"
           >
             {loading ? 'Signing in...' : 'Sign in'}
           </button>
@@ -216,7 +216,7 @@ function LoginForm() {
         <button
           onClick={handleGoogleSignIn}
           disabled={loading}
-          className="flex w-full items-center justify-center gap-2 rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-2.5 min-h-[44px] text-sm font-medium text-zinc-100 hover:bg-zinc-700 transition-colors disabled:opacity-50"
+          className="flex w-full items-center justify-center gap-2 rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-3 min-h-[44px] text-sm font-medium text-zinc-100 hover:bg-zinc-700 transition-colors disabled:opacity-50"
         >
           <svg className="h-4 w-4" viewBox="0 0 24 24">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>

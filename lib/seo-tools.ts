@@ -90,7 +90,7 @@ requests.post(
     name: 'Human-in-the-Loop',
     icon: '👤',
     tagline: 'Pause agents until humans approve.',
-    metaTitle: 'Human-in-the-Loop API for AI Agents | AgentUtils',
+    metaTitle: 'Checkpoint & Approval Gate API for AI Agents | AgentUtils',
     metaDescription: 'Pause any AI agent and wait for human approval before continuing. Pre-approve, reject, or modify agent actions with a simple API call.',
     h1: 'Human-in-the-Loop Approval for AI Agents',
     subtitle: 'Pause agents. Let humans decide. Resume on approval.',
