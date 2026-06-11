@@ -200,12 +200,28 @@ const checkpoint = await fetch("https://www.agent-utils.com/api/checkpoint", {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-zinc-800 px-6 py-6 flex items-center justify-between text-sm text-zinc-500">
-        <span>© {new Date().getFullYear()} AgentUtils</span>
-        <div className="flex gap-4">
-          <Link href="/tools/checkpoint" className="hover:text-zinc-300">API Docs</Link>
-          <Link href="/tools/dlq" className="hover:text-zinc-300">DLQ</Link>
-          <a href="https://github.com/gibtang/agent-utils" className="hover:text-zinc-300">GitHub</a>
+      <footer className="bg-charcoal-gray border-t border-border-subtle w-full py-12">
+        <div className="flex flex-col md:flex-row justify-between items-center px-[var(--spacing-gutter)] max-w-[var(--spacing-container-max)] mx-auto gap-8">
+          <div className="flex flex-col items-center md:items-start gap-4">
+            <span className="text-[32px] font-semibold text-on-surface">AgentUtils</span>
+            <p className="text-on-surface-variant font-[family-name:var(--font-jetbrains-mono)] text-xs opacity-80">
+              © {new Date().getFullYear()} AgentUtils Infrastructure. All rights reserved.
+            </p>
+          </div>
+          <div className="flex flex-wrap justify-center gap-8 font-[family-name:var(--font-jetbrains-mono)] text-xs font-semibold uppercase tracking-[0.05em] text-primary-fixed-dim">
+            <a href="https://github.com/gibtang/agent-utils" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors opacity-80 hover:opacity-100">
+              GitHub
+            </a>
+            <Link href="/docs" className="hover:text-primary transition-colors opacity-80 hover:opacity-100">
+              Documentation
+            </Link>
+            <Link href="/terms" className="hover:text-primary transition-colors opacity-80 hover:opacity-100">
+              Terms
+            </Link>
+            <Link href="/privacy" className="hover:text-primary transition-colors opacity-80 hover:opacity-100">
+              Privacy
+            </Link>
+          </div>
         </div>
       </footer>
     </div>

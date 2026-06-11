@@ -322,12 +322,18 @@ export default function Home() {
             >
               Documentation
             </Link>
-            <span className="text-primary-fixed-dim opacity-80">
+            <Link
+              href="/terms"
+              className="hover:text-primary transition-colors opacity-80 hover:opacity-100"
+            >
               Terms
-            </span>
-            <span className="text-primary-fixed-dim opacity-80">
+            </Link>
+            <Link
+              href="/privacy"
+              className="hover:text-primary transition-colors opacity-80 hover:opacity-100"
+            >
               Privacy
-            </span>
+            </Link>
           </div>
         </div>
       </footer>
