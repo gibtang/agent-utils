@@ -24,6 +24,7 @@ export const metadata: Metadata = {
     url: 'https://www.agent-utils.com/human-in-the-loop',
     siteName: 'AgentUtils',
     type: 'website',
+    images: [{ url: 'https://www.agent-utils.com/opengraph-image', width: 1200, height: 630 }],
   },
   alternates: {
     canonical: 'https://www.agent-utils.com/human-in-the-loop',
