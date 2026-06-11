@@ -91,21 +91,29 @@ export default async function ToolPage({ params }: { params: Promise<{ slug: str
       <SchemaMarkup tool={tool} />
 
       {/* Nav */}
-      <nav className="flex items-center justify-between px-6 py-4 border-b border-zinc-800">
-        <Link href="/" className="text-lg font-semibold tracking-tight">AgentUtils</Link>
-        <div className="flex items-center gap-4 text-sm text-zinc-400">
-          <Link href="/docs" className="hover:text-zinc-100 transition-colors">Docs</Link>
-          <Link href="/human-in-the-loop" className="hover:text-zinc-100 transition-colors">HITL</Link>
-          <Link
-            href="/signup"
-            className="px-3 py-1.5 rounded-md bg-zinc-100 text-zinc-950 font-medium hover:bg-white transition-colors"
-          >
-            Get API Key
+      <nav className="fixed top-0 w-full z-50 bg-space-black/80 backdrop-blur-md border-b border-border-subtle">
+        <div className="flex items-center justify-between px-[var(--spacing-gutter)] py-4 max-w-[var(--spacing-container-max)] mx-auto">
+          <Link href="/" className="text-[32px] font-semibold tracking-tight text-on-surface font-[family-name:var(--font-geist-sans)]">
+            AgentUtils
           </Link>
+          <div className="flex items-center gap-8 text-base text-on-surface-variant">
+            <Link href="/docs" className="text-primary-container font-bold hover:text-primary-fixed-dim transition-colors duration-200">
+              Docs
+            </Link>
+            <Link href="/human-in-the-loop" className="hover:text-primary-fixed-dim transition-colors duration-200">
+              Human-in-the-Loop
+            </Link>
+            <Link
+              href="/signup"
+              className="bg-primary-container text-on-primary-container px-6 py-2 rounded-md font-bold hover:bg-primary transition-all scale-100 active:scale-95"
+            >
+              Get API Key
+            </Link>
+          </div>
         </div>
       </nav>
 
-      <main className="max-w-4xl mx-auto px-6 py-16">
+      <main className="max-w-4xl mx-auto px-6 py-16 pt-28">
         {/* Hero */}
         <header>
           <p className="text-sm text-zinc-500 mb-2">{tool.icon} {tool.name}</p>
@@ -268,12 +276,43 @@ export default async function ToolPage({ params }: { params: Promise<{ slug: str
       </main>
 
       {/* Footer */}
-      <footer className="mt-auto border-t border-zinc-800 px-6 py-6 text-center text-sm text-zinc-500">
-        Built for agents. By humans.{' '}
-        <span className="text-xs ml-2">
-          Made by <a href="https://feedcode.dev" target="_blank" rel="noopener noreferrer" className="hover:text-zinc-100 transition-colors">feedcode</a>
-        </span>
-        <Link href="/" className="hover:text-zinc-300 transition-colors">AgentUtils</Link>
+      <footer className="bg-charcoal-gray border-t border-border-subtle w-full py-12">
+        <div className="flex flex-col md:flex-row justify-between items-center px-[var(--spacing-gutter)] max-w-[var(--spacing-container-max)] mx-auto gap-8">
+          <div className="flex flex-col items-center md:items-start gap-4">
+            <span className="text-[32px] font-semibold text-on-surface">AgentUtils</span>
+            <p className="text-on-surface-variant font-[family-name:var(--font-jetbrains-mono)] text-xs opacity-80">
+              © {new Date().getFullYear()} AgentUtils Infrastructure. All rights reserved.
+            </p>
+          </div>
+          <div className="flex flex-wrap justify-center gap-8 font-[family-name:var(--font-jetbrains-mono)] text-xs font-semibold uppercase tracking-[0.05em] text-primary-fixed-dim">
+            <a
+              href="https://github.com/gibtang/agent-utils"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-primary transition-colors opacity-80 hover:opacity-100"
+            >
+              GitHub
+            </a>
+            <Link
+              href="/docs"
+              className="hover:text-primary transition-colors opacity-80 hover:opacity-100"
+            >
+              Documentation
+            </Link>
+            <Link
+              href="/terms"
+              className="hover:text-primary transition-colors opacity-80 hover:opacity-100"
+            >
+              Terms
+            </Link>
+            <Link
+              href="/privacy"
+              className="hover:text-primary transition-colors opacity-80 hover:opacity-100"
+            >
+              Privacy
+            </Link>
+          </div>
+        </div>
       </footer>
     </>
   );

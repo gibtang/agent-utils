@@ -1,6 +1,15 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
 
 export const dynamic = 'force-static';
+
+export const metadata: Metadata = {
+  title: 'Documentation — AgentUtils',
+  description: 'Agent-native API utilities documentation. Quick start guides for Dead Letter Queue and Human-in-the-Loop Gate.',
+  alternates: {
+    canonical: '/docs',
+  },
+};
 
 const tools = [
   { slug: 'dlq', name: 'Dead Letter Queue', desc: 'Catch failed agent tasks, inspect payloads, retry with webhooks.', icon: '📬' },

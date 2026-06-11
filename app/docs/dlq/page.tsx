@@ -1,6 +1,15 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
 
 export const dynamic = 'force-static';
+
+export const metadata: Metadata = {
+  title: 'Dead Letter Queue API Docs — AgentUtils',
+  description: 'Capture failed agent tasks, inspect error payloads, and retry via webhook. Complete API reference for the AgentUtils Dead Letter Queue.',
+  alternates: {
+    canonical: '/docs/dlq',
+  },
+};
 
 export default function DlqDocs() {
   return (

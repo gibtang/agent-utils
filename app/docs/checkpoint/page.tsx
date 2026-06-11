@@ -1,6 +1,15 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
 
 export const dynamic = 'force-static';
+
+export const metadata: Metadata = {
+  title: 'Human-in-the-Loop Gate API Docs — AgentUtils',
+  description: 'Pause your agent until a human approves or rejects. Complete API reference for the AgentUtils Checkpoint/HITL gate.',
+  alternates: {
+    canonical: '/docs/checkpoint',
+  },
+};
 
 export default function CheckpointDocs() {
   return (
