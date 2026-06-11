@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 
 function LoginForm() {
-  const { user, signIn, signInWithGoogle } = useAuth();
+  const { user, signIn, signInWithGoogle, resetPassword } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
@@ -14,8 +14,40 @@ function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
+  const [showReset, setShowReset] = useState(false);
 
   const redirect = searchParams.get('redirect') || '/profile';
+
+  // Friendly error messages for Firebase auth errors
+  const getFriendlyError = (err: unknown): string => {
+    const message = err instanceof Error ? err.message : String(err);
+    if (message.includes('auth/invalid-credential') || message.includes('auth/wrong-password') || message.includes('auth/user-not-found')) {
+      return 'Invalid email or password. Please try again.';
+    }
+    if (message.includes('auth/too-many-requests')) {
+      return 'Too many failed attempts. Please wait a moment and try again.';
+    }
+    if (message.includes('auth/network-request-failed')) {
+      return 'Network error. Please check your connection and try again.';
+    }
+    if (message.includes('auth/email-already-in-use')) {
+      return 'An account with this email already exists.';
+    }
+    if (message.includes('auth/weak-password')) {
+      return 'Password must be at least 6 characters.';
+    }
+    if (message.includes('auth/invalid-email')) {
+      return 'Please enter a valid email address.';
+    }
+    if (message.includes('auth/popup-closed-by-user')) {
+      return 'Sign-in popup was closed. Please try again.';
+    }
+    if (message.includes('Auth not initialized')) {
+      return 'Authentication is loading. Please try again in a moment.';
+    }
+    return 'Something went wrong. Please try again.';
+  };
 
   // Redirect when user becomes authenticated — handles Google popup flow
   useEffect(() => {
@@ -32,8 +64,7 @@ function LoginForm() {
       await signIn(email, password);
       // Redirect handled by useEffect above
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Sign in failed';
-      setError(message);
+      setError(getFriendlyError(err));
     } finally {
       setLoading(false);
     }
@@ -46,8 +77,25 @@ function LoginForm() {
       await signInWithGoogle();
       // Redirect handled by useEffect above — onAuthStateChanged fires after popup closes
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Google sign in failed';
-      setError(message);
+      setError(getFriendlyError(err));
+      setLoading(false);
+    }
+  };
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    if (!email.trim()) {
+      setError('Please enter your email address first.');
+      return;
+    }
+    setLoading(true);
+    try {
+      await resetPassword(email);
+      setResetSent(true);
+    } catch (err: unknown) {
+      setError(getFriendlyError(err));
+    } finally {
       setLoading(false);
     }
   };
@@ -103,7 +151,13 @@ function LoginForm() {
             </button>
           </div>
           <div className="flex justify-end">
-            <a href="#" className="text-xs text-zinc-400 hover:text-zinc-200 transition-colors">Forgot password?</a>
+            <button
+              type="button"
+              onClick={() => { setShowReset(!showReset); setResetSent(false); setError(''); }}
+              className="text-xs text-zinc-400 hover:text-zinc-200 transition-colors"
+            >
+              Forgot password?
+            </button>
           </div>
           <button
             type="submit"
@@ -113,6 +167,45 @@ function LoginForm() {
             {loading ? 'Signing in...' : 'Sign in'}
           </button>
         </form>
+
+        {showReset && (
+          <div className="mt-4 rounded-lg border border-zinc-700 bg-zinc-800/50 p-4">
+            {resetSent ? (
+              <div className="text-center">
+                <p className="text-sm text-emerald-300 mb-2">Password reset email sent!</p>
+                <p className="text-xs text-zinc-400">Check your inbox for a link to reset your password.</p>
+                <button
+                  type="button"
+                  onClick={() => { setShowReset(false); setResetSent(false); }}
+                  className="mt-3 text-xs text-zinc-300 underline hover:text-zinc-100"
+                >
+                  Back to sign in
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleResetPassword} className="space-y-3">
+                <p className="text-xs text-zinc-400">Enter your email and we&apos;ll send you a reset link.</p>
+                <div className="flex gap-2">
+                  <input
+                    type="email"
+                    placeholder="Email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    className="flex-1 rounded-md border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-zinc-100 placeholder-zinc-500 focus:border-zinc-500 focus:outline-none"
+                  />
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="rounded-md bg-zinc-100 px-3 py-2 text-sm font-medium text-zinc-900 hover:bg-white transition-colors disabled:opacity-50"
+                  >
+                    {loading ? 'Sending...' : 'Send'}
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        )}
 
         <div className="my-6 flex items-center gap-3">
           <div className="h-px flex-1 bg-zinc-700" />

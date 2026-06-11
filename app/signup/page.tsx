@@ -15,6 +15,17 @@ export default function SignupPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const getFriendlyError = (err: unknown): string => {
+    const message = err instanceof Error ? err.message : String(err);
+    if (message.includes('auth/email-already-in-use')) return 'An account with this email already exists.';
+    if (message.includes('auth/weak-password')) return 'Password must be at least 6 characters.';
+    if (message.includes('auth/invalid-email')) return 'Please enter a valid email address.';
+    if (message.includes('auth/network-request-failed')) return 'Network error. Please check your connection.';
+    if (message.includes('auth/popup-closed-by-user')) return 'Sign-up popup was closed. Please try again.';
+    if (message.includes('Auth not initialized')) return 'Authentication is loading. Please try again in a moment.';
+    return 'Something went wrong. Please try again.';
+  };
+
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -27,8 +38,7 @@ export default function SignupPage() {
       await signUp(email, password, name);
       router.push('/dashboard');
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Sign up failed';
-      setError(message);
+      setError(getFriendlyError(err));
     } finally {
       setLoading(false);
     }
@@ -40,8 +50,7 @@ export default function SignupPage() {
       await signInWithGoogle();
       router.push('/dashboard');
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Google sign up failed';
-      setError(message);
+      setError(getFriendlyError(err));
     }
   };
 

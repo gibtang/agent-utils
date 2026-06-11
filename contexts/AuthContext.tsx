@@ -10,6 +10,7 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
   updateProfile as firebaseUpdateProfile,
+  sendPasswordResetEmail,
 } from 'firebase/auth';
 import { firebaseInitializationPromise } from '@/lib/firebase';
 
@@ -35,6 +36,7 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, name: string) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -154,6 +156,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await signInWithPopup(auth, provider);
   }, []);
 
+  const resetPassword = useCallback(async (email: string) => {
+    const { auth } = await firebaseInitializationPromise;
+    if (!auth) throw new Error('Auth not initialized');
+    await sendPasswordResetEmail(auth, email);
+  }, []);
+
   const logout = useCallback(async () => {
     const { auth } = await firebaseInitializationPromise;
     if (!auth) throw new Error('Auth not initialized');
@@ -171,6 +179,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     signIn,
     signUp,
     signInWithGoogle,
+    resetPassword,
     logout,
   };
 
