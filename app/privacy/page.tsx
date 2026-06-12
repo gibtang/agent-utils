@@ -12,9 +12,10 @@ export const metadata: Metadata = {
     url: 'https://www.agent-utils.com/privacy',
     siteName: 'AgentUtils',
     type: 'website',
+    images: [{ url: 'https://www.agent-utils.com/opengraph-image', width: 1200, height: 630 }],
   },
   twitter: {
-    card: 'summary',
+    card: 'summary_large_image',
     title: 'Privacy Policy — AgentUtils',
     description: 'Privacy Policy for AgentUtils infrastructure platform.',
   },

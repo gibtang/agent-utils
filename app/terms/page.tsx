@@ -12,9 +12,10 @@ export const metadata: Metadata = {
     url: 'https://www.agent-utils.com/terms',
     siteName: 'AgentUtils',
     type: 'website',
+    images: [{ url: 'https://www.agent-utils.com/opengraph-image', width: 1200, height: 630 }],
   },
   twitter: {
-    card: 'summary',
+    card: 'summary_large_image',
     title: 'Terms of Service — AgentUtils',
     description: 'Terms of Service for AgentUtils infrastructure platform.',
   },
