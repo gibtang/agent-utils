@@ -26,7 +26,7 @@ export default function PrivacyPage() {
           <Link href="/" className="text-xl font-semibold text-on-surface hover:text-primary transition-colors">
             AgentUtils
           </Link>
-          <Link href="/" className="text-sm text-on-surface-variant hover:text-primary transition-colors">
+          <Link href="/" className="text-sm text-on-surface-variant hover:text-primary transition-colors min-h-[44px] flex items-center">
             ← Back to Home
           </Link>
         </div>
@@ -107,16 +107,16 @@ export default function PrivacyPage() {
             </p>
           </div>
           <div className="flex flex-wrap justify-center gap-8 font-[family-name:var(--font-jetbrains-mono)] text-xs font-semibold uppercase tracking-[0.05em] text-primary-fixed-dim">
-            <a href="https://github.com/gibtang/agent-utils" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors opacity-80 hover:opacity-100 py-3.5 px-1">
+            <a href="https://github.com/gibtang/agent-utils" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors opacity-80 hover:opacity-100 py-3.5 px-1 min-h-[44px] flex items-center">
               GitHub
             </a>
-            <Link href="/docs" className="hover:text-primary transition-colors opacity-80 hover:opacity-100 py-3.5 px-1">
+            <Link href="/docs" className="hover:text-primary transition-colors opacity-80 hover:opacity-100 py-3.5 px-1 min-h-[44px] flex items-center">
               Documentation
             </Link>
-            <Link href="/terms" className="hover:text-primary transition-colors opacity-80 hover:opacity-100 py-3.5 px-1">
+            <Link href="/terms" className="hover:text-primary transition-colors opacity-80 hover:opacity-100 py-3.5 px-1 min-h-[44px] flex items-center">
               Terms
             </Link>
-            <Link href="/privacy" className="hover:text-primary transition-colors opacity-80 hover:opacity-100 py-3.5 px-1">
+            <Link href="/privacy" className="hover:text-primary transition-colors opacity-80 hover:opacity-100 py-3.5 px-1 min-h-[44px] flex items-center">
               Privacy
             </Link>
           </div>
