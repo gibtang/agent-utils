@@ -26,6 +26,11 @@ export const metadata: Metadata = {
     type: 'website',
     images: [{ url: 'https://www.agent-utils.com/opengraph-image', width: 1200, height: 630 }],
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Human-in-the-Loop API for AI Agents',
+    description: 'Pause AI agents for human approval. One API call. No infrastructure.',
+  },
   alternates: {
     canonical: 'https://www.agent-utils.com/human-in-the-loop',
   },

@@ -13,6 +13,11 @@ export const metadata: Metadata = {
     siteName: 'AgentUtils',
     type: 'website',
   },
+  twitter: {
+    card: 'summary',
+    title: 'Terms of Service — AgentUtils',
+    description: 'Terms of Service for AgentUtils infrastructure platform.',
+  },
   alternates: {
     canonical: 'https://www.agent-utils.com/terms',
   },
