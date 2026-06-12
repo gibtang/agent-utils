@@ -45,13 +45,13 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
         {/* Mobile nav */}
         <div className="lg:hidden border-b border-zinc-800 px-4 py-3">
           <div className="flex items-center justify-between">
-            <Link href="/docs" className="text-sm font-semibold py-2.5 px-1">Docs</Link>
+            <Link href="/docs" className="text-sm font-semibold py-3 px-1">Docs</Link>
             <div className="flex gap-1 overflow-x-auto">
               {tools.map((tool) => (
                 <Link
                   key={tool.slug}
                   href={`/docs/${tool.slug}`}
-                  className="shrink-0 rounded-md px-2 py-2.5 text-xs text-zinc-400 hover:bg-zinc-900 hover:text-zinc-100"
+                  className="shrink-0 rounded-md px-2 py-3 text-xs text-zinc-400 hover:bg-zinc-900 hover:text-zinc-100"
                 >
                   {tool.icon} {tool.name}
                 </Link>

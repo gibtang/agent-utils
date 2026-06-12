@@ -57,7 +57,7 @@ export default function SignupPage() {
   return (
     <div className="flex min-h-screen items-center justify-center px-4">
       <div className="w-full max-w-md rounded-2xl border border-zinc-800 bg-zinc-900 p-8 shadow-xl">
-        <Link href="/" className="block text-center mb-6">
+        <Link href="/" className="block text-center mb-6 min-h-[44px] flex items-center justify-center">
           <span className="text-2xl font-bold text-zinc-100">Agent<span className="text-zinc-500">Utils</span></span>
         </Link>
 
