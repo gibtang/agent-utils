@@ -98,10 +98,10 @@ export default async function ToolPage({ params }: { params: Promise<{ slug: str
             AgentUtils
           </Link>
           <div className="flex items-center gap-8 text-base text-on-surface-variant">
-            <Link href="/docs" className="text-primary-container font-bold hover:text-primary-fixed-dim transition-colors duration-200">
+            <Link href="/docs" className="text-primary-container font-bold hover:text-primary-fixed-dim transition-colors duration-200 py-2.5 px-1">
               Docs
             </Link>
-            <Link href="/human-in-the-loop" className="hover:text-primary-fixed-dim transition-colors duration-200">
+            <Link href="/human-in-the-loop" className="hover:text-primary-fixed-dim transition-colors duration-200 py-2.5 px-1">
               Human-in-the-Loop
             </Link>
             <Link
@@ -290,25 +290,25 @@ export default async function ToolPage({ params }: { params: Promise<{ slug: str
               href="https://github.com/gibtang/agent-utils"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-primary transition-colors opacity-80 hover:opacity-100"
+              className="hover:text-primary transition-colors opacity-80 hover:opacity-100 py-2.5 px-1"
             >
               GitHub
             </a>
             <Link
               href="/docs"
-              className="hover:text-primary transition-colors opacity-80 hover:opacity-100"
+              className="hover:text-primary transition-colors opacity-80 hover:opacity-100 py-2.5 px-1"
             >
               Documentation
             </Link>
             <Link
               href="/terms"
-              className="hover:text-primary transition-colors opacity-80 hover:opacity-100"
+              className="hover:text-primary transition-colors opacity-80 hover:opacity-100 py-2.5 px-1"
             >
               Terms
             </Link>
             <Link
               href="/privacy"
-              className="hover:text-primary transition-colors opacity-80 hover:opacity-100"
+              className="hover:text-primary transition-colors opacity-80 hover:opacity-100 py-2.5 px-1"
             >
               Privacy
             </Link>

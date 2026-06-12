@@ -21,7 +21,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
             <div className="mt-6">
               <Link
                 href="/signup"
-                className="block rounded-md bg-zinc-100 px-3 py-2 text-center text-sm font-medium text-zinc-900 hover:bg-white transition-colors"
+                className="block rounded-md bg-zinc-100 px-3 py-2.5 text-center text-sm font-medium text-zinc-900 hover:bg-white transition-colors"
               >
                 Get API Key
               </Link>
@@ -32,7 +32,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
                 <Link
                   key={tool.slug}
                   href={`/docs/${tool.slug}`}
-                  className="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-zinc-400 hover:bg-zinc-900 hover:text-zinc-100 transition-colors"
+                  className="flex items-center gap-2 rounded-md px-3 py-2.5 text-sm text-zinc-400 hover:bg-zinc-900 hover:text-zinc-100 transition-colors"
                 >
                   <span>{tool.icon}</span>
                   {tool.name}
@@ -45,13 +45,13 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
         {/* Mobile nav */}
         <div className="lg:hidden border-b border-zinc-800 px-4 py-3">
           <div className="flex items-center justify-between">
-            <Link href="/docs" className="text-sm font-semibold">Docs</Link>
+            <Link href="/docs" className="text-sm font-semibold py-2.5 px-1">Docs</Link>
             <div className="flex gap-1 overflow-x-auto">
               {tools.map((tool) => (
                 <Link
                   key={tool.slug}
                   href={`/docs/${tool.slug}`}
-                  className="shrink-0 rounded-md px-2 py-1 text-xs text-zinc-400 hover:bg-zinc-900 hover:text-zinc-100"
+                  className="shrink-0 rounded-md px-2 py-2.5 text-xs text-zinc-400 hover:bg-zinc-900 hover:text-zinc-100"
                 >
                   {tool.icon} {tool.name}
                 </Link>

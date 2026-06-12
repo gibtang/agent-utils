@@ -50,10 +50,10 @@ export default function HumanInTheLoopPage() {
           AgentUtils
         </Link>
         <div className="flex items-center gap-4 text-sm text-zinc-400">
-          <Link href="/docs" className="hover:text-zinc-100 transition-colors">
+          <Link href="/docs" className="hover:text-zinc-100 transition-colors py-2.5 px-1">
             Docs
           </Link>
-          <Link href="/tools/checkpoint" className="hover:text-zinc-100 transition-colors">
+          <Link href="/tools/checkpoint" className="hover:text-zinc-100 transition-colors py-2.5 px-1">
             API Reference
           </Link>
           <Link
@@ -210,16 +210,16 @@ const checkpoint = await fetch("https://www.agent-utils.com/api/checkpoint", {
             </p>
           </div>
           <div className="flex flex-wrap justify-center gap-8 font-[family-name:var(--font-jetbrains-mono)] text-xs font-semibold uppercase tracking-[0.05em] text-primary-fixed-dim">
-            <a href="https://github.com/gibtang/agent-utils" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors opacity-80 hover:opacity-100">
+            <a href="https://github.com/gibtang/agent-utils" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors opacity-80 hover:opacity-100 py-2.5 px-1">
               GitHub
             </a>
-            <Link href="/docs" className="hover:text-primary transition-colors opacity-80 hover:opacity-100">
+            <Link href="/docs" className="hover:text-primary transition-colors opacity-80 hover:opacity-100 py-2.5 px-1">
               Documentation
             </Link>
-            <Link href="/terms" className="hover:text-primary transition-colors opacity-80 hover:opacity-100">
+            <Link href="/terms" className="hover:text-primary transition-colors opacity-80 hover:opacity-100 py-2.5 px-1">
               Terms
             </Link>
-            <Link href="/privacy" className="hover:text-primary transition-colors opacity-80 hover:opacity-100">
+            <Link href="/privacy" className="hover:text-primary transition-colors opacity-80 hover:opacity-100 py-2.5 px-1">
               Privacy
             </Link>
           </div>
