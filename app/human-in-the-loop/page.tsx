@@ -58,7 +58,7 @@ export default function HumanInTheLoopPage() {
           </Link>
           <Link
             href="/signup"
-            className="px-3 py-1.5 rounded-md bg-zinc-100 text-zinc-950 font-medium hover:bg-white transition-colors"
+            className="px-3 py-2.5 rounded-md bg-zinc-100 text-zinc-950 font-medium hover:bg-white transition-colors"
           >
             Get API Key
           </Link>

@@ -106,7 +106,7 @@ export default async function ToolPage({ params }: { params: Promise<{ slug: str
             </Link>
             <Link
               href="/signup"
-              className="bg-primary-container text-on-primary-container px-6 py-2 rounded-md font-bold hover:bg-primary transition-all scale-100 active:scale-95"
+              className="bg-primary-container text-on-primary-container px-6 py-2.5 rounded-md font-bold hover:bg-primary transition-all scale-100 active:scale-95"
             >
               Get API Key
             </Link>
