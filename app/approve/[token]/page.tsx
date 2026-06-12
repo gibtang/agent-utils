@@ -32,10 +32,10 @@ export default function ApprovePage() {
       try {
         const res = await fetch(`/api/checkpoint/public/${token}`);
         const json = await res.json();
-        if (json.success) {
+        if (json.success && json.data && !json.data.error) {
           setCheckpoint(json.data);
         } else {
-          setError(json.data?.error || 'Not found');
+          setError(json.data?.error || json.error || 'Not found');
         }
       } catch {
         setError('Failed to load checkpoint');
