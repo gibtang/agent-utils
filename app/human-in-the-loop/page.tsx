@@ -50,15 +50,15 @@ export default function HumanInTheLoopPage() {
           AgentUtils
         </Link>
         <div className="flex items-center gap-4 text-sm text-zinc-400">
-          <Link href="/docs" className="hover:text-zinc-100 transition-colors py-3 px-1">
+          <Link href="/docs" className="hover:text-zinc-100 transition-colors py-3 px-1 min-h-[44px] flex items-center">
             Docs
           </Link>
-          <Link href="/tools/checkpoint" className="hover:text-zinc-100 transition-colors py-3 px-1">
+          <Link href="/tools/checkpoint" className="hover:text-zinc-100 transition-colors py-3 px-1 min-h-[44px] flex items-center">
             API Reference
           </Link>
           <Link
             href="/signup"
-            className="px-3 py-3 rounded-md bg-zinc-100 text-zinc-950 font-medium hover:bg-white transition-colors"
+            className="px-3 py-3 rounded-md bg-zinc-100 text-zinc-950 font-medium hover:bg-white transition-colors min-h-[44px] flex items-center"
           >
             Get API Key
           </Link>
@@ -78,13 +78,13 @@ export default function HumanInTheLoopPage() {
         <div className="flex gap-4 mt-8">
           <Link
             href="/signup"
-            className="px-6 py-3 rounded-lg bg-zinc-100 text-zinc-950 font-semibold hover:bg-white transition-colors"
+            className="px-6 py-3 rounded-lg bg-zinc-100 text-zinc-950 font-semibold hover:bg-white transition-colors min-h-[44px] flex items-center"
           >
             Start building free
           </Link>
           <Link
             href="/tools/checkpoint"
-            className="px-6 py-3 rounded-lg border border-zinc-700 text-zinc-300 font-semibold hover:border-zinc-500 transition-colors"
+            className="px-6 py-3 rounded-lg border border-zinc-700 text-zinc-300 font-semibold hover:border-zinc-500 transition-colors min-h-[44px] flex items-center"
           >
             API Docs →
           </Link>
@@ -193,7 +193,7 @@ const checkpoint = await fetch("https://www.agent-utils.com/api/checkpoint", {
           </p>
           <Link
             href="/signup"
-            className="inline-block px-6 py-3 rounded-lg bg-zinc-100 text-zinc-950 font-semibold hover:bg-white transition-colors"
+            className="inline-block px-6 py-3 rounded-lg bg-zinc-100 text-zinc-950 font-semibold hover:bg-white transition-colors min-h-[44px] flex items-center"
           >
             Get your API key →
           </Link>
@@ -210,16 +210,16 @@ const checkpoint = await fetch("https://www.agent-utils.com/api/checkpoint", {
             </p>
           </div>
           <div className="flex flex-wrap justify-center gap-8 font-[family-name:var(--font-jetbrains-mono)] text-xs font-semibold uppercase tracking-[0.05em] text-primary-fixed-dim">
-            <a href="https://github.com/gibtang/agent-utils" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors opacity-80 hover:opacity-100 py-3.5 px-1">
+            <a href="https://github.com/gibtang/agent-utils" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors opacity-80 hover:opacity-100 py-3.5 px-1 min-h-[44px] flex items-center">
               GitHub
             </a>
-            <Link href="/docs" className="hover:text-primary transition-colors opacity-80 hover:opacity-100 py-3.5 px-1">
+            <Link href="/docs" className="hover:text-primary transition-colors opacity-80 hover:opacity-100 py-3.5 px-1 min-h-[44px] flex items-center">
               Documentation
             </Link>
-            <Link href="/terms" className="hover:text-primary transition-colors opacity-80 hover:opacity-100 py-3.5 px-1">
+            <Link href="/terms" className="hover:text-primary transition-colors opacity-80 hover:opacity-100 py-3.5 px-1 min-h-[44px] flex items-center">
               Terms
             </Link>
-            <Link href="/privacy" className="hover:text-primary transition-colors opacity-80 hover:opacity-100 py-3.5 px-1">
+            <Link href="/privacy" className="hover:text-primary transition-colors opacity-80 hover:opacity-100 py-3.5 px-1 min-h-[44px] flex items-center">
               Privacy
             </Link>
           </div>

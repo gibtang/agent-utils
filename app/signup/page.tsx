@@ -75,7 +75,7 @@ export default function SignupPage() {
             placeholder="Name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-3 text-sm text-zinc-100 placeholder-zinc-500 focus:border-zinc-500 focus:outline-none"
+            className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-3 min-h-[44px] text-sm text-zinc-100 placeholder-zinc-500 focus:border-zinc-500 focus:outline-none"
           />
           <input
             type="email"
@@ -83,7 +83,7 @@ export default function SignupPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-3 text-sm text-zinc-100 placeholder-zinc-500 focus:border-zinc-500 focus:outline-none"
+            className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-3 min-h-[44px] text-sm text-zinc-100 placeholder-zinc-500 focus:border-zinc-500 focus:outline-none"
           />
           <div className="relative">
             <input
@@ -92,7 +92,7 @@ export default function SignupPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-3 pr-10 text-sm text-zinc-100 placeholder-zinc-500 focus:border-zinc-500 focus:outline-none"
+              className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-3 pr-10 min-h-[44px] text-sm text-zinc-100 placeholder-zinc-500 focus:border-zinc-500 focus:outline-none"
             />
             <button
               type="button"
