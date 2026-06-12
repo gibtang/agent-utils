@@ -50,7 +50,7 @@ export default function HumanInTheLoopPage() {
           AgentUtils
         </Link>
         <div className="flex items-center gap-4 text-sm text-zinc-400">
-          <Link href="/docs" className="hover:text-zinc-100 transition-colors py-3 px-1 min-h-[44px] flex items-center">
+          <Link href="/docs" className="hover:text-zinc-100 transition-colors py-3 px-1 min-h-[44px] min-w-[44px] flex items-center justify-center">
             Docs
           </Link>
           <Link href="/tools/checkpoint" className="hover:text-zinc-100 transition-colors py-3 px-1 min-h-[44px] flex items-center">
