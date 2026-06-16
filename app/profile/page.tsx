@@ -16,7 +16,6 @@ export default function ProfilePage() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [copiedSnippet, setCopiedSnippet] = useState<string | null>(null);
   const [toastVisible, setToastVisible] = useState(false);
 
   const [billingLoading, setBillingLoading] = useState(false);
@@ -144,15 +143,6 @@ export default function ProfilePage() {
     }
   };
 
-  const copySnippet = (id: string, text: string) => {
-    navigator.clipboard.writeText(text);
-    setCopiedSnippet(id);
-    setToastVisible(true);
-    setTimeout(() => setCopiedSnippet(null), 2000);
-  };
-
-  const apiKey = profile?.defaultKey || 'au_YOUR_KEY';
-
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-zinc-950">
@@ -219,114 +209,12 @@ export default function ProfilePage() {
           )}
         </div>
 
-        {/* For Your AI Agents */}
+        {/* API Usage */}
         <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-6 mb-6">
-          <h2 className="text-lg font-semibold mb-4">For Your AI Agents</h2>
-          <p className="text-sm text-zinc-400 mb-5">
-            Copy these snippets to tell your AI agents how to use AgentUtils.
+          <h2 className="text-lg font-semibold mb-4">API Usage</h2>
+          <p className="text-sm text-zinc-400">
+            Authentication is handled per-user via your account session. No API key required.
           </p>
-
-          {/* cURL Quick Start */}
-          <div className="mb-5">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-medium text-zinc-300">cURL — Quick Test</h3>
-              <button
-                onClick={() => copySnippet('curl', `curl -H "x-api-key: ${apiKey}" https://agentutils.dev/api/health`)}
-                className="text-xs text-zinc-500 hover:text-zinc-200 transition-colors"
-              >
-                {copiedSnippet === 'curl' ? 'Copied!' : 'Copy'}
-              </button>
-            </div>
-            <pre className="rounded bg-zinc-800 p-3 font-mono text-xs text-zinc-300 overflow-x-auto">{`curl -H "x-api-key: ${apiKey}" https://agentutils.dev/api/health`}</pre>
-          </div>
-
-          {/* Claude Code MCP */}
-          <div className="mb-5">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-medium text-zinc-300">Claude Code — MCP Config</h3>
-              <button
-                onClick={() => copySnippet('claude', JSON.stringify({
-                  mcpServers: {
-                    "agent-utils": {
-                      command: "npx",
-                      args: ["-y", "@agent-utils/mcp-server"],
-                      env: { AGENT_UTILS_API_KEY: apiKey }
-                    }
-                  }
-                }, null, 2))}
-                className="text-xs text-zinc-500 hover:text-zinc-200 transition-colors"
-              >
-                {copiedSnippet === 'claude' ? 'Copied!' : 'Copy'}
-              </button>
-            </div>
-            <pre className="rounded bg-zinc-800 p-3 font-mono text-xs text-zinc-300 overflow-x-auto">{JSON.stringify({
-              mcpServers: {
-                "agent-utils": {
-                  command: "npx",
-                  args: ["-y", "@agent-utils/mcp-server"],
-                  env: { AGENT_UTILS_API_KEY: apiKey }
-                }
-              }
-            }, null, 2)}</pre>
-          </div>
-
-          {/* Cursor MCP */}
-          <div className="mb-5">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-medium text-zinc-300">Cursor — MCP Config</h3>
-              <button
-                onClick={() => copySnippet('cursor', JSON.stringify({
-                  "agent-utils": {
-                    command: "npx",
-                    args: ["-y", "@agent-utils/mcp-server"],
-                    env: { AGENT_UTILS_API_KEY: apiKey }
-                  }
-                }, null, 2))}
-                className="text-xs text-zinc-500 hover:text-zinc-200 transition-colors"
-              >
-                {copiedSnippet === 'cursor' ? 'Copied!' : 'Copy'}
-              </button>
-            </div>
-            <pre className="rounded bg-zinc-800 p-3 font-mono text-xs text-zinc-300 overflow-x-auto">{JSON.stringify({
-              "agent-utils": {
-                command: "npx",
-                args: ["-y", "@agent-utils/mcp-server"],
-                env: { AGENT_UTILS_API_KEY: apiKey }
-              }
-            }, null, 2)}</pre>
-          </div>
-
-          {/* System prompt snippet */}
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-medium text-zinc-300">System Prompt — Paste into your agent</h3>
-              <button
-                onClick={() => copySnippet('prompt', `You have access to AgentUtils (https://agentutils.dev) — a suite of agent-native utilities.
-
-Authentication: All requests require header "x-api-key: ${apiKey}"
-
-Available tools:
-- Dead Letter Queue: POST /api/dlq (capture failure), GET /api/dlq (list), POST /api/dlq/{id}/retry (retry)
-- Human-in-the-Loop: POST /api/checkpoint (pause for approval), POST /api/checkpoint/{id}/resume (approve/reject)
-
-All endpoints return: { success: boolean, data?: any, error?: string }
-Full OpenAPI spec: https://agentutils.dev/api/docs`)}
-                className="text-xs text-zinc-500 hover:text-zinc-200 transition-colors"
-              >
-                {copiedSnippet === 'prompt' ? 'Copied!' : 'Copy'}
-              </button>
-            </div>
-            <pre className="rounded bg-zinc-800 p-3 font-mono text-xs text-zinc-300 overflow-x-auto whitespace-pre-wrap">{`You have access to AgentUtils (https://agentutils.dev) — a suite of agent-native utilities.
-
-Authentication: All requests require header "x-api-key: ${apiKey}"
-
-Available tools:
-- Dead Letter Queue: POST /api/dlq (capture failure), GET /api/dlq (list), POST /api/dlq/{id}/retry (retry)
-- Human-in-the-Loop: POST /api/checkpoint (pause for approval), POST /api/checkpoint/{id}/resume (approve/reject)
-
-All endpoints return: { success: boolean, data?: any, error?: string }
-Full OpenAPI spec: https://agentutils.dev/api/docs`}</pre>
-          </div>
         </div>
 
         {/* Account Info */}

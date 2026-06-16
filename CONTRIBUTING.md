@@ -34,7 +34,7 @@ npm run dev
 
 - `FIREBASE_PROJECT_ID`, `FIREBASE_CLIENT_ID`, etc. — Firebase Auth
 - `MONGODB_URI` — MongoDB connection string
-- `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` — Stripe billing
+- `STRIPE_SECRET_KEY` — Stripe billing
 - `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `S3_BUCKET` — File storage
 - `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_PHONE_NUMBER` — SMS
 - `RESEND_API_KEY` — Email
