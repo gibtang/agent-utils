@@ -10,6 +10,8 @@ export default function Footer() {
               <li><a href="/" className="text-sm text-gray-400 hover:text-gray-200">Home</a></li>
               <li><a href="/dashboard" className="text-sm text-gray-400 hover:text-gray-200">Dashboard</a></li>
               <li><a href="/tools" className="text-sm text-gray-400 hover:text-gray-200">Tools</a></li>
+              <li><a href="/tools/dlq" className="text-sm text-gray-400 hover:text-gray-200">DLQ Tool</a></li>
+              <li><a href="/tools/checkpoint" className="text-sm text-gray-400 hover:text-gray-200">Checkpoint Tool</a></li>
               <li><a href="/docs" className="text-sm text-gray-400 hover:text-gray-200">Documentation</a></li>
               <li><a href="/docs/checkpoint" className="text-sm text-gray-400 hover:text-gray-200">Checkpoint</a></li>
               <li><a href="/docs/dlq" className="text-sm text-gray-400 hover:text-gray-200">DLQ</a></li>
