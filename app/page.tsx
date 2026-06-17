@@ -20,6 +20,12 @@ export default function Home() {
             <Link href="/human-in-the-loop" className="hover:text-primary-fixed-dim transition-colors duration-200 py-2.5 px-1 min-h-[44px] flex items-center">
               Human-in-the-Loop
             </Link>
+            <Link href="/tools/dlq" className="hover:text-primary-fixed-dim transition-colors duration-200 py-2.5 px-1 min-h-[44px] flex items-center">
+              DLQ
+            </Link>
+            <Link href="/tools/checkpoint" className="hover:text-primary-fixed-dim transition-colors duration-200 py-2.5 px-1 min-h-[44px] flex items-center">
+              Checkpoint
+            </Link>
           </div>
           <div className="flex items-center gap-4">
             {/* Mobile nav links */}
@@ -199,6 +205,33 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Tools Section — Quick access to DLQ and Checkpoint */}
+        <section className="max-w-[var(--spacing-container-max)] mx-auto px-[var(--spacing-gutter)] mb-32">
+          <h2 className="text-[32px] font-semibold leading-10 tracking-[-0.01em] mb-8 text-center">
+            Free Tools
+          </h2>
+          <div className="grid md:grid-cols-2 gap-6">
+            <Link href="/tools/dlq" className="bento-card group bg-charcoal-gray border border-border-subtle rounded-xl p-8 hover:border-primary-container/30 transition-colors">
+              <h3 className="text-xl font-semibold mb-3">Dead Letter Queue</h3>
+              <p className="text-sm text-on-surface-variant leading-6">
+                Catch, inspect, and retry failed agent tasks. Never lose state to an API timeout.
+              </p>
+              <span className="inline-block mt-4 text-primary-container font-semibold text-sm group-hover:underline">
+                Try it →
+              </span>
+            </Link>
+            <Link href="/tools/checkpoint" className="bento-card group bg-charcoal-gray border border-border-subtle rounded-xl p-8 hover:border-primary-container/30 transition-colors">
+              <h3 className="text-xl font-semibold mb-3">Checkpoint</h3>
+              <p className="text-sm text-on-surface-variant leading-6">
+                Pause agents until a human approves. Gate dangerous actions with automated alerts.
+              </p>
+              <span className="inline-block mt-4 text-primary-container font-semibold text-sm group-hover:underline">
+                Try it →
+              </span>
+            </Link>
+          </div>
+        </section>
+
         {/* Framework Integrations */}
         <section className="border-y border-border-subtle bg-surface-container-lowest/50 py-16 mb-32">
           <div className="max-w-[var(--spacing-container-max)] mx-auto px-[var(--spacing-gutter)]">
@@ -322,6 +355,30 @@ export default function Home() {
               className="hover:text-primary transition-colors opacity-80 hover:opacity-100 py-3.5 px-1 min-h-[44px] flex items-center"
             >
               Documentation
+            </Link>
+            <Link
+              href="/docs/dlq"
+              className="hover:text-primary transition-colors opacity-80 hover:opacity-100 py-3.5 px-1 min-h-[44px] flex items-center"
+            >
+              DLQ Docs
+            </Link>
+            <Link
+              href="/docs/checkpoint"
+              className="hover:text-primary transition-colors opacity-80 hover:opacity-100 py-3.5 px-1 min-h-[44px] flex items-center"
+            >
+              Checkpoint Docs
+            </Link>
+            <Link
+              href="/tools/dlq"
+              className="hover:text-primary transition-colors opacity-80 hover:opacity-100 py-3.5 px-1 min-h-[44px] flex items-center"
+            >
+              DLQ Tool
+            </Link>
+            <Link
+              href="/tools/checkpoint"
+              className="hover:text-primary transition-colors opacity-80 hover:opacity-100 py-3.5 px-1 min-h-[44px] flex items-center"
+            >
+              Checkpoint Tool
             </Link>
             <Link
               href="/terms"
