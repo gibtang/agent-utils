@@ -35,14 +35,6 @@ function extractNamedExport(filePath, exportName) {
   return (new Function(`return ${m[1]}`))();
 }
 
-function extractDefaultExportArray(filePath) {
-  const src = fs.readFileSync(path.join(ROOT, filePath), 'utf-8');
-  const re = /const\s+(?:tools|featuredTools)\s*=\s*(\[[\s\S]*?\n\]);/;
-  const m = src.match(re);
-  if (!m) throw new Error(`Could not find tools array in ${filePath}`);
-  return (new Function(`return ${m[1]}`))();
-}
-
 function formatBytes(bytes) {
   if (bytes >= 1024 * 1024 * 1024) return `${bytes / (1024 * 1024 * 1024)}GB`;
   if (bytes >= 1024 * 1024) return `${bytes / (1024 * 1024)}MB`;
@@ -56,7 +48,6 @@ function formatBytes(bytes) {
 
 const spec = extractNamedExport('app/api/docs/route.ts', 'spec');
 const tiers = extractNamedExport('lib/pricing.ts', 'TIERS');
-extractDefaultExportArray('app/page.tsx');
 
 // ---------------------------------------------------------------------------
 // Build llms.txt

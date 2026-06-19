@@ -30,6 +30,10 @@ Pause agents for human approval
 - GET /api/checkpoint/{id} — Poll checkpoint status
 - POST /api/checkpoint/{id}/resume — Approve or reject checkpoint — body: { action: "approve|reject", reason?: string }
 
+### Image Upload — Upload images and get a hosted URL
+Upload images and get a hosted URL
+- POST /api/upload — Upload an image and get a hosted URL — body:  (multipart, field: "file")
+
 ## Rate Limits
 
 - Free: 500 calls/mo, 5MB files, 1h retention — $0/mo

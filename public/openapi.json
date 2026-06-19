@@ -216,6 +216,34 @@
         }
       }
     },
+    "/api/upload": {
+      "post": {
+        "tags": ["Image Upload"],
+        "summary": "Upload an image and get a hosted URL",
+        "description": "Upload an image (JPEG, PNG, WebP, or GIF, max 10MB) via multipart/form-data and receive a durable, shareable hosted URL that auto-expires. Optional retentionHours (default 24).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": ["file"],
+                "properties": {
+                  "file": { "type": "string", "format": "binary", "description": "Image file (image/jpeg, image/png, image/webp, or image/gif)" },
+                  "retentionHours": { "type": "number", "description": "Hours until the hosted URL expires (default 24)" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Image uploaded. Returns id, url, filename, contentType, size, expiresAt." },
+          "400": { "description": "Missing \"file\" field or invalid retentionHours" },
+          "413": { "description": "File exceeds the 10MB maximum" },
+          "415": { "description": "Unsupported media type (only jpeg/png/webp/gif)" }
+        }
+      }
+    },
     "/api/dlq": {
       "post": {
         "tags": ["Dead Letter Queue"],
@@ -536,6 +564,7 @@
   "tags": [
     { "name": "System", "description": "Health and status" },
     { "name": "File Host", "description": "Ephemeral file hosting" },
+    { "name": "Image Upload", "description": "Upload images and get a hosted URL" },
     { "name": "Dead Letter Queue", "description": "Capture and retry failures" },
     { "name": "Human-in-the-Loop", "description": "Pause agents for human approval" },
     { "name": "Agent Shield", "description": "PII redaction and hydration" },

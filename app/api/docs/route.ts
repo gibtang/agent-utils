@@ -66,6 +66,18 @@ DeadLetter: {
           reason: { type: 'string', description: 'Reason for rejection' },
         },
       },
+      ImageUploadResult: {
+        type: 'object',
+        required: ['id', 'url', 'filename', 'contentType', 'size', 'expiresAt'],
+        properties: {
+          id: { type: 'string', description: 'Unique upload identifier' },
+          url: { type: 'string', format: 'uri', description: 'Hosted image URL (public, no auth to view)' },
+          filename: { type: 'string', description: 'Original filename' },
+          contentType: { type: 'string', description: 'MIME type (image/jpeg, image/png, image/webp, image/gif)' },
+          size: { type: 'integer', description: 'File size in bytes' },
+          expiresAt: { type: 'string', format: 'date-time', description: 'When the hosted URL expires' },
+        },
+      },
     },
   },
   paths: {
@@ -202,12 +214,55 @@ DeadLetter: {
         responses: { '200': { description: 'Checkpoint resolved, webhook fired' } },
       },
     },
+    '/api/upload': {
+      post: {
+        tags: ['Image Upload'],
+        summary: 'Upload an image and get a hosted URL',
+        description:
+          'Multipart/form-data upload. Accepted types: JPEG, PNG, WebP, GIF (max 10MB). Returns a durable, shareable hosted URL that auto-expires.',
+        requestBody: {
+          required: true,
+          content: {
+            'multipart/form-data': {
+              schema: {
+                type: 'object',
+                required: ['file'],
+                properties: {
+                  file: { type: 'string', format: 'binary', description: 'Image file (image/jpeg, image/png, image/webp, or image/gif)' },
+                  retentionHours: { type: 'number', description: 'Hours until the hosted URL expires (default 24)' },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          '201': {
+            description: 'Image uploaded',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    success: { type: 'boolean', enum: [true] },
+                    data: { $ref: '#/components/schemas/ImageUploadResult' },
+                  },
+                },
+              },
+            },
+          },
+          '400': { description: 'Missing "file" field or invalid retentionHours' },
+          '413': { description: 'File exceeds the 10MB maximum' },
+          '415': { description: 'Unsupported media type (only jpeg/png/webp/gif)' },
+        },
+      },
+    },
   },
   tags: [
     { name: 'System', description: 'Health and status' },
     { name: 'API Keys', description: 'Manage API keys' },
     { name: 'Dead Letter Queue', description: 'Capture and retry failures' },
     { name: 'Human-in-the-Loop', description: 'Pause agents for human approval' },
+    { name: 'Image Upload', description: 'Upload images and get a hosted URL' },
   ],
 };
 
