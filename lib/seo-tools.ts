@@ -150,6 +150,60 @@ const { data } = await res.json();`,
     keywords: ['human in the loop API', 'agent approval workflow', 'AI agent guardrails', 'human oversight for AI', 'agent pause resume', 'human approval for agents'],
     relatedTools: ['dlq'],
   },
+  {
+    slug: 'image-upload',
+    name: 'Image Upload',
+    icon: '🖼️',
+    tagline: 'Upload images and get a hosted URL in one call.',
+    metaTitle: 'Image Upload API for AI Agents | AgentUtils',
+    metaDescription: 'Upload JPEG, PNG, WebP, or GIF images and receive a hosted URL in a single API call. No SDK, no S3 config — just multipart form data and an API key.',
+    h1: 'Image Upload & Hosting API for AI Agents',
+    subtitle: 'One API call. Durable hosted URL. Zero S3 configuration.',
+    whatItDoes: 'Send an image via multipart/form-data and get back a hosted URL you can embed anywhere. Files land in Backblaze B2 object storage with configurable retention and are served from a stable, shareable URL — no bucket policy tuning, no presigned URL juggling.',
+    whyAgentsNeed: [
+      'Agents that generate or capture images need a place to put them before referencing them in downstream tools',
+      'Configuring S3-compatible credentials, CORS, and bucket policies per agent is tedious and error-prone',
+      'Agents need durable URLs they can hand to other APIs (chat, email, CMS) without the link expiring mid-task',
+      'Self-hosting object storage is a distraction from the actual agent logic',
+    ],
+    useCases: [
+      { title: 'Generated images', description: 'Agent calls an image model — upload the result and get a URL to use in the next step' },
+      { title: 'Screenshot sharing', description: 'Agent captures a page screenshot — host it and share the link in a report or Slack message' },
+      { title: 'User-submitted media', description: 'Collect an image from a user mid-conversation — store it and reference it later' },
+      { title: 'Pipeline handoff', description: 'One agent produces an image, hands the hosted URL to a downstream agent that needs a public link' },
+    ],
+    codeExample: {
+      curl: `curl -X POST https://www.agent-utils.com/api/upload \\
+  -H "x-api-key: au_your_key" \\
+  -F "file=@screenshot.png" \\
+  -F "retentionHours=24"`,
+      python: `import requests
+
+with open("screenshot.png", "rb") as f:
+    resp = requests.post(
+        "https://www.agent-utils.com/api/upload",
+        headers={"x-api-key": "au_your_key"},
+        files={"file": f},
+        data={"retentionHours": 24},
+    )
+image_url = resp.json()["data"]["url"]`,
+      js: `const form = new FormData();
+form.append("file", fs.createReadStream("screenshot.png"));
+form.append("retentionHours", "24");
+
+const res = await fetch("https://www.agent-utils.com/api/upload", {
+  method: "POST",
+  headers: { "x-api-key": "au_your_key" },
+  body: form,
+});
+const { data } = await res.json();
+console.log(data.url);`,
+    },
+    apiEndpoint: 'POST /api/upload',
+    competitors: ['AWS S3 Presigned URLs', 'Cloudinary', 'Imgix', 'Uploadcare'],
+    keywords: ['image upload API', 'image hosting API', 'agent image storage', 'upload image get URL API', 'S3 compatible image upload', 'host image REST API'],
+    relatedTools: ['dlq', 'checkpoint'],
+  },
 ];
 
 export function getToolBySlug(slug: string): ToolSEO | undefined {

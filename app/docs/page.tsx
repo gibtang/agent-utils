@@ -14,6 +14,7 @@ export const metadata: Metadata = {
 const tools = [
   { slug: 'dlq', name: 'Dead Letter Queue', desc: 'Catch failed agent tasks, inspect payloads, retry with webhooks.', icon: '📬' },
   { slug: 'checkpoint', name: 'Human-in-the-Loop Gate', desc: 'Pause agents until a human approves or rejects.', icon: '👤' },
+  { slug: 'image-upload', name: 'Image Upload', desc: 'Upload images and get a hosted URL in one call.', icon: '🖼️' },
 ];
 
 export default function DocsPage() {
