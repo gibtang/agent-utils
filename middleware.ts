@@ -21,6 +21,11 @@ export async function middleware(request: NextRequest) {
     const url = request.nextUrl.clone();
     url.host = CANONICAL_HOST;
     url.hostname = CANONICAL_HOST;
+    // NextURL inherits the internal container port (e.g. 3000) from the
+    // request behind the reverse proxy. Setting host/hostname does not clear
+    // it, which would leak :3000 into the Location header and redirect users
+    // to an unreachable URL. Explicitly drop the port.
+    url.port = '';
     return NextResponse.redirect(url, 301);
   }
 
