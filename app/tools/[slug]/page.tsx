@@ -2,6 +2,7 @@ import { type Metadata } from 'next';
 import Link from 'next/link';
 import { getToolBySlug, getAllToolSlugs, tools } from '@/lib/seo-tools';
 import { notFound } from 'next/navigation';
+import MobileNav from '@/components/MobileNav';
 
 export const dynamic = 'force-static';
 
@@ -98,12 +99,15 @@ export default async function ToolPage({ params }: { params: Promise<{ slug: str
             AgentUtils
           </Link>
           <div className="flex items-center gap-8 text-base text-on-surface-variant">
+            <div className="hidden md:flex items-center gap-8 text-base text-on-surface-variant">
             <Link href="/docs" className="text-primary-container font-bold hover:text-primary-fixed-dim transition-colors duration-200 py-3 px-1 min-h-[44px] flex items-center">
               Docs
             </Link>
             <Link href="/human-in-the-loop" className="hover:text-primary-fixed-dim transition-colors duration-200 py-3 px-1 min-h-[44px] flex items-center">
               Human-in-the-Loop
             </Link>
+            </div>
+            <MobileNav />
             <Link
               href="/signup"
               className="bg-primary-container text-on-primary-container px-6 py-3 rounded-md font-bold hover:bg-primary transition-all scale-100 active:scale-95 min-h-[44px] flex items-center"

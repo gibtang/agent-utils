@@ -1,4 +1,5 @@
 import Link from "next/link";
+import MobileNav from "@/components/MobileNav";
 
 export const dynamic = 'force-static';
 
@@ -28,10 +29,8 @@ export default function Home() {
             </Link>
           </div>
           <div className="flex items-center gap-4">
-            {/* Mobile nav links */}
-            <Link href="/docs" className="md:hidden text-sm text-on-surface-variant hover:text-primary transition-colors py-3 px-1 min-h-[44px] flex items-center">
-              Docs
-            </Link>
+            {/* Mobile hamburger menu */}
+            <MobileNav />
             <a
               href="https://github.com/gibtang/agent-utils"
               target="_blank"
