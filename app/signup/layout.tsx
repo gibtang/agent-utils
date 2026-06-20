@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Sign Up — AgentUtils',
   description: 'Create your AgentUtils account and get an API key in 30 seconds.',
+  openGraph: { url: '/signup' },
   alternates: {
     canonical: '/signup',
   },

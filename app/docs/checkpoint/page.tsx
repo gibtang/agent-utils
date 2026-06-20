@@ -6,6 +6,7 @@ export const dynamic = 'force-static';
 export const metadata: Metadata = {
   title: 'Human-in-the-Loop Gate API Docs — AgentUtils',
   description: 'Pause your agent until a human approves or rejects. Complete API reference for the AgentUtils Checkpoint/HITL gate.',
+  openGraph: { url: '/docs/checkpoint' },
   alternates: {
     canonical: '/docs/checkpoint',
   },

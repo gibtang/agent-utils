@@ -1,7 +1,14 @@
 import Link from "next/link";
 import MobileNav from "@/components/MobileNav";
+import type { Metadata } from "next";
 
 export const dynamic = 'force-static';
+
+export const metadata: Metadata = {
+  // Page-specific og:url so social shares of the homepage point here,
+  // not a leaked default from the root layout.
+  openGraph: { url: "/" },
+};
 
 export default function Home() {
   return (

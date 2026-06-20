@@ -28,7 +28,6 @@ export const metadata: Metadata = {
   openGraph: {
     title: "AgentUtils — API Utilities for AI Agents",
     description: "Production-ready dead letter queues, human-in-the-loop gates, and redactable memory—all behind a single API key.",
-    url: "https://www.agent-utils.com",
     siteName: "AgentUtils",
     type: "website",
     locale: "en_US",

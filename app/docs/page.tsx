@@ -6,6 +6,7 @@ export const dynamic = 'force-static';
 export const metadata: Metadata = {
   title: 'Documentation — AgentUtils',
   description: 'Agent-native API utilities documentation. Quick start guides for Dead Letter Queue and Human-in-the-Loop Gate.',
+  openGraph: { url: '/docs' },
   alternates: {
     canonical: '/docs',
   },
@@ -60,19 +61,24 @@ export default function DocsPage() {
             <thead>
               <tr className="border-b border-zinc-800 text-zinc-400">
                 <th className="pb-3 pr-4 font-medium">Tier</th>
-                <th className="pb-3 pr-4 font-medium">Requests/Day</th>
-                <th className="pb-3 font-medium">Retention</th>
+                <th className="pb-3 pr-4 font-medium">Calls/Month</th>
+                <th className="pb-3 font-medium">File Retention</th>
               </tr>
             </thead>
             <tbody>
               <tr className="border-b border-zinc-800/50">
                 <td className="py-3 pr-4">Free</td>
-                <td className="py-3 pr-4">100</td>
+                <td className="py-3 pr-4">500</td>
                 <td className="py-3">1 hour</td>
               </tr>
               <tr className="border-b border-zinc-800/50">
-                <td className="py-3 pr-4">Pro</td>
+                <td className="py-3 pr-4">Builder ($19/mo)</td>
                 <td className="py-3 pr-4">10,000</td>
+                <td className="py-3">12 hours</td>
+              </tr>
+              <tr className="border-b border-zinc-800/50">
+                <td className="py-3 pr-4">Pro ($49/mo)</td>
+                <td className="py-3 pr-4">100,000</td>
                 <td className="py-3">24 hours</td>
               </tr>
               <tr>

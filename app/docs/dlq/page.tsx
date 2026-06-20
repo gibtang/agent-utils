@@ -6,6 +6,7 @@ export const dynamic = 'force-static';
 export const metadata: Metadata = {
   title: 'Dead Letter Queue API Docs — AgentUtils',
   description: 'Capture failed agent tasks, inspect error payloads, and retry via webhook. Complete API reference for the AgentUtils Dead Letter Queue.',
+  openGraph: { url: '/docs/dlq' },
   alternates: {
     canonical: '/docs/dlq',
   },

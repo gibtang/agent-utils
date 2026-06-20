@@ -6,6 +6,7 @@ export const dynamic = 'force-static';
 export const metadata: Metadata = {
   title: 'Image Upload API Docs — AgentUtils',
   description: 'Upload images and receive a hosted URL in a single API call. Complete API reference for the AgentUtils Image Upload tool.',
+  openGraph: { url: '/docs/image-upload' },
   alternates: {
     canonical: '/docs/image-upload',
   },
