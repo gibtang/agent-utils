@@ -151,7 +151,15 @@ export default function ProfilePage() {
     );
   }
 
-  if (!isAuthenticated) return null;
+  if (!isAuthenticated) {
+    // router.push('/login') fires in the effect above; render feedback instead
+    // of null so logged-out users don't see a blank page during redirect.
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-zinc-950">
+        <p className="text-zinc-400">Redirecting to sign in…</p>
+      </div>
+    );
+  }
 
   const tierColors: Record<string, string> = {
     free: 'text-zinc-400 bg-zinc-800',

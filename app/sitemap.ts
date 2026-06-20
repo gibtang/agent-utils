@@ -25,6 +25,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return [
     { url: `${BASE_URL}/`, lastModified: LAST_MOD, changeFrequency: 'daily', priority: 1.0 },
+    { url: `${BASE_URL}/tools`, lastModified: LAST_MOD, changeFrequency: 'weekly', priority: 0.9 },
     { url: `${BASE_URL}/docs`, lastModified: LAST_MOD, changeFrequency: 'weekly', priority: 0.7 },
     { url: `${BASE_URL}/human-in-the-loop`, lastModified: LAST_MOD, changeFrequency: 'weekly', priority: 0.7 },
     { url: `${BASE_URL}/terms`, lastModified: LAST_MOD, changeFrequency: 'monthly', priority: 0.3 },

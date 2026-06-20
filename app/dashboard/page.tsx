@@ -221,7 +221,16 @@ export default function DashboardPage() {
     );
   }
 
-  if (!isAuthenticated) return null;
+  if (!isAuthenticated) {
+    // AuthContext fires router.push('/login') in an effect above, but returning
+    // null leaves a blank page visible until the navigation commits. Render a
+    // lightweight redirect state instead so logged-out users see feedback.
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-zinc-950">
+        <p className="text-zinc-400">Redirecting to sign in…</p>
+      </div>
+    );
+  }
 
   const defaultKey = profile?.defaultKey || newKey;
   const pendingCount = checkpoints.filter(c => c.status === 'pending').length;
