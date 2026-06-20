@@ -33,11 +33,11 @@ describe('OpenAPI spec', () => {
 
   it('documents all tool endpoints', () => {
     const pathPrefixes = [
-      '/api/file-host',
       '/api/dlq',
       '/api/checkpoint',
-      '/api/shield',
-      '/api/otp',
+      '/api/keys',
+      '/api/upload',
+      '/api/health',
     ];
     for (const prefix of pathPrefixes) {
       const hasPath = Object.keys(spec.paths).some(p => p.startsWith(prefix));
@@ -47,11 +47,11 @@ describe('OpenAPI spec', () => {
 
   it('has tags for all tool groups', () => {
     const tagNames = spec.tags.map((t: { name: string }) => t.name);
-    expect(tagNames).toContain('File Host');
-expect(tagNames).toContain('Dead Letter Queue');
+    expect(tagNames).toContain('Dead Letter Queue');
     expect(tagNames).toContain('Human-in-the-Loop');
-    expect(tagNames).toContain('Agent Shield');
-    expect(tagNames).toContain('AgentVerify OTP');
+    expect(tagNames).toContain('System');
+    expect(tagNames).toContain('API Keys');
+    expect(tagNames).toContain('Image Upload');
   });
 
   it('all POST endpoints have request bodies or parameters', () => {
