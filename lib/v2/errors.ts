@@ -82,6 +82,10 @@ export const Errors = {
   adminRequired: () => apiError(ErrorCode.ADMIN_KEY_REQUIRED, 'Admin key required for this endpoint', 403),
   forbidden: (msg = 'Forbidden') => apiError(ErrorCode.FORBIDDEN, msg, 403),
   notFound: (msg = 'Not found') => apiError(ErrorCode.NOT_FOUND, msg, 404),
+  keyNotFound: () => apiError(ErrorCode.KEY_NOT_FOUND, 'KV key does not exist', 404),
+  versionMismatch: (currentVersion: number) =>
+    apiError(ErrorCode.VERSION_MISMATCH, 'CAS version mismatch', 409, { current_version: currentVersion }),
+  namespaceForbidden: () => apiError(ErrorCode.NAMESPACE_FORBIDDEN, 'Agent cannot access this KV namespace', 403),
   gone: (msg = 'Gone') => apiError(ErrorCode.GONE, msg, 410),
   tenantSuspended: () => apiError(ErrorCode.TENANT_SUSPENDED, 'Tenant account is suspended', 402),
   tenantDeleted: () => apiError(ErrorCode.TENANT_DELETED, 'Tenant has been deleted', 410),
