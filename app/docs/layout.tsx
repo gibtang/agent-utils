@@ -7,6 +7,8 @@ const tools = [
   { slug: 'checkpoint', name: 'Human-in-the-Loop', icon: '👤' },
 ];
 
+const v2 = { slug: 'v2', name: 'v2 API (current)', icon: '⚡' };
+
 export default function DocsLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100">
@@ -28,6 +30,16 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
             </div>
 
             <nav className="mt-6 space-y-1">
+              <Link
+                href={`/docs/${v2.slug}`}
+                className="flex items-center gap-2 rounded-md bg-zinc-900 px-3 py-2.5 text-sm text-zinc-100 transition-colors min-h-[44px]"
+              >
+                <span>{v2.icon}</span>
+                {v2.name}
+              </Link>
+              <div className="pt-3 pb-1 px-3 text-xs font-semibold uppercase tracking-wide text-zinc-600">
+                v1 (legacy)
+              </div>
               {tools.map((tool) => (
                 <Link
                   key={tool.slug}
@@ -47,6 +59,12 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
           <div className="flex items-center justify-between">
             <Link href="/docs" className="text-sm font-semibold py-3 px-1 min-h-[44px] flex items-center">Docs</Link>
             <div className="flex gap-1 overflow-x-auto">
+              <Link
+                href={`/docs/${v2.slug}`}
+                className="shrink-0 rounded-md bg-zinc-900 px-2 py-3 text-xs text-zinc-100 min-h-[44px] flex items-center"
+              >
+                {v2.icon} {v2.name}
+              </Link>
               {tools.map((tool) => (
                 <Link
                   key={tool.slug}

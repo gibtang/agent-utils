@@ -26,6 +26,25 @@ export default function DocsPage() {
         Agent-native API utilities. One API key, REST endpoints, JSON responses.
       </p>
 
+      {/* v2 banner */}
+      <Link
+        href="/docs/v2"
+        className="mt-6 flex items-start gap-3 rounded-lg border border-zinc-700 bg-gradient-to-br from-zinc-800 to-zinc-900 p-5 hover:border-zinc-500 transition-colors"
+      >
+        <span className="text-2xl">⚡</span>
+        <div>
+          <div className="flex items-center gap-2">
+            <h3 className="font-semibold">AgentUtils v2 API</h3>
+            <span className="rounded-full bg-emerald-900/60 px-2 py-0.5 text-xs font-medium text-emerald-300">current</span>
+          </div>
+          <p className="mt-1 text-sm text-zinc-400">
+            Multi-tenant, callback-signed, idempotent. KV store, audit log, DLQ, scheduler, and
+            HitL checkpoints under <code className="rounded bg-zinc-800 px-1.5 py-0.5 text-xs">/v1/*</code>.
+            New integrations should use v2 — the legacy <code className="rounded bg-zinc-800 px-1.5 py-0.5 text-xs">/api/*</code> docs below are deprecated.
+          </p>
+        </div>
+      </Link>
+
       {/* Quick Start */}
       <section className="mt-10">
         <h2 className="text-xl font-semibold mb-4">Quick Start</h2>
