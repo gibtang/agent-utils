@@ -157,7 +157,7 @@ To prevent a half-v1/half-v2 hybrid:
 - [ ] Update `public/openapi.json` with v2 endpoints.
 - [ ] Update `public/llms.txt` / `public/llms-full.txt` with v2 quick-start.
 - [ ] Add `/docs/v2` in-app documentation page.
-- [ ] Wire a cron/worker tick that calls `fireDueSchedules()` and `processTimeouts()` on an interval (Next.js route or external scheduler).
+- [x] Wire a cron/worker tick that calls `fireDueSchedules()` and `processTimeouts()` on an interval (Next.js route or external scheduler). See `docs/product/agentutils-v2-cron.md` — `POST /v1/tick` is implemented and tested; production wiring is an external cron hitting it (Coolify does not run Next.js cron jobs).
 - [ ] Resolve the "16 phantom endpoints" v1 OpenAPI ticket before publishing v2 docs.
 - [ ] Announce v1 DLQ/Checkpoint/HITL deprecation once v2 reaches production parity.
 - [ ] Remove v1 tool routes after 30 days of zero v1 traffic.
