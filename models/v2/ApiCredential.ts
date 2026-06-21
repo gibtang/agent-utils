@@ -7,7 +7,7 @@
  */
 import mongoose, { Schema, Document } from 'mongoose';
 
-export type KeyType = 'admin' | 'agent';
+export type KeyType = 'admin' | 'agent' | 'approval-proxy';
 
 export interface IApiCredential extends Document {
   keyHash: string; // sha256 hex
@@ -24,7 +24,7 @@ const ApiCredentialSchema = new Schema<IApiCredential>(
   {
     keyHash: { type: String, required: true, unique: true, index: true },
     keyPrefix: { type: String, required: true },
-    keyType: { type: String, enum: ['admin', 'agent'], required: true },
+    keyType: { type: String, enum: ['admin', 'agent', 'approval-proxy'], required: true },
     tenantId: { type: String, required: true, index: true },
     agentId: { type: String, default: null },
     active: { type: Boolean, default: true },

@@ -20,6 +20,13 @@ export interface ResolvedAdmin {
   plan: string;
 }
 
+export interface ResolvedApprovalProxy {
+  kind: 'approval-proxy';
+  tenantId: string;
+  tenantStatus: string;
+  plan: string;
+}
+
 export interface ResolvedAgent {
   kind: 'agent';
   tenantId: string;
@@ -28,7 +35,7 @@ export interface ResolvedAgent {
   plan: string;
 }
 
-export type Resolved = ResolvedAdmin | ResolvedAgent;
+export type Resolved = ResolvedAdmin | ResolvedAgent | ResolvedApprovalProxy;
 
 export interface Resolution {
   resolved: Resolved;
@@ -43,24 +50,26 @@ export interface Resolution {
  */
 export async function resolveCredentials(
   req: NextRequest,
-  opts: { requireAdminKey?: boolean; allowAgentKey?: boolean } = {},
+  opts: { requireAdminKey?: boolean; allowAgentKey?: boolean; requireApprovalKey?: boolean } = {},
 ): Promise<Resolution | ApiError> {
   await connectDB();
 
   const requestId = (req.headers.get('x-request-id') as string) || undefined;
   const adminKey = req.headers.get('x-admin-key');
+  const approvalKey = req.headers.get('x-approval-key');
   const apiKey = req.headers.get('x-api-key');
   const presentedAgentId = req.headers.get('x-agent-id');
 
   const hasAdmin = !!adminKey;
+  const hasApproval = !!approvalKey;
   const hasAgent = !!apiKey;
 
-  if (!hasAdmin && !hasAgent) {
+  if (!hasAdmin && !hasAgent && !hasApproval) {
     return Errors.missingAuth();
   }
 
   // Determine which key to use. Admin endpoints require admin key.
-  let keyType: 'admin' | 'agent';
+  let keyType: 'admin' | 'agent' | 'approval-proxy';
   let rawKey: string;
 
   if (opts.requireAdminKey) {
@@ -70,14 +79,21 @@ export async function resolveCredentials(
     }
     keyType = 'admin';
     rawKey = adminKey as string;
+  } else if (opts.requireApprovalKey) {
+    if (!hasApproval) {
+      return Errors.forbidden('Approval-proxy or admin key required');
+    }
+    keyType = 'approval-proxy';
+    rawKey = approvalKey as string;
   } else if (hasAdmin && !opts.allowAgentKey) {
-    // Tool endpoints that should reject admin keys: handled by callers via
-    // requireToolKey(). Here, prefer admin only when no agent key present.
     keyType = 'admin';
     rawKey = adminKey as string;
   } else if (hasAgent) {
     keyType = 'agent';
     rawKey = apiKey as string;
+  } else if (hasApproval) {
+    keyType = 'approval-proxy';
+    rawKey = approvalKey as string;
   } else {
     keyType = 'admin';
     rawKey = adminKey as string;
@@ -87,6 +103,9 @@ export async function resolveCredentials(
     return Errors.invalidCreds();
   }
   if (keyType === 'agent' && !rawKey.startsWith('agutil_agt_')) {
+    return Errors.invalidCreds();
+  }
+  if (keyType === 'approval-proxy' && !rawKey.startsWith('agutil_apr_')) {
     return Errors.invalidCreds();
   }
 
@@ -121,6 +140,12 @@ export async function resolveCredentials(
   if (keyType === 'admin') {
     return {
       resolved: { kind: 'admin', tenantId: tenant.tenantId, tenantStatus: tenant.status, plan: tenant.plan },
+      requestId: requestId ?? '',
+    };
+  }
+  if (keyType === 'approval-proxy') {
+    return {
+      resolved: { kind: 'approval-proxy', tenantId: tenant.tenantId, tenantStatus: tenant.status, plan: tenant.plan },
       requestId: requestId ?? '',
     };
   }
@@ -159,4 +184,17 @@ export async function requireAgentKey(req: NextRequest): Promise<Resolution | Ap
     return Errors.adminRequired();
   }
   return resolveCredentials(req, { allowAgentKey: true });
+}
+
+/**
+ * Approve/reject endpoints accept admin key OR approval-proxy key.
+ */
+export async function requireApprovalOrAdmin(req: NextRequest): Promise<Resolution | ApiError> {
+  const adminKey = req.headers.get('x-admin-key');
+  const approvalKey = req.headers.get('x-approval-key');
+  if (!adminKey && !approvalKey) {
+    return Errors.forbidden('Tenant admin key or approval-proxy key required');
+  }
+  if (adminKey) return resolveCredentials(req, { requireAdminKey: true });
+  return resolveCredentials(req, { requireApprovalKey: true });
 }

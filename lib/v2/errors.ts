@@ -97,6 +97,7 @@ export const Errors = {
   payloadTooLarge: (msg = 'Payload too large') => apiError(ErrorCode.PAYLOAD_TOO_LARGE, msg, 413),
   conflict: (msg: string, details?: Record<string, unknown>) =>
     apiError(ErrorCode.CONFLICT, msg, 409, details),
+  checkpointAlreadyResolved: () => apiError(ErrorCode.CHECKPOINT_ALREADY_RESOLVED, 'Checkpoint already resolved', 409),
   tenantNameTaken: () => apiError(ErrorCode.TENANT_NAME_TAKEN, 'Tenant name already registered', 409),
   agentNameTaken: () => apiError(ErrorCode.AGENT_NAME_TAKEN, 'Agent name already exists in this tenant', 409),
   rateLimited: (retryAfterSeconds: number) =>

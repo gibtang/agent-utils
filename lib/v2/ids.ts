@@ -59,3 +59,8 @@ export function generateAdminKey(): string {
 export function generateAgentKey(): string {
   return `agutil_agt_${randomHex()}`;
 }
+
+/** Full approval-proxy key (shown once). Scoped to approve/reject checkpoints. */
+export function generateApprovalProxyKey(): string {
+  return `agutil_apr_${randomHex()}`;
+}
