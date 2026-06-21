@@ -67,8 +67,8 @@ spec = {
             'TenantCreated': {'type': 'object', 'properties': {
                 'tenant_id': {'type': 'string'}, 'name': {'type': 'string'}, 'plan': {'type': 'string'},
                 'admin_key': {'type': 'string', 'description': 'One-time — shown only here'}, 'quota': {'type': 'object'}}},
-            'AgentCreate': {'type': 'object', 'required': ['agent_id'], 'properties': {
-                'agent_id': {'type': 'string', 'pattern': '^[a-z0-9_]{1,40}$'}, 'metadata': {'type': 'object'}}},
+            'AgentCreate': {'type': 'object', 'required': ['name'], 'properties': {
+                'name': {'type': 'string', 'pattern': '^[a-z0-9][a-z0-9-]{2,31}$'}, 'description': {'type': 'string'}, 'callback_base_url': {'type': 'string', 'format': 'uri'}}},
             'KvPut': {'type': 'object', 'required': ['value'], 'properties': {
                 'value': {}, 'ttl_seconds': {'type': 'integer', 'minimum': 1},
                 'cas_version': {'type': 'integer', 'description': 'Optimistic concurrency (If-Match)'}}},

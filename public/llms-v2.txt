@@ -28,7 +28,7 @@ curl -X POST https://agentutils.dev/v1/tenants \
 # 2. Register an agent — store the one-time agent key
 curl -X POST https://agentutils.dev/v1/agents \
   -H "x-admin-key: agutil_adm_…" -H "content-type: application/json" \
-  -d '{"agent_id":"worker-1"}'
+  -d '{"name":"worker-1"}'
 # → { "data": { "agent_id":"worker-1", "api_key":"agutil_agt_…" } }
 
 # 3. Use any tool with the agent key

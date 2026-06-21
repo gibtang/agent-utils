@@ -21,7 +21,7 @@ const SNIP_CREATE_TENANT = `curl -X POST https://agentutils.dev/v1/tenants \\
 const SNIP_REGISTER_AGENT = `curl -X POST https://agentutils.dev/v1/agents \\
   -H "x-admin-key: agutil_adm_…" \\
   -H "content-type: application/json" \\
-  -d '{ "agent_id":"worker-1" }'
+  -d '{ "name":"worker-1" }'
 
 # → { "data": { "agent_id":"worker-1", "api_key":"agutil_agt_…" } }`;
 
