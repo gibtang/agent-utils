@@ -181,7 +181,9 @@ export function createRoute<TParams extends Record<string, string | string[]> = 
             ? { data: null, error: result.toJSON(requestId || '0') }
             : result.kind === 'list'
               ? { data: result.data, meta: { cursor: result.cursor, has_more: result.has_more } }
-              : { data: result.data };
+              : result.kind === 'noContent'
+                ? { data: null }
+                : { data: result.data };
           const status = isApiError(result)
             ? result.http
             : result.kind === 'created'

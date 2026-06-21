@@ -7,7 +7,7 @@ import { Errors } from '@/lib/v2/errors';
 import Tenant from '@/models/v2/Tenant';
 import { quotaFor } from '@/lib/v2/quota';
 
-export const GET = createRoute({ admin: true }, async (ctx) => {
+export const GET = createRoute<{ id: string }>({ admin: true }, async (ctx) => {
   const targetId = ctx.params.id as string;
   if (ctx.resolved.tenantId !== targetId) {
     // Admin key may only read its own tenant. Cross-tenant → 404 (no existence leak).
@@ -37,7 +37,7 @@ export const GET = createRoute({ admin: true }, async (ctx) => {
   };
 });
 
-export const DELETE = createRoute({ admin: true }, async (ctx) => {
+export const DELETE = createRoute<{ id: string }>({ admin: true }, async (ctx) => {
   const targetId = ctx.params.id as string;
   if (ctx.resolved.tenantId !== targetId) {
     return Errors.notFound();

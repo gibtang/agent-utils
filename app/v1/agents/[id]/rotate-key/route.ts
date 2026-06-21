@@ -8,7 +8,7 @@ import { hashKey } from '@/lib/v2/crypto';
 import Agent from '@/models/v2/Agent';
 import ApiCredential from '@/models/v2/ApiCredential';
 
-export const POST = createRoute({ admin: true }, async (ctx) => {
+export const POST = createRoute<{ id: string }>({ admin: true }, async (ctx) => {
   const targetAgentId = ctx.params.id as string;
   const tenantId = ctx.resolved.tenantId;
   const agent = await Agent.findOne({ tenantId, agentId: targetAgentId }).lean();

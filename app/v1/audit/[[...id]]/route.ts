@@ -7,6 +7,7 @@
  * Any authenticated agent within the tenant can read all entries (R-AL-5).
  */
 import { createRoute } from '@/lib/v2/route';
+import { agentIdOf } from '@/lib/v2/auth';
 import { Errors } from '@/lib/v2/errors';
 import { resourceId } from '@/lib/v2/ids';
 import AuditLog from '@/models/v2/AuditLog';
@@ -51,7 +52,7 @@ export const POST = createRoute({ agentKey: true, idempotent: 'POST /v1/audit' }
     await AuditLog.create({
       auditId,
       tenantId: ctx.resolved.tenantId,
-      agentId: ctx.resolved.agentId,
+      agentId: agentIdOf(ctx.resolved),
       action,
       resourceType: body.resource_type ?? null,
       resourceId: body.resource_id ?? null,
@@ -74,7 +75,7 @@ export const POST = createRoute({ agentKey: true, idempotent: 'POST /v1/audit' }
     kind: 'created' as const,
     data: {
       id: auditId,
-      agent_id: ctx.resolved.agentId,
+      agent_id: agentIdOf(ctx.resolved),
       action,
       timestamp: now.toISOString(),
     },

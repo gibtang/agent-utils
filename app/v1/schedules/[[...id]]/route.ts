@@ -7,6 +7,7 @@
  *   DELETE /v1/schedules/{id}   (cancel)
  */
 import { createRoute } from '@/lib/v2/route';
+import { agentIdOf } from '@/lib/v2/auth';
 import { Errors } from '@/lib/v2/errors';
 import { resourceId } from '@/lib/v2/ids';
 import Schedule, { ScheduleStatus } from '@/models/v2/Schedule';
@@ -86,7 +87,7 @@ export const POST = createRoute({ agentKey: true, idempotent: 'POST /v1/schedule
     const sched = await Schedule.create({
       scheduleId,
       tenantId: ctx.resolved.tenantId,
-      agentId: ctx.resolved.agentId,
+      agentId: agentIdOf(ctx.resolved),
       callbackUrl: body.callback_url,
       callbackPayload: body.callback_payload ?? null,
       fireAt: new Date(fireAtMs),
@@ -105,7 +106,7 @@ export const POST = createRoute({ agentKey: true, idempotent: 'POST /v1/schedule
 // ── GET (list + single) ──────────────────────────────────────────────────────
 export const GET = createRoute<{ id?: string[] }>({ agentKey: true }, async (ctx) => {
   const tenantId = ctx.resolved.tenantId;
-  const agentId = ctx.resolved.agentId;
+  const agentId = agentIdOf(ctx.resolved);
   const id = idFromParams(ctx.params);
 
   if (id) {
@@ -135,7 +136,7 @@ export const PATCH = createRoute<{ id?: string[] }>({ agentKey: true }, async (c
   const id = idFromParams(ctx.params);
   const s = await Schedule.findOne({ scheduleId: id }).lean() as any;
   if (!s || s.tenantId !== ctx.resolved.tenantId) return Errors.notFound('schedule not found');
-  if (s.agentId !== ctx.resolved.agentId) return Errors.forbidden();
+  if (s.agentId !== agentIdOf(ctx.resolved)) return Errors.forbidden();
   if (s.status !== 'pending') return Errors.conflict('Schedule already cancelled', { code: 'SCHEDULE_ALREADY_CANCELLED' });
 
   const body = (ctx.body ?? {}) as {
@@ -181,7 +182,7 @@ export const DELETE = createRoute<{ id?: string[] }>({ agentKey: true }, async (
   const id = idFromParams(ctx.params);
   const s = await Schedule.findOne({ scheduleId: id }).lean() as any;
   if (!s || s.tenantId !== ctx.resolved.tenantId) return Errors.notFound('schedule not found');
-  if (s.agentId !== ctx.resolved.agentId) return Errors.forbidden();
+  if (s.agentId !== agentIdOf(ctx.resolved)) return Errors.forbidden();
 
   // R-SCH-3: if already fired, return 409.
   if (s.status === 'fired') return Errors.conflict('Schedule already fired');

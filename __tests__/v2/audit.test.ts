@@ -63,8 +63,8 @@ describe('Card 4 — Audit Log', () => {
     // DELETE handler isn't exported → Next.js returns 405 at framework level;
     // here we assert the route file only exports POST/GET.
     expect(auditPost).toBeDefined();
-    expect((await import('@/app/v1/audit/[[...id]]/route')).DELETE).toBeUndefined();
-    expect((await import('@/app/v1/audit/[[...id]]/route')).PATCH).toBeUndefined();
+    expect((await import('@/app/v1/audit/[[...id]]/route') as { DELETE?: unknown }).DELETE).toBeUndefined();
+    expect((await import('@/app/v1/audit/[[...id]]/route') as { PATCH?: unknown }).PATCH).toBeUndefined();
   });
 
   it('AL-006: timestamp is server-assigned (within 2s of receipt)', async () => {

@@ -10,7 +10,7 @@
 import { createRoute, type RouteContext } from '@/lib/v2/route';
 import { Errors, ApiError } from '@/lib/v2/errors';
 import { ok, errorResponse, noContent } from '@/lib/v2/envelope';
-import { resolveCredentials, requireAgentKey, requireApprovalOrAdmin } from '@/lib/v2/auth';
+import { resolveCredentials, requireAgentKey, requireApprovalOrAdmin, agentIdOf } from '@/lib/v2/auth';
 import { resourceId } from '@/lib/v2/ids';
 import Checkpoint, { CheckpointStatus, TimeoutAction } from '@/models/v2/Checkpoint';
 import { reserveCountedQuota, releaseCountedQuota } from '@/lib/v2/quota';
@@ -108,7 +108,7 @@ export const POST = createRoute({ agentKey: true, idempotent: 'POST /v1/checkpoi
     const cp = await Checkpoint.create({
       checkpointId,
       tenantId: ctx.resolved.tenantId,
-      agentId: ctx.resolved.agentId,
+      agentId: agentIdOf(ctx.resolved),
       title: body.title,
       description: body.description ?? null,
       context: body.context ?? null,
@@ -212,7 +212,7 @@ export const DELETE = createRoute<{ id?: string[] }>({ agentKey: true }, async (
   const c = await Checkpoint.findOne({ checkpointId: id }).lean() as any;
   if (!c || c.tenantId !== ctx.resolved.tenantId) return Errors.notFound('checkpoint not found');
   // R-HITL-4: only creating agent may cancel.
-  if (c.agentId !== ctx.resolved.agentId) return Errors.forbidden('Only the creating agent may cancel');
+  if (c.agentId !== agentIdOf(ctx.resolved)) return Errors.forbidden('Only the creating agent may cancel');
   if (c.status !== 'pending') return Errors.conflict('Checkpoint already resolved');
   const updated = await Checkpoint.findOneAndUpdate(
     { checkpointId: id, status: 'pending' },

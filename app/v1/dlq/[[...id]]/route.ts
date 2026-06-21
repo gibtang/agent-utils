@@ -13,6 +13,7 @@
  * Per-agent scoping: same-tenant other-agent → 403; cross-tenant → 404 (R-DLQ-4).
  */
 import { createRoute } from '@/lib/v2/route';
+import { agentIdOf } from '@/lib/v2/auth';
 import { Errors } from '@/lib/v2/errors';
 import { resourceId } from '@/lib/v2/ids';
 import DlqItem, { IDlqItem } from '@/models/v2/DlqItem';
@@ -114,7 +115,7 @@ export const POST = createRoute({ agentKey: true, idempotent: 'POST /v1/dlq' }, 
     const item = await DlqItem.create({
       dlqId,
       tenantId: ctx.resolved.tenantId,
-      agentId: ctx.resolved.agentId,
+      agentId: agentIdOf(ctx.resolved),
       workflowId: body.workflow_id ?? null,
       operation: body.operation,
       source: body.source,
@@ -147,7 +148,7 @@ export const GET = createRoute<{ id?: string[] }>({ agentKey: true }, async (ctx
   const idSeg = ctx.params.id;
   const id = Array.isArray(idSeg) && idSeg.length ? idSeg[0] : undefined;
   const tenantId = ctx.resolved.tenantId;
-  const agentId = ctx.resolved.agentId;
+  const agentId = agentIdOf(ctx.resolved);
 
   if (id) {
     const item = await DlqItem.findOne({ dlqId: id }).lean();
@@ -183,7 +184,7 @@ export const GET = createRoute<{ id?: string[] }>({ agentKey: true }, async (ctx
 export async function POST_claim(ctx: import('@/lib/v2/route').RouteContext<{ id?: string[] }>) {
   const id = Array.isArray(ctx.params.id) && ctx.params.id.length ? ctx.params.id[0] : '';
   const tenantId = ctx.resolved.tenantId;
-  const agentId = ctx.resolved.agentId;
+  const agentId = agentIdOf(ctx.resolved);
   const item = await DlqItem.findOne({ dlqId: id }).lean();
   const owner = isOwner(item as IDlqItem | null, tenantId, agentId);
   if (owner === 'notfound') return Errors.dlqNotFound();
@@ -237,7 +238,7 @@ export async function POST_claim(ctx: import('@/lib/v2/route').RouteContext<{ id
 export async function POST_release(ctx: import('@/lib/v2/route').RouteContext<{ id?: string[] }>) {
   const id = Array.isArray(ctx.params.id) && ctx.params.id.length ? ctx.params.id[0] : '';
   const tenantId = ctx.resolved.tenantId;
-  const agentId = ctx.resolved.agentId;
+  const agentId = agentIdOf(ctx.resolved);
   const item = await DlqItem.findOne({ dlqId: id }).lean();
   const owner = isOwner(item as IDlqItem | null, tenantId, agentId);
   if (owner === 'notfound') return Errors.dlqNotFound();
@@ -263,7 +264,7 @@ export async function POST_release(ctx: import('@/lib/v2/route').RouteContext<{ 
 export async function POST_fail(ctx: import('@/lib/v2/route').RouteContext<{ id?: string[] }>) {
   const id = Array.isArray(ctx.params.id) && ctx.params.id.length ? ctx.params.id[0] : '';
   const tenantId = ctx.resolved.tenantId;
-  const agentId = ctx.resolved.agentId;
+  const agentId = agentIdOf(ctx.resolved);
   const item = await DlqItem.findOne({ dlqId: id }).lean();
   const owner = isOwner(item as IDlqItem | null, tenantId, agentId);
   if (owner === 'notfound') return Errors.dlqNotFound();
@@ -296,7 +297,7 @@ export async function POST_fail(ctx: import('@/lib/v2/route').RouteContext<{ id?
 export async function POST_resolve(ctx: import('@/lib/v2/route').RouteContext<{ id?: string[] }>) {
   const id = Array.isArray(ctx.params.id) && ctx.params.id.length ? ctx.params.id[0] : '';
   const tenantId = ctx.resolved.tenantId;
-  const agentId = ctx.resolved.agentId;
+  const agentId = agentIdOf(ctx.resolved);
   const item = await DlqItem.findOne({ dlqId: id }).lean();
   const owner = isOwner(item as IDlqItem | null, tenantId, agentId);
   if (owner === 'notfound') return Errors.dlqNotFound();
@@ -329,7 +330,7 @@ export async function POST_resolve(ctx: import('@/lib/v2/route').RouteContext<{ 
 export const DELETE = createRoute<{ id?: string[] }>({ agentKey: true }, async (ctx) => {
   const id = Array.isArray(ctx.params.id) && ctx.params.id.length ? ctx.params.id[0] : '';
   const item = await DlqItem.findOne({ dlqId: id }).lean();
-  const owner = isOwner(item as IDlqItem | null, ctx.resolved.tenantId, ctx.resolved.agentId);
+  const owner = isOwner(item as IDlqItem | null, ctx.resolved.tenantId, agentIdOf(ctx.resolved));
   if (owner === 'notfound') return Errors.dlqNotFound();
   if (owner === 'forbidden') return Errors.forbidden('DLQ item belongs to another agent');
 

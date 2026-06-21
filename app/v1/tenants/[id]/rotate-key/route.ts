@@ -9,7 +9,7 @@ import { hashKey } from '@/lib/v2/crypto';
 import Tenant from '@/models/v2/Tenant';
 import ApiCredential from '@/models/v2/ApiCredential';
 
-export const POST = createRoute({ admin: true }, async (ctx) => {
+export const POST = createRoute<{ id: string }>({ admin: true }, async (ctx) => {
   const targetId = ctx.params.id as string;
   if (ctx.resolved.tenantId !== targetId) return Errors.notFound();
 

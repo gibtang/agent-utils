@@ -172,6 +172,12 @@ export async function resolveCredentials(
   };
 }
 
+/** Type-safe accessor: throws if the resolved identity is not an agent. */
+export function agentIdOf(r: Resolved): string {
+  if (r.kind !== 'agent') throw new Error('agent key required for this endpoint');
+  return r.agentId;
+}
+
 /**
  * Require an agent key (tool endpoints). Admin keys are rejected with
  * ADMIN_KEY_REQUIRED semantics — but per PRD MT-007 the code is ADMIN_KEY_REQUIRED

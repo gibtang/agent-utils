@@ -14,6 +14,7 @@
  * credential. Cross-tenant guesses return 404 (not 403) per EC-KV-4.
  */
 import { createRoute } from '@/lib/v2/route';
+import { agentIdOf } from '@/lib/v2/auth';
 import { Errors } from '@/lib/v2/errors';
 import KvEntry from '@/models/v2/KvEntry';
 import { authorizeNamespace, KEY_RE, NAMESPACE_RE, KV_MAX_VALUE_BYTES, serializedBytes } from '@/lib/v2/kv';
@@ -43,7 +44,7 @@ export const GET = createRoute<CatchParams>({ agentKey: true }, async (ctx) => {
   if (!namespace || !NAMESPACE_RE.test(namespace) && namespace !== 'shared') {
     return Errors.validation('namespace must be a valid agent name or "shared"', { field: 'namespace' });
   }
-  const auth = authorizeNamespace(ctx.resolved.agentId!, namespace);
+  const auth = authorizeNamespace(agentIdOf(ctx.resolved), namespace);
   if (!auth.ok) return Errors.namespaceForbidden();
 
   const tenantId = ctx.resolved.tenantId;
@@ -111,7 +112,7 @@ export const PUT = createRoute<CatchParams>({ agentKey: true }, async (ctx) => {
   if (!namespace || (namespace !== 'shared' && !NAMESPACE_RE.test(namespace))) {
     return Errors.validation('namespace must be a valid agent name or "shared"', { field: 'namespace' });
   }
-  const auth = authorizeNamespace(ctx.resolved.agentId!, namespace);
+  const auth = authorizeNamespace(agentIdOf(ctx.resolved), namespace);
   if (!auth.ok) return Errors.namespaceForbidden();
 
   if (!key || !KEY_RE.test(key)) return Errors.validation('key format invalid', { field: 'key' });
@@ -218,7 +219,7 @@ export const DELETE = createRoute<CatchParams>({ agentKey: true }, async (ctx) =
   if (!namespace || (namespace !== 'shared' && !NAMESPACE_RE.test(namespace))) {
     return Errors.validation('namespace must be a valid agent name or "shared"', { field: 'namespace' });
   }
-  const auth = authorizeNamespace(ctx.resolved.agentId!, namespace);
+  const auth = authorizeNamespace(agentIdOf(ctx.resolved), namespace);
   if (!auth.ok) return Errors.namespaceForbidden();
   if (!key || !KEY_RE.test(key)) return Errors.validation('key format invalid', { field: 'key' });
 

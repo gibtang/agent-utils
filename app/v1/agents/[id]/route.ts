@@ -9,7 +9,7 @@ import { hashKey } from '@/lib/v2/crypto';
 import Agent from '@/models/v2/Agent';
 import ApiCredential from '@/models/v2/ApiCredential';
 
-export const GET = createRoute({}, async (ctx) => {
+export const GET = createRoute<{ id: string }>({}, async (ctx) => {
   const targetAgentId = ctx.params.id as string;
   const tenantId = ctx.resolved.tenantId;
   // Both admin keys and agent keys within the tenant may read.

@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// Public paths that don't require auth
-const publicPaths = ['/', '/pricing', '/api/webhooks', '/api/auth', '/api/health', '/docs', '/llms.txt', '/hook', '/f', '/login', '/signup', '/api/firebase-config', '/api/user', '/approve', '/api/checkpoint/public'];
+// Public paths that don't require auth. /v1/* is v2 AgentUtils — auth is handled
+// inside each route via lib/v2/auth.ts, so the middleware must not gate it.
+const publicPaths = ['/', '/pricing', '/api/webhooks', '/api/auth', '/api/health', '/docs', '/llms.txt', '/hook', '/f', '/login', '/signup', '/api/firebase-config', '/api/user', '/approve', '/api/checkpoint/public', '/v1'];
 
 // Canonical hostname. Canonical tags across the site declare the www host,
 // so the bare apex domain is 301-redirected here to avoid duplicate-content
