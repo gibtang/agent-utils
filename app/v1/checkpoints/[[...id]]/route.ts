@@ -217,7 +217,7 @@ export const DELETE = createRoute<{ id?: string[] }>({ agentKey: true }, async (
   const updated = await Checkpoint.findOneAndUpdate(
     { checkpointId: id, status: 'pending' },
     { $set: { status: 'cancelled', resolvedAt: new Date() } },
-    { new: true },
+    { returnDocument: "after" },
   ).lean();
   if (!updated) return Errors.conflict('Checkpoint already resolved');
   await releaseCountedQuota(ctx.resolved.tenantId, 'pendingCheckpointCount');

@@ -210,7 +210,7 @@ export async function POST_claim(ctx: import('@/lib/v2/route').RouteContext<{ id
       $set: { status: 'claimed', lockedUntil, lockedBy: agentId, lastAttemptedAt: now, failedAt: now },
       $inc: { attemptCount: 1 },
     },
-    { new: true },
+    { returnDocument: "after" },
   ).lean();
 
   if (!claimed) {
@@ -249,7 +249,7 @@ export async function POST_release(ctx: import('@/lib/v2/route').RouteContext<{ 
     {
       $set: { status: 'failed', lockedUntil: null, lockedBy: null, failedAt: new Date(), lastError: { reason: body.reason ?? null, at: new Date().toISOString() } },
     },
-    { new: true },
+    { returnDocument: "after" },
   ).lean() as IDlqItem | null;
   if (!updated) {
     const fresh = await DlqItem.findOne({ dlqId: id }).lean() as IDlqItem | null;
@@ -282,7 +282,7 @@ export async function POST_fail(ctx: import('@/lib/v2/route').RouteContext<{ id?
         nextRetryAfter: body.next_retry_after ? new Date(body.next_retry_after) : null,
       },
     },
-    { new: true },
+    { returnDocument: "after" },
   ).lean() as IDlqItem | null;
   if (!updated) {
     const fresh = await DlqItem.findOne({ dlqId: id }).lean() as IDlqItem | null;
@@ -315,7 +315,7 @@ export async function POST_resolve(ctx: import('@/lib/v2/route').RouteContext<{ 
         result: { resolution: body.resolution ?? null, ...(body.result ? { result: body.result } : {}) },
       },
     },
-    { new: true },
+    { returnDocument: "after" },
   ).lean() as IDlqItem | null;
   if (!updated) {
     const fresh = await DlqItem.findOne({ dlqId: id }).lean() as IDlqItem | null;
@@ -336,7 +336,7 @@ export const DELETE = createRoute<{ id?: string[] }>({ agentKey: true }, async (
   const updated = await DlqItem.findOneAndUpdate(
     { dlqId: id, status: { $ne: 'archived' } },
     { $set: { status: 'archived', archivedAt: new Date(), lockedUntil: null, lockedBy: null } },
-    { new: true },
+    { returnDocument: "after" },
   ).lean();
   if (!updated) return Errors.dlqAlreadyResolved();
   return { kind: 'noContent' as const };

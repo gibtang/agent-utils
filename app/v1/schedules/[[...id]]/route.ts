@@ -171,7 +171,7 @@ export const PATCH = createRoute<{ id?: string[] }>({ agentKey: true }, async (c
     set.label = body.label;
   }
 
-  const updated = await Schedule.findOneAndUpdate({ scheduleId: id, status: 'pending' }, { $set: set }, { new: true }).lean();
+  const updated = await Schedule.findOneAndUpdate({ scheduleId: id, status: 'pending' }, { $set: set }, { returnDocument: "after" }).lean();
   if (!updated) return Errors.conflict('Schedule already cancelled');
   return { kind: 'ok' as const, data: serialize(updated) };
 });
@@ -191,7 +191,7 @@ export const DELETE = createRoute<{ id?: string[] }>({ agentKey: true }, async (
   const updated = await Schedule.findOneAndUpdate(
     { scheduleId: id, status: 'pending' },
     { $set: { status: 'cancelled' } },
-    { new: true },
+    { returnDocument: "after" },
   ).lean();
   if (!updated) return Errors.conflict('Schedule already cancelled');
   await releaseScheduleQuota(ctx.resolved.tenantId);

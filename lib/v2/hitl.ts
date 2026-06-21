@@ -41,7 +41,7 @@ export async function applyResolution(
         resolvedAt: now,
       },
     },
-    { new: true },
+    { returnDocument: "after" },
   ).lean();
   if (!cp) return { delivered: false, dlqCreated: false };
 

@@ -45,14 +45,14 @@ export async function checkRateLimit(tenantId: string, plan: string): Promise<Ra
     const updated = await Tenant.findOneAndUpdate(
       { tenantId, rlBucket: bucketId },
       { $inc: { rlCount: 1 } },
-      { new: true },
+      { returnDocument: "after" },
     ).lean();
     count = (updated as { rlCount?: number } | null)?.rlCount ?? currentCount + 1;
   } else {
     const updated = await Tenant.findOneAndUpdate(
       { tenantId },
       { $set: { rlBucket: bucketId, rlCount: 1 } },
-      { new: true },
+      { returnDocument: "after" },
     ).lean();
     count = (updated as { rlCount?: number } | null)?.rlCount ?? 1;
   }

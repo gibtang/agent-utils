@@ -59,7 +59,7 @@ export async function reserveCountedQuota(
   const updated = await Tenant.findOneAndUpdate(
     { tenantId, [field]: { $lt: limit } },
     { $inc: { [field]: 1 } },
-    { new: true },
+    { returnDocument: "after" },
   ).lean();
   const used = (updated as (ITenant & { _id: unknown }) | null)?.[field] ?? limit + 1;
   return { ok: !!updated, used, limit };
@@ -93,7 +93,7 @@ export async function reserveKvQuota(
       $expr: { $lte: [{ $add: ['$kvStorageBytes', valueBytes] }, q.kvStorageBytes] },
     },
     { $inc: { kvKeyCount: 1, kvStorageBytes: valueBytes } },
-    { new: true },
+    { returnDocument: "after" },
   ).lean();
   return { ok: !!updated, used: (updated as ITenant | null)?.kvKeyCount ?? q.kvKeys, limit: q.kvKeys };
 }
