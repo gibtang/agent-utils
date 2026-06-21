@@ -45,42 +45,42 @@ export const tools: ToolSEO[] = [
       { title: 'Multi-step pipeline failures', description: 'Step 3 of 5 fails — capture which step, what input, and the error for targeted retry' },
     ],
     codeExample: {
-      curl: `curl -X POST https://www.agent-utils.com/api/dlq \\
-  -H "x-api-key: au_your_key" \\
-  -H "Content-Type: application/json" \\
+      curl: `curl -X POST https://www.agent-utils.com/v1/dlq \\
+  -H "x-agent-id: data-pipeline" -H "x-api-key: agutil_agt_…" \\
+  -H "content-type: application/json" \\
   -d '{
-    "agentName": "data-pipeline",
-    "taskType": "import_csv",
-    "error": "Column count mismatch: expected 12, got 15",
-    "payload": {"fileId": "abc123", "rows": 5000}
+    "payload": {"fileId": "abc123", "rows": 5000},
+    "error": "Column count mismatch: expected 12, got 15"
   }'`,
       python: `import requests
 
-requests.post(
-    "https://www.agent-utils.com/api/dlq",
-    headers={"x-api-key": "au_your_key"},
-    json={
-        "agentName": "data-pipeline",
-        "taskType": "import_csv",
-        "error": "Column count mismatch",
-        "payload": {"fileId": "abc123", "rows": 5000},
+resp = requests.post(
+    "https://www.agent-utils.com/v1/dlq",
+    headers={
+        "x-agent-id": "data-pipeline",
+        "x-api-key": "agutil_agt_…",
+        "content-type": "application/json",
     },
-)`,
-      js: `const res = await fetch("https://www.agent-utils.com/api/dlq", {
+    json={
+        "payload": {"fileId": "abc123", "rows": 5000},
+        "error": "Column count mismatch: expected 12, got 15",
+    },
+)
+dlq_id = resp.json()["data"]["id"]`,
+      js: `const res = await fetch("https://www.agent-utils.com/v1/dlq", {
   method: "POST",
   headers: {
-    "x-api-key": "au_your_key",
-    "Content-Type": "application/json",
+    "x-agent-id": "data-pipeline",
+    "x-api-key": "agutil_agt_…",
+    "content-type": "application/json",
   },
   body: JSON.stringify({
-    agentName: "data-pipeline",
-    taskType: "import_csv",
-    error: "Column count mismatch",
     payload: { fileId: "abc123", rows: 5000 },
+    error: "Column count mismatch: expected 12, got 15",
   }),
 });`,
     },
-    apiEndpoint: 'POST /api/dlq',
+    apiEndpoint: 'POST /v1/dlq',
     competitors: ['AWS SQS DLQ', 'RabbitMQ Dead Letter', 'Apache Kafka DLQ'],
     keywords: ['dead letter queue API', 'agent error handling', 'failed task recovery', 'agent retry mechanism', 'dead letter queue for AI', 'error queue for agents'],
     relatedTools: ['checkpoint'],
@@ -108,44 +108,49 @@ requests.post(
       { title: 'Email sending', description: 'Agent composed an email to a customer — pause for manager approval' },
     ],
     codeExample: {
-      curl: `curl -X POST https://www.agent-utils.com/api/checkpoint \\
-  -H "x-api-key: au_your_key" \\
-  -H "Content-Type: application/json" \\
+      curl: `curl -X POST https://www.agent-utils.com/v1/checkpoints \\
+  -H "x-agent-id: finance-bot" -H "x-api-key: agutil_agt_…" \\
+  -H "content-type: application/json" \\
   -d '{
-    "agentName": "finance-bot",
-    "taskDescription": "Wire $5,000 to vendor",
-    "state": {"amount": 5000, "vendor": "Acme Corp"},
-    "webhookUrl": "https://your-server.com/resume"
+    "title": "Approve wire transfer?",
+    "callback_url": "https://your-server.com/resume",
+    "timeout_action": "auto_reject",
+    "timeout_seconds": 3600
   }'`,
       python: `import requests
 
 resp = requests.post(
-    "https://www.agent-utils.com/api/checkpoint",
-    headers={"x-api-key": "au_your_key"},
+    "https://www.agent-utils.com/v1/checkpoints",
+    headers={
+        "x-agent-id": "finance-bot",
+        "x-api-key": "agutil_agt_…",
+        "content-type": "application/json",
+    },
     json={
-        "agentName": "finance-bot",
-        "taskDescription": "Wire $5,000 to vendor",
-        "state": {"amount": 5000, "vendor": "Acme Corp"},
-        "webhookUrl": "https://your-server.com/resume",
+        "title": "Approve wire transfer?",
+        "callback_url": "https://your-server.com/resume",
+        "timeout_action": "auto_reject",
+        "timeout_seconds": 3600,
     },
 )
 checkpoint_id = resp.json()["data"]["id"]`,
-      js: `const res = await fetch("https://www.agent-utils.com/api/checkpoint", {
+      js: `const res = await fetch("https://www.agent-utils.com/v1/checkpoints", {
   method: "POST",
   headers: {
-    "x-api-key": "au_your_key",
-    "Content-Type": "application/json",
+    "x-agent-id": "finance-bot",
+    "x-api-key": "agutil_agt_…",
+    "content-type": "application/json",
   },
   body: JSON.stringify({
-    agentName: "finance-bot",
-    taskDescription: "Wire $5,000 to vendor",
-    state: { amount: 5000, vendor: "Acme Corp" },
-    webhookUrl: "https://your-server.com/resume",
+    title: "Approve wire transfer?",
+    callback_url: "https://your-server.com/resume",
+    timeout_action: "auto_reject",
+    timeout_seconds: 3600,
   }),
 });
 const { data } = await res.json();`,
     },
-    apiEndpoint: 'POST /api/checkpoint',
+    apiEndpoint: 'POST /v1/checkpoints',
     competitors: ['LangGraph Human-in-the-Loop', 'Inkeep', 'Humanloop'],
     keywords: ['human in the loop API', 'agent approval workflow', 'AI agent guardrails', 'human oversight for AI', 'agent pause resume', 'human approval for agents'],
     relatedTools: ['dlq'],

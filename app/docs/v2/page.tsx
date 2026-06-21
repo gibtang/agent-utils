@@ -12,52 +12,52 @@ export const metadata: Metadata = {
 };
 
 // Code snippets as plain template strings — avoids fragile JSX-embedded curlies.
-const SNIP_CREATE_TENANT = `curl -X POST https://agentutils.dev/v1/tenants \\
+const SNIP_CREATE_TENANT = `curl -X POST https://www.agent-utils.com/v1/tenants \\
   -H "content-type: application/json" \\
   -d '{ "name":"my-agent", "owner_email":"me@x.com", "plan":"free" }'
 
 # → { "data": { "tenant_id":"ten_…", "admin_key":"agutil_adm_…" } }`;
 
-const SNIP_REGISTER_AGENT = `curl -X POST https://agentutils.dev/v1/agents \\
+const SNIP_REGISTER_AGENT = `curl -X POST https://www.agent-utils.com/v1/agents \\
   -H "x-admin-key: agutil_adm_…" \\
   -H "content-type: application/json" \\
   -d '{ "name":"worker-1" }'
 
 # → { "data": { "agent_id":"worker-1", "api_key":"agutil_agt_…" } }`;
 
-const SNIP_KV = `curl -X PUT "https://agentutils.dev/v1/kv/state/last-run" \\
+const SNIP_KV = `curl -X PUT "https://www.agent-utils.com/v1/kv/state/last-run" \\
   -H "x-agent-id: worker-1" -H "x-api-key: agutil_agt_…" \\
   -H "content-type: application/json" \\
   -d '{ "value": { "ts": 1234567890 }, "ttl_seconds": 3600 }'`;
 
-const SNIP_AUDIT = `curl -X POST https://agentutils.dev/v1/audit \\
+const SNIP_AUDIT = `curl -X POST https://www.agent-utils.com/v1/audit \\
   -H "x-agent-id: worker-1" -H "x-api-key: agutil_agt_…" \\
   -H "content-type: application/json" \\
   -d '{ "action":"email.sent", "workflow_id":"wf-42" }'`;
 
 const SNIP_DLQ = `# capture
-curl -X POST https://agentutils.dev/v1/dlq \\
+curl -X POST https://www.agent-utils.com/v1/dlq \\
   -H "x-agent-id: worker-1" -H "x-api-key: agutil_agt_…" \\
   -H "content-type: application/json" \\
   -d '{ "payload": { "job": 7 }, "error": "SMTP timeout" }'
 
 # claim atomically
-curl -X POST https://agentutils.dev/v1/dlq/{id}/claim \\
+curl -X POST https://www.agent-utils.com/v1/dlq/{id}/claim \\
   -H "x-agent-id: worker-1" -H "x-api-key: agutil_agt_…"`;
 
-const SNIP_SCHEDULE = `curl -X POST https://agentutils.dev/v1/schedules \\
+const SNIP_SCHEDULE = `curl -X POST https://www.agent-utils.com/v1/schedules \\
   -H "x-agent-id: worker-1" -H "x-api-key: agutil_agt_…" \\
   -H "content-type: application/json" \\
   -d '{ "callback_url":"https://myapp.com/hook", "callback_payload": {"job":7}, "fire_at":"2026-07-01T00:00:00Z" }'`;
 
 const SNIP_HITL = `# create checkpoint
-curl -X POST https://agentutils.dev/v1/checkpoints \\
+curl -X POST https://www.agent-utils.com/v1/checkpoints \\
   -H "x-agent-id: worker-1" -H "x-api-key: agutil_agt_…" \\
   -H "content-type: application/json" \\
   -d '{ "title":"Approve refund?", "callback_url":"https://myapp.com/cb", "timeout_action":"auto_reject", "timeout_seconds": 3600 }'
 
 # approve (admin or approval-proxy key)
-curl -X POST https://agentutils.dev/v1/checkpoints/{id}/approve \\
+curl -X POST https://www.agent-utils.com/v1/checkpoints/{id}/approve \\
   -H "x-admin-key: agutil_adm_…"`;
 
 const SNIP_CALLBACK = `# verify (Node.js)

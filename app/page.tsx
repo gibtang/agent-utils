@@ -110,6 +110,7 @@ export default function Home() {
                   <span className="text-syntax-keyword">
                     &quot;x-agent-id: trade-bot&quot; \
                   </span>{" "}
+                  -H{" "}
                   <span className="text-syntax-keyword">
                     &quot;x-api-key: $AGENT_KEY&quot;
                   </span>{" "}
@@ -118,16 +119,7 @@ export default function Home() {
                 <div className="pl-4 text-on-surface-variant">-d {"{"}</div>
                 <div className="pl-8 flex gap-2">
                   <span className="text-primary-container">
-                    &quot;agentName&quot;:
-                  </span>
-                  <span className="text-syntax-keyword">
-                    &quot;trade-bot&quot;
-                  </span>
-                  ,
-                </div>
-                <div className="pl-8 flex gap-2">
-                  <span className="text-primary-container">
-                    &quot;taskDescription&quot;:
+                    &quot;title&quot;:
                   </span>
                   <span className="text-syntax-keyword">
                     &quot;Execute AAPL trade&quot;
@@ -135,9 +127,18 @@ export default function Home() {
                   ,
                 </div>
                 <div className="pl-8 flex gap-2">
-                  <span className="text-primary-container">&quot;state&quot;:</span>
+                  <span className="text-primary-container">
+                    &quot;callback_url&quot;:
+                  </span>
                   <span className="text-syntax-keyword">
-                    {"{"}"symbol":"AAPL","action":"buy"{"}"}
+                    &quot;https://trade-bot.com/hook&quot;
+                  </span>
+                  ,
+                </div>
+                <div className="pl-8 flex gap-2">
+                  <span className="text-primary-container">&quot;timeout_action&quot;:</span>
+                  <span className="text-syntax-keyword">
+                    &quot;auto_reject&quot;
                   </span>
                 </div>
                 <div className="pl-4 text-on-surface-variant">{"}"}</div>
@@ -366,13 +367,13 @@ export default function Home() {
               Documentation
             </Link>
             <Link
-              href="/docs/dlq"
+              href="/docs/v2"
               className="hover:text-primary transition-colors opacity-80 hover:opacity-100 py-3.5 px-1 min-h-[44px] flex items-center"
             >
               DLQ Docs
             </Link>
             <Link
-              href="/docs/checkpoint"
+              href="/docs/v2"
               className="hover:text-primary transition-colors opacity-80 hover:opacity-100 py-3.5 px-1 min-h-[44px] flex items-center"
             >
               Checkpoint Docs

@@ -1,6 +1,6 @@
 # AgentUtils v2
 
-> Multi-tenant, agent-native infrastructure. One key per agent. KV store, audit log, dead-letter queue, scheduler, and human-in-the-loop checkpoints. https://agentutils.dev
+> Multi-tenant, agent-native infrastructure. One key per agent. KV store, audit log, dead-letter queue, scheduler, and human-in-the-loop checkpoints. https://www.agent-utils.com
 
 v2 is tenant-isolated and callback-signed. The legacy `/api/*` surface is deprecated — use `/v1/*`.
 
@@ -20,19 +20,19 @@ Keys are shown exactly once at creation/rotation. Hashed at rest (SHA-256).
 
 ```bash
 # 1. Create a tenant (public) — store the one-time admin key
-curl -X POST https://agentutils.dev/v1/tenants \
+curl -X POST https://www.agent-utils.com/v1/tenants \
   -H "content-type: application/json" \
   -d '{"name":"my-agent","owner_email":"me@x.com","plan":"free"}'
 # → { "data": { "tenant_id":"ten_…", "admin_key":"agutil_adm_…" } }
 
 # 2. Register an agent — store the one-time agent key
-curl -X POST https://agentutils.dev/v1/agents \
+curl -X POST https://www.agent-utils.com/v1/agents \
   -H "x-admin-key: agutil_adm_…" -H "content-type: application/json" \
   -d '{"name":"worker-1"}'
 # → { "data": { "agent_id":"worker-1", "api_key":"agutil_agt_…" } }
 
 # 3. Use any tool with the agent key
-curl -X PUT "https://agentutils.dev/v1/kv/state/last-run" \
+curl -X PUT "https://www.agent-utils.com/v1/kv/state/last-run" \
   -H "x-agent-id: worker-1" -H "x-api-key: agutil_agt_…" \
   -H "content-type: application/json" \
   -d '{"value":{"ts":1234567890}}'
@@ -114,6 +114,6 @@ Pro plan raises these. Check `GET /v1/tenants/{id}` for live usage.
 
 ## Full reference
 
-OpenAPI spec: https://agentutils.dev/openapi-v2.json
+OpenAPI spec: https://www.agent-utils.com/openapi-v2.json
 
 Legacy v1 (`/api/*`) is deprecated and single-tenant. Do not use it for new integrations.

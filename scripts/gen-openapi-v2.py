@@ -15,7 +15,7 @@ spec = {
             'Multi-tenant, agent-native infrastructure: KV store, audit log, '
             'dead-letter queue, scheduler, and human-in-the-loop checkpoints. '
             'Tenant-isolated, callback-signed, idempotent.\n\n'
-            '## Base URL\nhttps://agentutils.dev/v1\n\n'
+            '## Base URL\nhttps://www.agent-utils.com/v1\n\n'
             '## Authentication\nServer-derived identity from key prefix:\n'
             '- `agutil_adm_…` — admin key (tenant scope). Header: `x-admin-key`.\n'
             '- `agutil_agt_…` — agent key (tenant + agent scope). Headers: `x-agent-id` + `x-api-key`.\n'
@@ -28,7 +28,7 @@ spec = {
             '`{ "error": { "code", "message", "details", "request_id" } }`'
         ),
     },
-    'servers': [{'url': 'https://agentutils.dev/v1'}],
+    'servers': [{'url': 'https://www.agent-utils.com/v1'}],
     'tags': [
         {'name': 'Tenants', 'description': 'Tenant lifecycle, quota, admin-key rotation'},
         {'name': 'Agents', 'description': 'Agent registration and key rotation'},

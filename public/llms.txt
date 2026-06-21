@@ -1,6 +1,6 @@
 # AgentUtils
 
-> Multi-tenant, agent-native infrastructure. KV, audit, DLQ, scheduler, HitL. https://agentutils.dev
+> Multi-tenant, agent-native infrastructure. KV, audit, DLQ, scheduler, HitL. https://www.agent-utils.com
 
 The current API is **v2** under `/v1/*` — tenant-isolated, callback-signed, idempotent.
 

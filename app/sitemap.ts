@@ -16,7 +16,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.8,
   }));
 
-  const docPages = toolSlugs.map((slug) => ({
+  // Only include docs pages that actually exist as routes.
+  // /docs/dlq and /docs/checkpoint were deleted (commit 03d78af) — only
+  // /docs/v2 and /docs/image-upload remain as sub-routes under /docs/.
+  const existingDocSlugs = ['v2', 'image-upload'];
+  const docPages = existingDocSlugs.map((slug) => ({
     url: `${BASE_URL}/docs/${slug}`,
     lastModified: LAST_MOD,
     changeFrequency: 'weekly' as const,

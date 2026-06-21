@@ -3,11 +3,11 @@
   "info": {
     "title": "AgentUtils API v2",
     "version": "2.0.0",
-    "description": "Multi-tenant, agent-native infrastructure: KV store, audit log, dead-letter queue, scheduler, and human-in-the-loop checkpoints. Tenant-isolated, callback-signed, idempotent.\n\n## Base URL\nhttps://agentutils.dev/v1\n\n## Authentication\nServer-derived identity from key prefix:\n- `agutil_adm_\u2026` \u2014 admin key (tenant scope). Header: `x-admin-key`.\n- `agutil_agt_\u2026` \u2014 agent key (tenant + agent scope). Headers: `x-agent-id` + `x-api-key`.\n- `agutil_apr_\u2026` \u2014 approval-proxy key (HitL approve/reject only). Header: `X-Approval-Key`.\n\n`tenant_id` is always server-derived \u2014 never accepted from the client.\n\n## Standard headers\n- `Idempotency-Key` \u2014 replay-safe on all `POST` creation endpoints.\n- All responses include `X-Request-Id`.\n\n## Error envelope\n`{ \"error\": { \"code\", \"message\", \"details\", \"request_id\" } }`"
+    "description": "Multi-tenant, agent-native infrastructure: KV store, audit log, dead-letter queue, scheduler, and human-in-the-loop checkpoints. Tenant-isolated, callback-signed, idempotent.\n\n## Base URL\nhttps://www.agent-utils.com/v1\n\n## Authentication\nServer-derived identity from key prefix:\n- `agutil_adm_\u2026` \u2014 admin key (tenant scope). Header: `x-admin-key`.\n- `agutil_agt_\u2026` \u2014 agent key (tenant + agent scope). Headers: `x-agent-id` + `x-api-key`.\n- `agutil_apr_\u2026` \u2014 approval-proxy key (HitL approve/reject only). Header: `X-Approval-Key`.\n\n`tenant_id` is always server-derived \u2014 never accepted from the client.\n\n## Standard headers\n- `Idempotency-Key` \u2014 replay-safe on all `POST` creation endpoints.\n- All responses include `X-Request-Id`.\n\n## Error envelope\n`{ \"error\": { \"code\", \"message\", \"details\", \"request_id\" } }`"
   },
   "servers": [
     {
-      "url": "https://agentutils.dev/v1"
+      "url": "https://www.agent-utils.com/v1"
     }
   ],
   "tags": [
