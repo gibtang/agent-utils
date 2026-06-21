@@ -109,7 +109,7 @@ export default async function ToolPage({ params }: { params: Promise<{ slug: str
             </div>
             <MobileNav />
             <Link
-              href="/signup"
+              href="/docs/v2"
               className="bg-primary-container text-on-primary-container px-6 py-3 rounded-md font-bold hover:bg-primary transition-all scale-100 active:scale-95 min-h-[44px] flex items-center"
             >
               Get API Key
@@ -132,7 +132,7 @@ export default async function ToolPage({ params }: { params: Promise<{ slug: str
               View API Docs
             </Link>
             <Link
-              href="/signup"
+              href="/docs/v2"
               className="px-5 py-3 rounded-lg border border-zinc-700 text-zinc-300 font-medium hover:border-zinc-500 transition-colors text-sm min-h-[44px] flex items-center"
             >
               Get API Key Free
@@ -265,7 +265,7 @@ export default async function ToolPage({ params }: { params: Promise<{ slug: str
           <p className="mt-2 text-zinc-400">500 free API calls per month. No credit card required.</p>
           <div className="mt-6 flex justify-center gap-3">
             <Link
-              href="/signup"
+              href="/docs/v2"
               className="px-6 py-3 rounded-lg bg-zinc-100 text-zinc-950 font-semibold hover:bg-white transition-colors"
             >
               Get API Key

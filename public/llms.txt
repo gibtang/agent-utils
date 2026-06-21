@@ -2,49 +2,8 @@
 
 > Multi-tenant, agent-native infrastructure. KV, audit, DLQ, scheduler, HitL. https://agentutils.dev
 
-> **v2 is now available** under `/v1/*` — tenant-isolated, callback-signed, idempotent. New integrations should use **[llms-v2.txt](./llms-v2.txt)** (v2 quick-start + reference). The `/api/*` surface below is the deprecated single-tenant v1.
+The current API is **v2** under `/v1/*` — tenant-isolated, callback-signed, idempotent.
 
-## Authentication (v1, deprecated)
+**Read the full reference: [llms-v2.txt](./llms-v2.txt)**
 
-All endpoints require `x-api-key` header with key starting with `au_`.
-Create key at https://agentutils.dev/dashboard after signup.
-
-## Quick Start
-
-```
-curl -H "x-api-key: au_YOUR_KEY" https://agentutils.dev/api/health
-```
-
-## Tools
-
-### Dead Letter Queue — Capture and retry failures
-Capture and retry failures
-- POST /api/dlq — Capture a failure — body: { agentName: string, taskType: string, payload: any, error: string, retryWebhook?: string }
-- GET /api/dlq?status=VALUE&page=VALUE&limit=VALUE — List failures
-- GET /api/dlq/{id} — Inspect failure (full payload)
-- DELETE /api/dlq/{id} — Dismiss failure
-- POST /api/dlq/{id}/retry — Retry — forward payload to webhook
-
-### Human-in-the-Loop — Pause agents for human approval
-Pause agents for human approval
-- POST /api/checkpoint — Create checkpoint (agent sleeps) — body: { agentName: string, taskDescription: string, state: any, webhookUrl: string }
-- GET /api/checkpoint — List checkpoints
-- GET /api/checkpoint/{id} — Poll checkpoint status
-- POST /api/checkpoint/{id}/resume — Approve or reject checkpoint — body: { action: "approve|reject", reason?: string }
-
-### Image Upload — Upload images and get a hosted URL
-Upload images and get a hosted URL
-- POST /api/upload — Upload an image and get a hosted URL — body:  (multipart, field: "file")
-
-## Rate Limits
-
-- Free: 500 calls/mo, 5MB files, 1h retention — $0/mo
-- Builder: 10,000 calls/mo, $0.002/call overage, 25MB files, 12h retention — $19/mo
-- Pro: 100,000 calls/mo, $0.001/call overage, 50MB files, 24h retention — $49/mo
-- Enterprise: Unlimited, 500MB files, 72h retention — $0/mo
-
-## OpenAPI Spec
-Full machine-readable spec: https://agentutils.dev/api/docs
-
-## Response Format
-All endpoints return: `{ success: boolean, data?: any, error?: string, code?: string }`
+The previous single-tenant `/api/*` surface has been removed.

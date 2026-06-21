@@ -34,7 +34,7 @@ export default function ToolsPage() {
             {/* Mobile hamburger menu */}
             <MobileNav />
             <Link
-              href="/signup"
+              href="/docs/v2"
               className="bg-primary-container text-on-primary-container px-6 py-3 rounded-md font-bold hover:bg-primary transition-all scale-100 active:scale-95 min-h-[44px] flex items-center"
             >
               Get API Key
@@ -68,7 +68,7 @@ export default function ToolsPage() {
 
         <div className="mt-16 text-center">
           <Link
-            href="/signup"
+            href="/docs/v2"
             className="inline-block px-6 py-3 rounded-lg bg-zinc-100 text-zinc-950 font-semibold hover:bg-white transition-colors"
           >
             Get Free API Key

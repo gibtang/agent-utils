@@ -50,7 +50,7 @@ export default function Home() {
               </svg>
             </a>
             <Link
-              href="/signup"
+              href="/docs/v2"
               className="bg-primary-container text-on-primary-container px-6 py-2.5 rounded-md font-bold hover:bg-primary transition-all scale-100 active:scale-95 min-h-[44px] flex items-center"
             >
               Get API Key
@@ -74,7 +74,7 @@ export default function Home() {
             </p>
             <div className="flex flex-wrap gap-4">
               <Link
-                href="/signup"
+                href="/docs/v2"
                 className="bg-on-surface text-space-black px-8 py-4 rounded-md font-bold text-lg hover:bg-primary transition-all"
               >
                 Start building free
@@ -102,11 +102,14 @@ export default function Home() {
                   <span className="text-primary-container">curl</span>
                   <span className="text-on-surface">-X POST</span>
                   <span className="text-syntax-keyword">
-                    &quot;https://www.agent-utils.com/api/checkpoint&quot;
+                    &quot;https://www.agent-utils.com/v1/checkpoints&quot;
                   </span>
                 </div>
                 <div className="pl-4 text-on-surface-variant">
                   -H{" "}
+                  <span className="text-syntax-keyword">
+                    &quot;x-agent-id: trade-bot&quot; \
+                  </span>{" "}
                   <span className="text-syntax-keyword">
                     &quot;x-api-key: $AGENT_KEY&quot;
                   </span>{" "}
@@ -323,7 +326,7 @@ export default function Home() {
                 standard infrastructure. No platform lock-in.
               </p>
               <Link
-                href="/signup"
+                href="/docs/v2"
                 className="bg-primary-container text-on-primary-container px-10 py-5 rounded-lg font-bold text-xl hover:bg-primary hover:scale-105 active:scale-95 transition-all shadow-xl shadow-primary-container/20 inline-block"
               >
                 Get API Key

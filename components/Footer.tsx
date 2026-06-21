@@ -8,22 +8,18 @@ export default function Footer() {
             <h3 className="text-sm font-semibold text-white mb-4 uppercase tracking-wider">Agent Utils</h3>
             <ul className="space-y-2">
               <li><a href="/" className="text-sm text-gray-400 hover:text-gray-200">Home</a></li>
-              <li><a href="/dashboard" className="text-sm text-gray-400 hover:text-gray-200">Dashboard</a></li>
               <li><a href="/tools" className="text-sm text-gray-400 hover:text-gray-200">Tools</a></li>
-              <li><a href="/tools/dlq" className="text-sm text-gray-400 hover:text-gray-200">DLQ Tool</a></li>
-              <li><a href="/tools/checkpoint" className="text-sm text-gray-400 hover:text-gray-200">Checkpoint Tool</a></li>
               <li><a href="/docs" className="text-sm text-gray-400 hover:text-gray-200">Documentation</a></li>
-              <li><a href="/docs/checkpoint" className="text-sm text-gray-400 hover:text-gray-200">Checkpoint</a></li>
-              <li><a href="/docs/dlq" className="text-sm text-gray-400 hover:text-gray-200">DLQ</a></li>
+              <li><a href="/docs/v2" className="text-sm text-gray-400 hover:text-gray-200">v2 API (current)</a></li>
               <li><a href="/human-in-the-loop" className="text-sm text-gray-400 hover:text-gray-200">Human-in-the-Loop</a></li>
             </ul>
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-white mb-4 uppercase tracking-wider">Account</h3>
+            <h3 className="text-sm font-semibold text-white mb-4 uppercase tracking-wider">Reference</h3>
             <ul className="space-y-2">
-              <li><a href="/login" className="text-sm text-gray-400 hover:text-gray-200">Login</a></li>
-              <li><a href="/signup" className="text-sm text-gray-400 hover:text-gray-200">Sign Up</a></li>
-              <li><a href="/profile" className="text-sm text-gray-400 hover:text-gray-200">Profile</a></li>
+              <li><a href="/llms-v2.txt" className="text-sm text-gray-400 hover:text-gray-200">llms-v2.txt</a></li>
+              <li><a href="/openapi-v2.json" className="text-sm text-gray-400 hover:text-gray-200">OpenAPI spec</a></li>
+              <li><a href="https://github.com/gibtang/agent-utils" target="_blank" rel="noopener noreferrer" className="text-sm text-gray-400 hover:text-gray-200">GitHub</a></li>
             </ul>
           </div>
           <div>

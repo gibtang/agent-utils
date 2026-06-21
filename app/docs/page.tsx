@@ -5,17 +5,18 @@ export const dynamic = 'force-static';
 
 export const metadata: Metadata = {
   title: 'Documentation — AgentUtils',
-  description: 'Agent-native API utilities documentation. Quick start guides for Dead Letter Queue and Human-in-the-Loop Gate.',
+  description:
+    'AgentUtils v2 API documentation. Multi-tenant KV store, audit log, dead-letter queue, scheduler, and human-in-the-loop checkpoints.',
   openGraph: { url: '/docs' },
-  alternates: {
-    canonical: '/docs',
-  },
+  alternates: { canonical: '/docs' },
 };
 
 const tools = [
-  { slug: 'dlq', name: 'Dead Letter Queue', desc: 'Catch failed agent tasks, inspect payloads, retry with webhooks.', icon: '📬' },
-  { slug: 'checkpoint', name: 'Human-in-the-Loop Gate', desc: 'Pause agents until a human approves or rejects.', icon: '👤' },
-  { slug: 'image-upload', name: 'Image Upload', desc: 'Upload images and get a hosted URL in one call.', icon: '🖼️' },
+  { slug: 'v2', name: 'KV Store', desc: 'Tenant-isolated key-value with CAS, TTL, and namespaces.', icon: '🗃️' },
+  { slug: 'v2', name: 'Audit Log', desc: 'Append-only, server-timestamped, immutable audit trail.', icon: '📜' },
+  { slug: 'v2', name: 'Dead Letter Queue', desc: 'Pull-based failure inbox with atomic claim/release.', icon: '📬' },
+  { slug: 'v2', name: 'Scheduler', desc: 'Once-callbacks with fixed retry and DLQ cascade.', icon: '⏰' },
+  { slug: 'v2', name: 'Human-in-the-Loop', desc: 'Checkpoints requiring human approval before proceeding.', icon: '👤' },
 ];
 
 export default function DocsPage() {
@@ -23,7 +24,8 @@ export default function DocsPage() {
     <div className="max-w-3xl">
       <h1 className="text-3xl font-bold tracking-tight">Documentation</h1>
       <p className="mt-3 text-zinc-400">
-        Agent-native API utilities. One API key, REST endpoints, JSON responses.
+        Multi-tenant, agent-native infrastructure. One key per agent, tenant-isolated,
+        callback-signed, idempotent.
       </p>
 
       {/* v2 banner */}
@@ -35,12 +37,12 @@ export default function DocsPage() {
         <div>
           <div className="flex items-center gap-2">
             <h3 className="font-semibold">AgentUtils v2 API</h3>
-            <span className="rounded-full bg-emerald-900/60 px-2 py-0.5 text-xs font-medium text-emerald-300">current</span>
+            <span className="rounded-full bg-emerald-900/60 px-2 py-0.5 text-xs font-medium text-emerald-300">
+              current
+            </span>
           </div>
           <p className="mt-1 text-sm text-zinc-400">
-            Multi-tenant, callback-signed, idempotent. KV store, audit log, DLQ, scheduler, and
-            HitL checkpoints under <code className="rounded bg-zinc-800 px-1.5 py-0.5 text-xs">/v1/*</code>.
-            New integrations should use v2 — the legacy <code className="rounded bg-zinc-800 px-1.5 py-0.5 text-xs">/api/*</code> docs below are deprecated.
+            Full quick-start and reference for the five tools. Start here.
           </p>
         </div>
       </Link>
@@ -49,74 +51,32 @@ export default function DocsPage() {
       <section className="mt-10">
         <h2 className="text-xl font-semibold mb-4">Quick Start</h2>
         <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-5 text-sm font-mono text-zinc-300 leading-relaxed overflow-x-auto">
-          <p className="text-zinc-500"># 1. Create an account & get API key</p>
-          <p>curl -X POST https://www.agent-utils.com/api/user \</p>
-          <p className="ml-4">-H &quot;Content-Type: application/json&quot; \</p>
-          <p className="ml-4">-d {`'{"kindeId":"...", "email":"you@example.com"}'`}</p>
-          <p className="mt-3 text-zinc-500"># 2. Use any endpoint with your API key</p>
-          <p>curl https://www.agent-utils.com/api/health \</p>
-          <p className="ml-4">-H &quot;x-api-key: au_your_key_here&quot;</p>
-          <p className="mt-3 text-zinc-500"># 3. All endpoints return JSON</p>
-          <p>{`{"success": true, "data": {...}}`}</p>
+          <p className="text-zinc-500"># 1. Create a tenant (public) — store the one-time admin key</p>
+          <p>curl -X POST https://www.agent-utils.com/v1/tenants \</p>
+          <p className="ml-4">-H &quot;content-type: application/json&quot; \</p>
+          <p className="ml-4">-d {`'{ "name":"my-agent", "owner_email":"me@x.com" }'`}</p>
+          <p className="mt-3 text-zinc-500"># 2. Register an agent — store the one-time agent key</p>
+          <p>curl -X POST https://www.agent-utils.com/v1/agents \</p>
+          <p className="ml-4">-H &quot;x-admin-key: agutil_adm_…&quot; \</p>
+          <p className="ml-4">-d {`'{ "agent_id":"worker-1" }'`}</p>
+          <p className="mt-3 text-zinc-500"># 3. Call any tool with the agent key</p>
+          <p>curl -X PUT &quot;https://www.agent-utils.com/v1/kv/state/last&quot; \</p>
+          <p className="ml-4">-H &quot;x-agent-id: worker-1&quot; -H &quot;x-api-key: agutil_agt_…&quot; \</p>
+          <p className="ml-4">-d {`'{ "value": { "ts": 1234567890 } }'`}</p>
         </div>
-      </section>
-
-      {/* Authentication */}
-      <section className="mt-10">
-        <h2 className="text-xl font-semibold mb-4">Authentication</h2>
-        <p className="text-sm text-zinc-400 mb-3">
-          All API endpoints require an API key sent via the <code className="rounded bg-zinc-800 px-1.5 py-0.5 text-xs">x-api-key</code> header.
+        <p className="mt-3 text-sm text-zinc-500">
+          See the <Link href="/docs/v2" className="underline hover:text-zinc-300">full v2 reference</Link> for auth,
+          callbacks, quotas, and every endpoint.
         </p>
-        <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4 text-sm font-mono text-zinc-300">
-          <p>-H &quot;x-api-key: au_550e8400-e29b-41d4-a716-446655440000&quot;</p>
-        </div>
-      </section>
-
-      {/* Rate Limits */}
-      <section className="mt-10">
-        <h2 className="text-xl font-semibold mb-4">Rate Limits</h2>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm text-left">
-            <thead>
-              <tr className="border-b border-zinc-800 text-zinc-400">
-                <th className="pb-3 pr-4 font-medium">Tier</th>
-                <th className="pb-3 pr-4 font-medium">Calls/Month</th>
-                <th className="pb-3 font-medium">File Retention</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr className="border-b border-zinc-800/50">
-                <td className="py-3 pr-4">Free</td>
-                <td className="py-3 pr-4">500</td>
-                <td className="py-3">1 hour</td>
-              </tr>
-              <tr className="border-b border-zinc-800/50">
-                <td className="py-3 pr-4">Builder ($19/mo)</td>
-                <td className="py-3 pr-4">10,000</td>
-                <td className="py-3">12 hours</td>
-              </tr>
-              <tr className="border-b border-zinc-800/50">
-                <td className="py-3 pr-4">Pro ($49/mo)</td>
-                <td className="py-3 pr-4">100,000</td>
-                <td className="py-3">24 hours</td>
-              </tr>
-              <tr>
-                <td className="py-3 pr-4">Enterprise</td>
-                <td className="py-3 pr-4">Unlimited</td>
-                <td className="py-3">72 hours</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
       </section>
 
       {/* Tools Grid */}
       <section className="mt-10">
-        <h2 className="text-xl font-semibold mb-4">Tools</h2>
+        <h2 className="text-xl font-semibold mb-4">The five tools</h2>
         <div className="space-y-3">
-          {tools.map((tool) => (
+          {tools.map((tool, i) => (
             <Link
-              key={tool.slug}
+              key={i}
               href={`/docs/${tool.slug}`}
               className="flex items-start gap-3 rounded-lg border border-zinc-800 p-4 hover:border-zinc-600 transition-colors"
             >
@@ -127,6 +87,43 @@ export default function DocsPage() {
               </div>
             </Link>
           ))}
+        </div>
+      </section>
+
+      {/* Reference */}
+      <section className="mt-10">
+        <h2 className="text-xl font-semibold mb-4">Reference</h2>
+        <div className="space-y-3">
+          <Link
+            href="/docs/v2"
+            className="flex items-start gap-3 rounded-lg border border-zinc-800 p-4 hover:border-zinc-600 transition-colors"
+          >
+            <span className="text-xl">📖</span>
+            <div>
+              <h3 className="font-semibold text-sm">v2 API reference (human-readable)</h3>
+              <p className="mt-0.5 text-sm text-zinc-400">All endpoints with copy-pasteable curl.</p>
+            </div>
+          </Link>
+          <Link
+            href="/llms-v2.txt"
+            className="flex items-start gap-3 rounded-lg border border-zinc-800 p-4 hover:border-zinc-600 transition-colors"
+          >
+            <span className="text-xl">🤖</span>
+            <div>
+              <h3 className="font-semibold text-sm">llms-v2.txt (agent-readable)</h3>
+              <p className="mt-0.5 text-sm text-zinc-400">The summary an agent reads to learn the API.</p>
+            </div>
+          </Link>
+          <Link
+            href="/openapi-v2.json"
+            className="flex items-start gap-3 rounded-lg border border-zinc-800 p-4 hover:border-zinc-600 transition-colors"
+          >
+            <span className="text-xl">🔧</span>
+            <div>
+              <h3 className="font-semibold text-sm">OpenAPI 3.1 spec (machine-readable)</h3>
+              <p className="mt-0.5 text-sm text-zinc-400">19 paths, 29 operations.</p>
+            </div>
+          </Link>
         </div>
       </section>
     </div>

@@ -75,6 +75,11 @@ export function apiError(
   return new ApiError(code, message, http, details);
 }
 
+/** Type guard. */
+export function isApiError(v: unknown): v is ApiError {
+  return v instanceof ApiError;
+}
+
 /** Standard factories. */
 export const Errors = {
   missingAuth: () => apiError(ErrorCode.MISSING_AUTH_HEADERS, 'Required auth header(s) missing', 401),

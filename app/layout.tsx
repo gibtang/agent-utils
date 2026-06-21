@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, JetBrains_Mono } from "next/font/google";
 import { GoogleAnalytics } from "@next/third-parties/google";
-import { AuthProvider } from "@/contexts/AuthContext";
 import Footer from "@/components/Footer";
 import "./globals.css";
 
@@ -53,13 +52,11 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-space-black text-on-surface">
-        <AuthProvider>
           {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID && (
             <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID} />
           )}
           {children}
           <Footer />
-        </AuthProvider>
       </body>
     </html>
   );

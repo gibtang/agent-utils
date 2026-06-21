@@ -62,7 +62,7 @@ export default function HumanInTheLoopPage() {
             API Reference
           </Link>
           <Link
-            href="/signup"
+            href="/docs/v2"
             className="px-3 py-3 rounded-md bg-zinc-100 text-zinc-950 font-medium hover:bg-white transition-colors min-h-[44px] flex items-center"
           >
             Get API Key
@@ -82,7 +82,7 @@ export default function HumanInTheLoopPage() {
         </p>
         <div className="flex gap-4 mt-8">
           <Link
-            href="/signup"
+            href="/docs/v2"
             className="px-6 py-3 rounded-lg bg-zinc-100 text-zinc-950 font-semibold hover:bg-white transition-colors min-h-[44px] flex items-center"
           >
             Start building free
@@ -105,7 +105,7 @@ export default function HumanInTheLoopPage() {
               <div className="text-3xl mb-3">1️⃣</div>
               <h3 className="font-semibold mb-2">Agent pauses</h3>
               <p className="text-sm text-zinc-400">
-                Your agent calls <code className="text-xs bg-zinc-800 px-1.5 py-0.5 rounded">POST /api/checkpoint</code> with
+                Your agent calls <code className="text-xs bg-zinc-800 px-1.5 py-0.5 rounded">POST /v1/checkpoints</code> with
                 the task description and current state. It gets a checkpoint ID back.
               </p>
             </div>
@@ -135,7 +135,7 @@ export default function HumanInTheLoopPage() {
           <h2 className="text-2xl font-semibold mb-6">3 lines to add human approval</h2>
           <pre className="rounded-lg border border-zinc-800 bg-zinc-900 p-5 text-sm leading-relaxed overflow-x-auto text-zinc-300">
 {`// In your agent's critical step:
-const checkpoint = await fetch("https://www.agent-utils.com/api/checkpoint", {
+const checkpoint = await fetch("https://www.agent-utils.com/v1/checkpoints", {
   method: "POST",
   headers: { "x-api-key": "au_...", "Content-Type": "application/json" },
   body: JSON.stringify({
@@ -197,7 +197,7 @@ const checkpoint = await fetch("https://www.agent-utils.com/api/checkpoint", {
             Free tier: 100 checkpoints/month. No credit card required.
           </p>
           <Link
-            href="/signup"
+            href="/docs/v2"
             className="inline-block px-6 py-3 rounded-lg bg-zinc-100 text-zinc-950 font-semibold hover:bg-white transition-colors min-h-[44px] flex items-center"
           >
             Get your API key →

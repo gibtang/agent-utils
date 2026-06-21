@@ -1,6 +1,8 @@
 import { NextRequest } from 'next/server';
-import { validateApiKey, authErrorResponse } from '@/lib/auth';
-import { successResponse, errorResponse } from '@/lib/response';
+import { requireAgentKey } from '@/lib/v2/auth';
+import { isApiError } from '@/lib/v2/errors';
+import { ok, errorResponse } from '@/lib/v2/envelope';
+import { Errors } from '@/lib/v2/errors';
 import { uploadFile } from '@/lib/storage';
 import { validateImage } from '@/lib/image-upload';
 
@@ -13,31 +15,33 @@ const DEFAULT_RETENTION_HOURS = 24;
 /**
  * POST /api/upload — store an image in B2 and return a hosted URL.
  *
- * Auth: `x-api-key` header.
+ * Auth: v2 agent key (`x-agent-id` + `x-api-key`). Tenant isolation is enforced
+ * by the resolved identity; the returned file id is a capability token.
+ *
  * Body: multipart/form-data with a `file` field (image/jpeg|png|webp|gif) and
  * an optional `retentionHours` numeric field (default 24).
  *
- * @returns 201 `{ success, data: { id, url, filename, contentType, size, expiresAt } }`
+ * @returns 201 `{ data: { id, url, filename, contentType, size, expiresAt } }`
  */
 export async function POST(request: NextRequest) {
-  const authResult = await validateApiKey(request);
-  if (!authResult.success) return authErrorResponse(authResult);
+  const resolution = await requireAgentKey(request);
+  if (isApiError(resolution)) return errorResponse(resolution);
 
   let form: FormData;
   try {
     form = await request.formData();
   } catch {
-    return errorResponse('Request body must be multipart/form-data.', 400);
+    return errorResponse(Errors.validation('Request body must be multipart/form-data.'));
   }
 
   const file = form.get('file');
   if (!(file instanceof File)) {
-    return errorResponse('Missing "file" field in multipart form data.', 400);
+    return errorResponse(Errors.validation('Missing "file" field in multipart form data.'));
   }
 
   const validation = validateImage(file.type, file.size);
   if (!validation.valid) {
-    return errorResponse(validation.error, validation.statusCode);
+    return errorResponse(Errors.validation(validation.error));
   }
 
   const rawRetention = form.get('retentionHours');
@@ -45,7 +49,7 @@ export async function POST(request: NextRequest) {
   if (rawRetention !== null) {
     const parsed = Number(rawRetention);
     if (!Number.isFinite(parsed) || parsed <= 0) {
-      return errorResponse('retentionHours must be a positive number.', 400);
+      return errorResponse(Errors.validation('retentionHours must be a positive number.'));
     }
     retentionHours = parsed;
   }
@@ -53,9 +57,9 @@ export async function POST(request: NextRequest) {
   try {
     const buffer = Buffer.from(await file.arrayBuffer());
     const result = await uploadFile(buffer, file.name, file.type, retentionHours);
-    return successResponse(result, 201);
+    return ok(result, { status: 201 });
   } catch (err) {
     console.error('Image upload error:', err);
-    return errorResponse('Failed to store image.', 500);
+    return errorResponse(Errors.internal());
   }
 }
