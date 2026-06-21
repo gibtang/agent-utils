@@ -1,0 +1,209 @@
+#!/usr/bin/env python3
+"""Generate public/openapi-v2.json. Run after adding/changing v2 routes."""
+import json
+from pathlib import Path
+
+ERR = {'$ref': '#/components/schemas/Error'}
+P = lambda name: {'$ref': f'#/components/parameters/{name}'}
+
+spec = {
+    'openapi': '3.1.0',
+    'info': {
+        'title': 'AgentUtils API v2',
+        'version': '2.0.0',
+        'description': (
+            'Multi-tenant, agent-native infrastructure: KV store, audit log, '
+            'dead-letter queue, scheduler, and human-in-the-loop checkpoints. '
+            'Tenant-isolated, callback-signed, idempotent.\n\n'
+            '## Base URL\nhttps://agentutils.dev/v1\n\n'
+            '## Authentication\nServer-derived identity from key prefix:\n'
+            '- `agutil_adm_…` — admin key (tenant scope). Header: `x-admin-key`.\n'
+            '- `agutil_agt_…` — agent key (tenant + agent scope). Headers: `x-agent-id` + `x-api-key`.\n'
+            '- `agutil_apr_…` — approval-proxy key (HitL approve/reject only). Header: `X-Approval-Key`.\n\n'
+            '`tenant_id` is always server-derived — never accepted from the client.\n\n'
+            '## Standard headers\n'
+            '- `Idempotency-Key` — replay-safe on all `POST` creation endpoints.\n'
+            '- All responses include `X-Request-Id`.\n\n'
+            '## Error envelope\n'
+            '`{ "error": { "code", "message", "details", "request_id" } }`'
+        ),
+    },
+    'servers': [{'url': 'https://agentutils.dev/v1'}],
+    'tags': [
+        {'name': 'Tenants', 'description': 'Tenant lifecycle, quota, admin-key rotation'},
+        {'name': 'Agents', 'description': 'Agent registration and key rotation'},
+        {'name': 'Approval Keys', 'description': 'Approval-proxy keys for delegated HitL'},
+        {'name': 'KV Store', 'description': 'Tenant-isolated KV with CAS, TTL, namespaces'},
+        {'name': 'Audit Log', 'description': 'Append-only, server-timestamped audit trail'},
+        {'name': 'Dead Letter Queue', 'description': 'Independent pull-based failure inbox'},
+        {'name': 'Scheduler', 'description': 'Once-callbacks with fixed retry + DLQ cascade'},
+        {'name': 'Human-in-the-Loop', 'description': 'Checkpoints requiring human approval'},
+        {'name': 'System', 'description': 'Cron tick (internal)'},
+    ],
+    'components': {
+        'securitySchemes': {
+            'adminKey': {'type': 'apiKey', 'in': 'header', 'name': 'x-admin-key', 'description': 'Admin key `agutil_adm_…`'},
+            'agentKey': {'type': 'apiKey', 'in': 'header', 'name': 'x-api-key', 'description': 'Agent key `agutil_agt_…` (with `x-agent-id`)'},
+            'approvalKey': {'type': 'apiKey', 'in': 'header', 'name': 'X-Approval-Key', 'description': 'Approval-proxy key `agutil_apr_…`'},
+            'cronSecret': {'type': 'http', 'scheme': 'bearer', 'description': 'CRON_SECRET bearer for the cron tick'},
+        },
+        'parameters': {
+            'tenantId': {'name': 'id', 'in': 'path', 'required': True, 'schema': {'type': 'string'}},
+            'agentId': {'name': 'id', 'in': 'path', 'required': True, 'schema': {'type': 'string'}},
+            'dlqId': {'name': 'id', 'in': 'path', 'required': True, 'schema': {'type': 'string'}},
+            'checkpointId': {'name': 'id', 'in': 'path', 'required': True, 'schema': {'type': 'string'}},
+        },
+        'schemas': {
+            'Error': {
+                'type': 'object', 'required': ['error'],
+                'properties': {'error': {'type': 'object', 'required': ['code', 'message'],
+                    'properties': {'code': {'type': 'string'}, 'message': {'type': 'string'},
+                        'details': {'type': 'object'}, 'request_id': {'type': 'string'}}}},
+            },
+            'TenantCreate': {'type': 'object', 'required': ['name', 'owner_email'], 'properties': {
+                'name': {'type': 'string', 'minLength': 3, 'maxLength': 40},
+                'owner_email': {'type': 'string', 'format': 'email'},
+                'plan': {'type': 'string', 'enum': ['free', 'pro'], 'default': 'free'}}},
+            'TenantCreated': {'type': 'object', 'properties': {
+                'tenant_id': {'type': 'string'}, 'name': {'type': 'string'}, 'plan': {'type': 'string'},
+                'admin_key': {'type': 'string', 'description': 'One-time — shown only here'}, 'quota': {'type': 'object'}}},
+            'AgentCreate': {'type': 'object', 'required': ['agent_id'], 'properties': {
+                'agent_id': {'type': 'string', 'pattern': '^[a-z0-9_]{1,40}$'}, 'metadata': {'type': 'object'}}},
+            'KvPut': {'type': 'object', 'required': ['value'], 'properties': {
+                'value': {}, 'ttl_seconds': {'type': 'integer', 'minimum': 1},
+                'cas_version': {'type': 'integer', 'description': 'Optimistic concurrency (If-Match)'}}},
+            'DlqCreate': {'type': 'object', 'required': ['payload', 'error'], 'properties': {
+                'payload': {}, 'error': {'type': 'string'}, 'workflow_id': {'type': 'string'},
+                'lock_seconds': {'type': 'integer', 'default': 300}}},
+            'ScheduleCreate': {'type': 'object', 'required': ['callback_url', 'callback_payload', 'fire_at'], 'properties': {
+                'callback_url': {'type': 'string', 'format': 'uri'}, 'callback_payload': {},
+                'fire_at': {'type': 'string', 'format': 'date-time'}, 'dlq_on_failure': {'type': 'boolean', 'default': False}}},
+            'CheckpointCreate': {'type': 'object', 'required': ['title', 'callback_url'], 'properties': {
+                'title': {'type': 'string'}, 'prompt': {'type': 'string'},
+                'callback_url': {'type': 'string', 'format': 'uri'}, 'callback_payload': {},
+                'timeout_action': {'type': 'string', 'enum': ['auto_reject', 'dlq'], 'default': 'auto_reject'},
+                'timeout_seconds': {'type': 'integer', 'minimum': 60}, 'expires_at': {'type': 'string', 'format': 'date-time'}}},
+            'AuditAppend': {'type': 'object', 'required': ['action'], 'properties': {
+                'action': {'type': 'string'}, 'workflow_id': {'type': 'string'},
+                'actor': {'type': 'string'}, 'metadata': {'type': 'object'}}},
+        },
+    },
+    'paths': {
+        '/tenants': {
+            'post': {'tags': ['Tenants'], 'summary': 'Create tenant + admin key',
+                'description': 'Public. Returns a one-time admin key (`agutil_adm_…`) — store it immediately.',
+                'security': [],
+                'requestBody': {'required': True, 'content': {'application/json': {'schema': {'$ref': '#/components/schemas/TenantCreate'}}}},
+                'responses': {'201': {'description': 'Created', 'content': {'application/json': {'schema': {'$ref': '#/components/schemas/TenantCreated'}}}},
+                    '409': {'description': 'TENANT_NAME_TAKEN', 'content': {'application/json': {'schema': ERR}}}}}},
+        '/tenants/{id}': {
+            'get': {'tags': ['Tenants'], 'summary': 'Tenant quota usage', 'security': [{'adminKey': []}],
+                'parameters': [P('tenantId')],
+                'responses': {'200': {'description': 'Usage'}, '403': {'description': 'Forbidden (wrong tenant)'}}},
+            'delete': {'tags': ['Tenants'], 'summary': 'Delete tenant (hard delete)',
+                'description': 'Requires body `{ "confirm": "DELETE ALL DATA" }`. 30-day grace before purge.',
+                'security': [{'adminKey': []}], 'parameters': [P('tenantId')],
+                'requestBody': {'required': True, 'content': {'application/json': {'schema': {'type': 'object', 'required': ['confirm'],
+                    'properties': {'confirm': {'type': 'string', 'enum': ['DELETE ALL DATA']}}}}}},
+                'responses': {'202': {'description': 'Scheduled for deletion'}, '400': {'description': 'DELETE_REQUIRES_CONFIRM'}}}},
+        '/tenants/{id}/rotate-key': {
+            'post': {'tags': ['Tenants'], 'summary': 'Rotate admin key', 'security': [{'adminKey': []}],
+                'parameters': [P('tenantId')], 'responses': {'200': {'description': 'New one-time admin key'}}}},
+        '/agents': {
+            'post': {'tags': ['Agents'], 'summary': 'Register agent (returns one-time agent key)', 'security': [{'adminKey': []}],
+                'requestBody': {'required': True, 'content': {'application/json': {'schema': {'$ref': '#/components/schemas/AgentCreate'}}}},
+                'responses': {'201': {'description': 'Created — one-time `agutil_agt_…` key'},
+                    '409': {'description': 'AGENT_ID_TAKEN'}, '402': {'description': 'QUOTA_EXCEEDED (agents)'}}}},
+        '/agents/{id}': {
+            'get': {'tags': ['Agents'], 'summary': 'Agent metadata (masked key)', 'security': [{'adminKey': []}, {'agentKey': []}],
+                'parameters': [P('agentId')], 'responses': {'200': {'description': 'Agent'}, '404': {'description': 'Not found / cross-tenant'}}}},
+        '/agents/{id}/rotate-key': {
+            'post': {'tags': ['Agents'], 'summary': 'Rotate agent key', 'security': [{'adminKey': []}],
+                'parameters': [P('agentId')], 'responses': {'200': {'description': 'New one-time agent key'}}}},
+        '/approval-keys': {
+            'post': {'tags': ['Approval Keys'], 'summary': 'Create approval-proxy key',
+                'description': 'Returns a one-time `agutil_apr_…` key usable only for checkpoint approve/reject. Scoped to a single checkpoint when `checkpoint_id` is provided.',
+                'security': [{'adminKey': []}],
+                'requestBody': {'required': True, 'content': {'application/json': {'schema': {'type': 'object',
+                    'properties': {'checkpoint_id': {'type': 'string'}, 'label': {'type': 'string'}}}}}},
+                'responses': {'201': {'description': 'Created — one-time `agutil_apr_…` key'}}}},
+        '/kv/{namespace}/{key}': {
+            'parameters': [
+                {'name': 'namespace', 'in': 'path', 'required': True, 'schema': {'type': 'string'}, 'description': 'Isolation boundary within the tenant'},
+                {'name': 'key', 'in': 'path', 'required': True, 'schema': {'type': 'string'}}],
+            'get': {'tags': ['KV Store'], 'summary': 'Get value (conditional on If-Match)', 'security': [{'agentKey': []}],
+                'parameters': [{'name': 'If-Match', 'in': 'header', 'schema': {'type': 'string'}, 'description': '412 PRECONDITION_FAILED if version differs'}],
+                'responses': {'200': {'description': 'Value + X-Version header'}, '404': {'description': 'KEY_NOT_FOUND'}, '412': {'description': 'VERSION_MISMATCH'}}},
+            'put': {'tags': ['KV Store'], 'summary': 'Put value (CAS via cas_version)', 'security': [{'agentKey': []}],
+                'requestBody': {'required': True, 'content': {'application/json': {'schema': {'$ref': '#/components/schemas/KvPut'}}}},
+                'responses': {'200': {'description': 'Stored — returns new version'}, '409': {'description': 'VERSION_MISMATCH (CAS)'}, '403': {'description': 'NAMESPACE_FORBIDDEN'}}},
+            'delete': {'tags': ['KV Store'], 'summary': 'Delete key', 'security': [{'agentKey': []}],
+                'responses': {'204': {'description': 'Deleted'}, '404': {'description': 'KEY_NOT_FOUND'}}}},
+        '/audit/{id}': {
+            'parameters': [{'name': 'id', 'in': 'path', 'required': False, 'schema': {'type': 'string'}, 'description': 'Omit for list; use ?cursor= for pagination'}],
+            'post': {'tags': ['Audit Log'], 'summary': 'Append audit entry (server-timestamped, immutable)', 'security': [{'agentKey': []}, {'adminKey': []}],
+                'requestBody': {'required': True, 'content': {'application/json': {'schema': {'$ref': '#/components/schemas/AuditAppend'}}}},
+                'responses': {'201': {'description': 'Appended'}}},
+            'get': {'tags': ['Audit Log'], 'summary': 'List audit entries (cursor-paginated, workflow filter)', 'security': [{'agentKey': []}, {'adminKey': []}],
+                'parameters': [{'name': 'workflow_id', 'in': 'query', 'schema': {'type': 'string'}},
+                    {'name': 'cursor', 'in': 'query', 'schema': {'type': 'string'}}, {'name': 'limit', 'in': 'query', 'schema': {'type': 'integer', 'default': 50}}],
+                'responses': {'200': {'description': 'Paginated list'}}}},
+        '/dlq/{id}': {
+            'parameters': [{'name': 'id', 'in': 'path', 'required': False, 'schema': {'type': 'string'}}],
+            'post': {'tags': ['Dead Letter Queue'], 'summary': 'Capture a failure', 'security': [{'agentKey': []}],
+                'requestBody': {'required': True, 'content': {'application/json': {'schema': {'$ref': '#/components/schemas/DlqCreate'}}}},
+                'responses': {'201': {'description': 'Captured'}, '402': {'description': 'QUOTA_EXCEEDED (dlq)'}}},
+            'get': {'tags': ['Dead Letter Queue'], 'summary': 'List failures (status filter, cursor)', 'security': [{'agentKey': []}, {'adminKey': []}],
+                'parameters': [{'name': 'status', 'in': 'query', 'schema': {'type': 'string', 'enum': ['failed', 'claimed', 'resolved', 'archived']}},
+                    {'name': 'cursor', 'in': 'query', 'schema': {'type': 'string'}}],
+                'responses': {'200': {'description': 'Paginated list'}}},
+            'delete': {'tags': ['Dead Letter Queue'], 'summary': 'Permanently remove a DLQ item', 'security': [{'agentKey': []}],
+                'parameters': [P('dlqId')], 'responses': {'204': {'description': 'Removed'}, '404': {'description': 'DLQ_NOT_FOUND'}}}},
+        '/dlq/{id}/claim': {'post': {'tags': ['Dead Letter Queue'], 'summary': 'Atomically claim a failure (lock + status=claimed)', 'security': [{'agentKey': []}],
+            'parameters': [P('dlqId')], 'responses': {'200': {'description': 'Claimed — full payload'}, '409': {'description': 'ALREADY_CLAIMED'}}}},
+        '/dlq/{id}/release': {'post': {'tags': ['Dead Letter Queue'], 'summary': 'Release a claimed lock back to failed (retryable)', 'security': [{'agentKey': []}],
+            'parameters': [P('dlqId')], 'responses': {'200': {'description': 'Released'}}}},
+        '/dlq/{id}/fail': {'post': {'tags': ['Dead Letter Queue'], 'summary': 'Mark claimed failure permanently failed (archived)', 'security': [{'agentKey': []}],
+            'parameters': [P('dlqId')], 'responses': {'200': {'description': 'Failed'}}}},
+        '/dlq/{id}/resolve': {'post': {'tags': ['Dead Letter Queue'], 'summary': 'Mark failure resolved', 'security': [{'agentKey': []}],
+            'parameters': [P('dlqId')], 'responses': {'200': {'description': 'Resolved'}}}},
+        '/schedules/{id}': {
+            'parameters': [{'name': 'id', 'in': 'path', 'required': False, 'schema': {'type': 'string'}}],
+            'post': {'tags': ['Scheduler'], 'summary': 'Schedule a once-callback (fixed retry: now, +30s, +90s)', 'security': [{'agentKey': []}],
+                'requestBody': {'required': True, 'content': {'application/json': {'schema': {'$ref': '#/components/schemas/ScheduleCreate'}}}},
+                'responses': {'201': {'description': 'Scheduled'}, '402': {'description': 'QUOTA_EXCEEDED (active schedules)'}}},
+            'get': {'tags': ['Scheduler'], 'summary': 'List/get schedules', 'security': [{'agentKey': []}, {'adminKey': []}],
+                'parameters': [{'name': 'status', 'in': 'query', 'schema': {'type': 'string', 'enum': ['pending', 'fired', 'cancelled', 'failed']}}],
+                'responses': {'200': {'description': 'List/detail'}}},
+            'patch': {'tags': ['Scheduler'], 'summary': 'Update a pending schedule', 'security': [{'agentKey': []}], 'responses': {'200': {'description': 'Updated'}}},
+            'delete': {'tags': ['Scheduler'], 'summary': 'Cancel a pending schedule', 'security': [{'agentKey': []}], 'responses': {'204': {'description': 'Cancelled'}}}},
+        '/checkpoints/{id}': {
+            'parameters': [{'name': 'id', 'in': 'path', 'required': False, 'schema': {'type': 'string'}}],
+            'post': {'tags': ['Human-in-the-Loop'], 'summary': 'Create checkpoint (pause for human approval)', 'security': [{'agentKey': []}],
+                'requestBody': {'required': True, 'content': {'application/json': {'schema': {'$ref': '#/components/schemas/CheckpointCreate'}}}},
+                'responses': {'201': {'description': 'Checkpoint created'}}},
+            'get': {'tags': ['Human-in-the-Loop'], 'summary': 'List/poll checkpoints (?status=pending)', 'security': [{'agentKey': []}, {'adminKey': []}],
+                'parameters': [{'name': 'status', 'in': 'query', 'schema': {'type': 'string', 'enum': ['pending', 'approved', 'rejected', 'expired', 'cancelled']}}],
+                'responses': {'200': {'description': 'List/detail'}}},
+            'delete': {'tags': ['Human-in-the-Loop'], 'summary': 'Cancel a pending checkpoint (creating agent only)', 'security': [{'agentKey': []}], 'responses': {'204': {'description': 'Cancelled'}}}},
+        '/checkpoints/{id}/approve': {'post': {'tags': ['Human-in-the-Loop'], 'summary': 'Approve a checkpoint',
+            'description': 'Admin key OR approval-proxy key (`X-Approval-Key`). Fires signed callback.',
+            'security': [{'adminKey': []}, {'approvalKey': []}], 'parameters': [P('checkpointId')],
+            'requestBody': {'content': {'application/json': {'schema': {'type': 'object', 'properties': {'reason': {'type': 'string'}}}}}},
+            'responses': {'200': {'description': 'Approved'}, '404': {'description': 'Cross-tenant / not found'}}}},
+        '/checkpoints/{id}/reject': {'post': {'tags': ['Human-in-the-Loop'], 'summary': 'Reject a checkpoint',
+            'description': 'Admin key OR approval-proxy key. Fires signed callback. DLQ cascade if timeout_action=dlq.',
+            'security': [{'adminKey': []}, {'approvalKey': []}], 'parameters': [P('checkpointId')],
+            'requestBody': {'content': {'application/json': {'schema': {'type': 'object', 'properties': {'reason': {'type': 'string'}}}}}},
+            'responses': {'200': {'description': 'Rejected'}, '404': {'description': 'Cross-tenant / not found'}}}},
+        '/tick': {'post': {'tags': ['System'], 'summary': 'Cron tick — fires due schedules + processes checkpoint timeouts',
+            'description': 'Internal. Driven by external cron every 30–60s. See docs/product/agentutils-v2-cron.md.',
+            'security': [{'cronSecret': []}],
+            'responses': {'200': {'description': 'Summary of processed schedules + timeouts'}, '401': {'description': 'UNAUTHORIZED — missing/invalid CRON_SECRET'}}}},
+    },
+}
+
+out = Path('public/openapi-v2.json')
+out.write_text(json.dumps(spec, indent=2) + '\n')
+d = json.loads(out.read_text())
+print(f'wrote {out} — paths: {len(d["paths"])}, schemas: {len(d["components"]["schemas"])}, params: {len(d["components"]["parameters"])}')

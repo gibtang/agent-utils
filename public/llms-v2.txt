@@ -1,0 +1,119 @@
+# AgentUtils v2
+
+> Multi-tenant, agent-native infrastructure. One key per agent. KV store, audit log, dead-letter queue, scheduler, and human-in-the-loop checkpoints. https://agentutils.dev
+
+v2 is tenant-isolated and callback-signed. The legacy `/api/*` surface is deprecated — use `/v1/*`.
+
+## Authentication
+
+Identity is server-derived from the key prefix. `tenant_id` is NEVER sent by the client.
+
+| Key | Prefix | Scope | Headers |
+|---|---|---|---|
+| Admin | `agutil_adm_…` | whole tenant | `x-admin-key` |
+| Agent | `agutil_agt_…` | one agent in a tenant | `x-agent-id` + `x-api-key` |
+| Approval-proxy | `agutil_apr_…` | HitL approve/reject only | `X-Approval-Key` |
+
+Keys are shown exactly once at creation/rotation. Hashed at rest (SHA-256).
+
+## Quick Start
+
+```bash
+# 1. Create a tenant (public) — store the one-time admin key
+curl -X POST https://agentutils.dev/v1/tenants \
+  -H "content-type: application/json" \
+  -d '{"name":"my-agent","owner_email":"me@x.com","plan":"free"}'
+# → { "data": { "tenant_id":"ten_…", "admin_key":"agutil_adm_…" } }
+
+# 2. Register an agent — store the one-time agent key
+curl -X POST https://agentutils.dev/v1/agents \
+  -H "x-admin-key: agutil_adm_…" -H "content-type: application/json" \
+  -d '{"agent_id":"worker-1"}'
+# → { "data": { "agent_id":"worker-1", "api_key":"agutil_agt_…" } }
+
+# 3. Use any tool with the agent key
+curl -X PUT "https://agentutils.dev/v1/kv/state/last-run" \
+  -H "x-agent-id: worker-1" -H "x-api-key: agutil_agt_…" \
+  -H "content-type: application/json" \
+  -d '{"value":{"ts":1234567890}}'
+```
+
+## Standard behavior
+
+- **Idempotency:** send `Idempotency-Key: <uuid>` on any `POST` that creates a resource. Replays return the original result. Conflicting keys return 409.
+- **Request ID:** every response includes `X-Request-Id`. Echo it in support requests.
+- **Pagination:** list endpoints use `?cursor=` + `?limit=`. Response includes `meta.cursor` and `meta.has_more`. No offset paging.
+- **Rate limiting:** per-tenant sliding minute. 429 returns `RATE_LIMITED` + `Retry-After` header.
+- **Quota:** per-tenant plan limits. 402 `QUOTA_EXCEEDED` on overrun. Check usage via `GET /v1/tenants/{id}`.
+- **Errors:** `{ "error": { "code", "message", "details", "request_id" } }`.
+
+## Tools
+
+### KV Store — tenant-isolated key-value with CAS + TTL
+- `PUT /v1/kv/{namespace}/{key}` — set value. Body: `{ value, ttl_seconds?, cas_version? }`. CAS: include `cas_version` to reject concurrent writes (409 VERSION_MISMATCH).
+- `GET /v1/kv/{namespace}/{key}` — get value. `If-Match` header → 412 if version differs. Response header `X-Version`.
+- `DELETE /v1/kv/{namespace}/{key}` — delete.
+Namespaces isolate data within a tenant. TTL auto-expires keys.
+
+### Audit Log — append-only, server-timestamped, immutable
+- `POST /v1/audit` — append. Body: `{ action, workflow_id?, actor?, metadata? }`. Server stamps `timestamp` + `request_id`. Immutable.
+- `GET /v1/audit` — list. `?workflow_id=`, `?cursor=`, `?limit=`. Cross-tenant entries are never visible.
+
+### Dead Letter Queue — independent pull-based failure inbox
+- `POST /v1/dlq` — capture a failure. Body: `{ payload, error, workflow_id?, lock_seconds? }`.
+- `GET /v1/dlq` — list. `?status=failed|claimed|resolved|archived`, `?cursor=`.
+- `POST /v1/dlq/{id}/claim` — atomically lock for processing (status→claimed). 409 ALREADY_CLAIMED if taken.
+- `POST /v1/dlq/{id}/release` — release lock back to failed (retryable).
+- `POST /v1/dlq/{id}/fail` — mark permanently failed (archived).
+- `POST /v1/dlq/{id}/resolve` — mark resolved.
+AgentUtils does NOT execute retries — agents pull, process, and resolve. Locks auto-expire.
+
+### Scheduler — once-callbacks with fixed retry + DLQ cascade
+- `POST /v1/schedules` — schedule a callback. Body: `{ callback_url, callback_payload, fire_at, dlq_on_failure? }`. Fixed retry: at `fire_at`, then +30s, +90s.
+- `GET /v1/schedules` — list. `?status=pending|fired|cancelled|failed`.
+- `GET /v1/schedules/{id}` — detail.
+- `PATCH /v1/schedules/{id}` — update pending schedule.
+- `DELETE /v1/schedules/{id}` — cancel pending schedule.
+Callbacks are HMAC-signed (see Callbacks below). Driven by `POST /v1/tick`.
+
+### Human-in-the-Loop — checkpoints requiring human approval
+- `POST /v1/checkpoints` — create checkpoint (agent pauses). Body: `{ title, prompt?, callback_url, callback_payload?, timeout_action?, timeout_seconds?, expires_at? }`.
+- `GET /v1/checkpoints` — list/poll. `?status=pending|approved|rejected|expired|cancelled`.
+- `GET /v1/checkpoints/{id}` — poll status.
+- `DELETE /v1/checkpoints/{id}` — cancel (creating agent only).
+- `POST /v1/checkpoints/{id}/approve` — approve (admin OR approval-proxy key). Fires signed callback.
+- `POST /v1/checkpoints/{id}/reject` — reject (admin OR approval-proxy key). DLQ cascade if `timeout_action=dlq`.
+Create an approval-proxy key (`POST /v1/approval-keys`) to delegate approve/reject to a reviewer without giving them tenant admin.
+
+## Callbacks (signed)
+
+When AgentUtils calls your `callback_url` (scheduler fire, checkpoint resolution), every request is HMAC-SHA256 signed:
+
+- Header `X-AgentUtils-Timestamp: <unix-ms>`
+- Header `X-AgentUtils-Signature: <hex HMAC-SHA256 of "<ts>.<body>" over the tenant's callback_secret>`
+- Body is the JSON event.
+
+Verify on receipt:
+```js
+const crypto = require('crypto');
+const sig = crypto.createHmac('sha256', tenantCallbackSecret)
+  .update(`${ts}.${rawBody}`).digest('hex');
+if (sig !== headerSignature) return 401;
+```
+Reject callbacks older than 5 min (replay protection). Redirects are NOT followed (SSRF hardening) — `redirect: 'error'`.
+
+## Quota (free plan)
+
+- agents: 5
+- active schedules: 50
+- open checkpoints: 25
+- DLQ items: 200
+- audit entries: 10,000 (retention 90d)
+
+Pro plan raises these. Check `GET /v1/tenants/{id}` for live usage.
+
+## Full reference
+
+OpenAPI spec: https://agentutils.dev/openapi-v2.json
+
+Legacy v1 (`/api/*`) is deprecated and single-tenant. Do not use it for new integrations.

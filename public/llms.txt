@@ -1,8 +1,10 @@
 # AgentUtils
 
-> One API key. Agent-native utilities. https://agentutils.dev
+> Multi-tenant, agent-native infrastructure. KV, audit, DLQ, scheduler, HitL. https://agentutils.dev
 
-## Authentication
+> **v2 is now available** under `/v1/*` — tenant-isolated, callback-signed, idempotent. New integrations should use **[llms-v2.txt](./llms-v2.txt)** (v2 quick-start + reference). The `/api/*` surface below is the deprecated single-tenant v1.
+
+## Authentication (v1, deprecated)
 
 All endpoints require `x-api-key` header with key starting with `au_`.
 Create key at https://agentutils.dev/dashboard after signup.

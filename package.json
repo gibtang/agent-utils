@@ -12,7 +12,8 @@
     "generate:llms": "node scripts/generate-llms-txt.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
-    "prepare": "husky"
+    "prepare": "husky",
+    "gen:openapi": "python3 scripts/gen-openapi-v2.py"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1037.0",
