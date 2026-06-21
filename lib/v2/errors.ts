@@ -83,6 +83,9 @@ export const Errors = {
   forbidden: (msg = 'Forbidden') => apiError(ErrorCode.FORBIDDEN, msg, 403),
   notFound: (msg = 'Not found') => apiError(ErrorCode.NOT_FOUND, msg, 404),
   keyNotFound: () => apiError(ErrorCode.KEY_NOT_FOUND, 'KV key does not exist', 404),
+  dlqNotFound: () => apiError(ErrorCode.DLQ_ITEM_NOT_FOUND, 'DLQ item does not exist', 404),
+  dlqLocked: (lockedUntil: string) => apiError(ErrorCode.DLQ_ITEM_LOCKED, 'DLQ item is locked', 409, { locked_until: lockedUntil }),
+  dlqAlreadyResolved: () => apiError(ErrorCode.DLQ_ITEM_ALREADY_RESOLVED, 'DLQ item already resolved or archived', 409),
   versionMismatch: (currentVersion: number) =>
     apiError(ErrorCode.VERSION_MISMATCH, 'CAS version mismatch', 409, { current_version: currentVersion }),
   namespaceForbidden: () => apiError(ErrorCode.NAMESPACE_FORBIDDEN, 'Agent cannot access this KV namespace', 403),
