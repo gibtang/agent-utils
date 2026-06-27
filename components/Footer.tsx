@@ -13,7 +13,7 @@ export default function Footer() {
               <li><Link href="/tools" className="text-sm text-gray-400 hover:text-gray-200">Tools</Link></li>
               <li><Link href="/docs" className="text-sm text-gray-400 hover:text-gray-200">Documentation</Link></li>
               <li><Link href="/docs/v2" className="text-sm text-gray-400 hover:text-gray-200">v2 API (current)</Link></li>
-              <li><Link href="/human-in-the-loop" className="text-sm text-gray-400 hover:text-gray-200">Human-in-the-Loop</Link></li>
+              <li><Link href="/tools/checkpoint" className="text-sm text-gray-400 hover:text-gray-200">Checkpoint</Link></li>
             </ul>
           </div>
           <div>

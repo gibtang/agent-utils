@@ -6,7 +6,7 @@ export const dynamic = 'force-static';
 export const metadata: Metadata = {
   title: 'Documentation — AgentUtils',
   description:
-    'AgentUtils v2 API documentation. Multi-tenant KV store, audit log, dead-letter queue, scheduler, and human-in-the-loop checkpoints.',
+    'AgentUtils v2 API documentation. Dead-letter queue, checkpoint approvals, KV store, and audit log.',
   openGraph: { url: '/docs' },
   alternates: { canonical: '/docs' },
 };
@@ -15,7 +15,6 @@ const tools = [
   { slug: 'v2', name: 'KV Store', desc: 'Tenant-isolated key-value with CAS, TTL, and namespaces.', icon: '🗃️' },
   { slug: 'v2', name: 'Audit Log', desc: 'Append-only, server-timestamped, immutable audit trail.', icon: '📜' },
   { slug: 'v2', name: 'Dead Letter Queue', desc: 'Pull-based failure inbox with atomic claim/release.', icon: '📬' },
-  { slug: 'v2', name: 'Scheduler', desc: 'Once-callbacks with fixed retry and DLQ cascade.', icon: '⏰' },
   { slug: 'v2', name: 'Human-in-the-Loop', desc: 'Checkpoints requiring human approval before proceeding.', icon: '👤' },
 ];
 
@@ -34,15 +33,15 @@ export default function DocsPage() {
         className="mt-6 flex items-start gap-3 rounded-lg border border-zinc-700 bg-gradient-to-br from-zinc-800 to-zinc-900 p-5 hover:border-zinc-500 transition-colors"
       >
         <span className="text-2xl">⚡</span>
-        <div>
-          <div className="flex items-center gap-2">
-            <h3 className="font-semibold">AgentUtils v2 API</h3>
-            <span className="rounded-full bg-emerald-900/60 px-2 py-0.5 text-xs font-medium text-emerald-300">
-              current
-            </span>
-          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <h3 className="font-semibold">AgentUtils v2 API</h3>
+              <span className="rounded-full bg-emerald-900/60 px-2 py-0.5 text-xs font-medium text-emerald-300">
+                current
+              </span>
+            </div>
           <p className="mt-1 text-sm text-zinc-400">
-            Full quick-start and reference for the five tools. Start here.
+            Full quick-start and reference for the launch tools. Start here.
           </p>
         </div>
       </Link>
@@ -72,7 +71,7 @@ export default function DocsPage() {
 
       {/* Tools Grid */}
       <section className="mt-10">
-        <h2 className="text-xl font-semibold mb-4">The five tools</h2>
+        <h2 className="text-xl font-semibold mb-4">The launch tools</h2>
         <div className="space-y-3">
           {tools.map((tool, i) => (
             <Link

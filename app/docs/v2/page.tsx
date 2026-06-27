@@ -6,7 +6,7 @@ export const dynamic = 'force-static';
 export const metadata: Metadata = {
   title: 'AgentUtils v2 API — Multi-tenant Infrastructure',
   description:
-    'Tenant-isolated KV store, audit log, dead-letter queue, scheduler, and human-in-the-loop checkpoints. v2 API quick start and reference.',
+    'Tenant-isolated KV store, audit log, dead-letter queue, and human-in-the-loop checkpoints. v2 API quick start and reference.',
   openGraph: { url: '/docs/v2' },
   alternates: { canonical: '/docs/v2' },
 };
@@ -44,11 +44,6 @@ curl -X POST https://www.agent-utils.com/v1/dlq \\
 # claim atomically
 curl -X POST https://www.agent-utils.com/v1/dlq/{id}/claim \\
   -H "x-agent-id: worker-1" -H "x-api-key: agutil_agt_…"`;
-
-const SNIP_SCHEDULE = `curl -X POST https://www.agent-utils.com/v1/schedules \\
-  -H "x-agent-id: worker-1" -H "x-api-key: agutil_agt_…" \\
-  -H "content-type: application/json" \\
-  -d '{ "callback_url":"https://myapp.com/hook", "callback_payload": {"job":7}, "fire_at":"2026-07-01T00:00:00Z" }'`;
 
 const SNIP_HITL = `# create checkpoint
 curl -X POST https://www.agent-utils.com/v1/checkpoints \\
@@ -91,13 +86,12 @@ export default function V2Docs() {
       </Link>
       <h1 className="mt-4 text-3xl font-bold tracking-tight">⚡ AgentUtils v2 API</h1>
       <p className="mt-3 text-zinc-400">
-        Multi-tenant, agent-native infrastructure: KV store, audit log, dead-letter queue, scheduler,
-        and human-in-the-loop checkpoints. Tenant-isolated, callback-signed, idempotent.
+        Multi-tenant, agent-native infrastructure: KV store, audit log, dead-letter queue, and human-in-the-loop checkpoints. Tenant-isolated, callback-signed, idempotent.
       </p>
 
       <Note>
-        <strong>v2 is the current API.</strong> It lives under <code>/v1/*</code> and replaces the
-        legacy single-tenant <code>/api/*</code> surface. The full machine-readable reference is at{' '}
+            <strong>v2 is the current API.</strong> It lives under <code>/v1/*</code> and replaces the
+            legacy single-tenant <code>/api/*</code> surface. The full machine-readable reference is at{' '}
         <Link href="/openapi-v2.json" className="underline">
           /openapi-v2.json
         </Link>{' '}
@@ -163,7 +157,7 @@ export default function V2Docs() {
 
       {/* Tools */}
       <section className="mt-10">
-        <h2 className="text-2xl font-semibold">The five tools</h2>
+        <h2 className="text-2xl font-semibold">The launch tools</h2>
 
         <h3 className="mt-6 text-lg font-medium">🗃️ KV Store — tenant-isolated key-value with CAS + TTL</h3>
         <p className="mt-2 text-zinc-400">
@@ -191,15 +185,6 @@ export default function V2Docs() {
         </p>
         <div className="mt-3">
           <Code>{SNIP_DLQ}</Code>
-        </div>
-
-        <h3 className="mt-6 text-lg font-medium">⏰ Scheduler — once-callbacks with fixed retry</h3>
-        <p className="mt-2 text-zinc-400">
-          Schedule a signed callback at <code>fire_at</code>. Fixed retry on failure: at the time,
-          then +30s, +90s. Optional DLQ cascade on exhaustion.
-        </p>
-        <div className="mt-3">
-          <Code>{SNIP_SCHEDULE}</Code>
         </div>
 
         <h3 className="mt-6 text-lg font-medium">👤 Human-in-the-Loop — checkpoints for approval</h3>

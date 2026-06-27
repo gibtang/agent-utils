@@ -7,7 +7,7 @@ export const dynamic = 'force-static';
 
 export const metadata: Metadata = {
   title: 'All Tools — AgentUtils',
-  description: 'Browse all AgentUtils API tools for AI agents: Dead Letter Queue, Checkpoint, Image Upload, and more.',
+  description: 'Browse the launch AgentUtils API tools for AI agents: Dead Letter Queue, Checkpoint, KV Store, and Audit Log.',
   openGraph: { url: '/tools' },
   alternates: {
     canonical: 'https://www.agent-utils.com/tools',
@@ -26,8 +26,17 @@ export default function ToolsPage() {
             <Link href="/docs" className="text-primary-container font-bold hover:text-primary-fixed-dim transition-colors duration-200 py-3 px-1 min-h-[44px] flex items-center">
               Docs
             </Link>
-            <Link href="/human-in-the-loop" className="hover:text-primary-fixed-dim transition-colors duration-200 py-3 px-1 min-h-[44px] flex items-center">
-              Human-in-the-Loop
+            <Link href="/tools/dlq" className="hover:text-primary-fixed-dim transition-colors duration-200 py-3 px-1 min-h-[44px] flex items-center">
+              DLQ
+            </Link>
+            <Link href="/tools/checkpoint" className="hover:text-primary-fixed-dim transition-colors duration-200 py-3 px-1 min-h-[44px] flex items-center">
+              Checkpoint
+            </Link>
+            <Link href="/tools/kv-store" className="hover:text-primary-fixed-dim transition-colors duration-200 py-3 px-1 min-h-[44px] flex items-center">
+              KV Store
+            </Link>
+            <Link href="/tools/audit-log" className="hover:text-primary-fixed-dim transition-colors duration-200 py-3 px-1 min-h-[44px] flex items-center">
+              Audit Log
             </Link>
           </div>
           <div className="flex items-center gap-4">
@@ -47,7 +56,7 @@ export default function ToolsPage() {
         <header className="mb-12">
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight">All Tools</h1>
           <p className="mt-4 text-lg text-zinc-400">
-            Every AgentUtils API endpoint as a standalone tool. One API key. No SDK.
+            The launch tools as standalone pages. One API key. No SDK.
           </p>
         </header>
 

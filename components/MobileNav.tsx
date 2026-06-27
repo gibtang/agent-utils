@@ -30,13 +30,6 @@ export default function MobileNav() {
               Docs
             </Link>
             <Link
-              href="/human-in-the-loop"
-              onClick={() => setOpen(false)}
-              className="text-on-surface-variant py-3 px-2 min-h-[44px] flex items-center hover:bg-zinc-900 rounded-md transition-colors"
-            >
-              Human-in-the-Loop
-            </Link>
-            <Link
               href="/tools/dlq"
               onClick={() => setOpen(false)}
               className="text-on-surface-variant py-3 px-2 min-h-[44px] flex items-center hover:bg-zinc-900 rounded-md transition-colors"
@@ -49,6 +42,20 @@ export default function MobileNav() {
               className="text-on-surface-variant py-3 px-2 min-h-[44px] flex items-center hover:bg-zinc-900 rounded-md transition-colors"
             >
               Checkpoint
+            </Link>
+            <Link
+              href="/tools/kv-store"
+              onClick={() => setOpen(false)}
+              className="text-on-surface-variant py-3 px-2 min-h-[44px] flex items-center hover:bg-zinc-900 rounded-md transition-colors"
+            >
+              KV Store
+            </Link>
+            <Link
+              href="/tools/audit-log"
+              onClick={() => setOpen(false)}
+              className="text-on-surface-variant py-3 px-2 min-h-[44px] flex items-center hover:bg-zinc-900 rounded-md transition-colors"
+            >
+              Audit Log
             </Link>
           </div>
         </div>

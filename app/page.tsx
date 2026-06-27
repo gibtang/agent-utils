@@ -26,14 +26,17 @@ export default function Home() {
             <Link href="/docs" className="text-primary-container font-bold hover:text-primary-fixed-dim transition-colors duration-200 py-2.5 px-1 min-h-[44px] flex items-center">
               Docs
             </Link>
-            <Link href="/human-in-the-loop" className="hover:text-primary-fixed-dim transition-colors duration-200 py-2.5 px-1 min-h-[44px] flex items-center">
-              Human-in-the-Loop
-            </Link>
             <Link href="/tools/dlq" className="hover:text-primary-fixed-dim transition-colors duration-200 py-2.5 px-1 min-h-[44px] flex items-center">
               DLQ
             </Link>
             <Link href="/tools/checkpoint" className="hover:text-primary-fixed-dim transition-colors duration-200 py-2.5 px-1 min-h-[44px] flex items-center">
               Checkpoint
+            </Link>
+            <Link href="/tools/kv-store" className="hover:text-primary-fixed-dim transition-colors duration-200 py-2.5 px-1 min-h-[44px] flex items-center">
+              KV Store
+            </Link>
+            <Link href="/tools/audit-log" className="hover:text-primary-fixed-dim transition-colors duration-200 py-2.5 px-1 min-h-[44px] flex items-center">
+              Audit Log
             </Link>
           </div>
           <div className="flex items-center gap-4">
@@ -65,13 +68,13 @@ export default function Home() {
         <section className="max-w-[var(--spacing-container-max)] mx-auto px-[var(--spacing-gutter)] grid lg:grid-cols-2 gap-12 items-center mb-32">
           <div className="space-y-8">
             <h1 className="text-5xl md:text-[48px] font-bold leading-[56px] tracking-[-0.02em]">
-              The Missing Infrastructure Layer for{" "}
+              The missing infrastructure layer for{" "}
               <span className="text-primary-container">AI Agents</span>
             </h1>
             <p className="text-base text-on-surface-variant max-w-xl leading-6">
-              Production-ready dead letter queues, human-in-the-loop gates, and
-              audit trails—all behind a single API key. No SDKs, just curl
-              and go.
+              Production-ready dead letter queues, human-in-the-loop gates,
+              audit trails, and agent state storage behind a single API key.
+              No SDKs, just curl and go.
             </p>
             <div className="flex flex-wrap gap-4">
               <Link
@@ -197,11 +200,11 @@ export default function Home() {
                   </svg>
                 </div>
                 <h3 className="text-[32px] font-semibold leading-10 tracking-[-0.01em] mb-4">
-                  Human-in-the-Loop
+                  Checkpoint
                 </h3>
                 <p className="text-base text-on-surface-variant max-w-sm leading-6">
                   Pause agents until a human approves. Prevent costly errors and
-                  hallucinated actions with automated Slack and email alerts.
+                  irreversible actions with a simple approval gate.
                 </p>
               </div>
               <div className="mt-8 flex items-center gap-4 text-secondary font-[family-name:var(--font-jetbrains-mono)] text-xs font-semibold uppercase tracking-[0.05em]">
