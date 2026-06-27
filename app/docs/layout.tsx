@@ -1,87 +1,38 @@
 import Link from 'next/link';
-
-export const dynamic = 'force-static';
-
-const tools = [
-  { slug: 'dlq', name: 'Dead Letter Queue', icon: '📬' },
-  { slug: 'checkpoint', name: 'Human-in-the-Loop', icon: '👤' },
-];
-
-const v2 = { slug: 'v2', name: 'v2 API (current)', icon: '⚡' };
+import { getCurrentAgentUtilsDocs } from '@/lib/agentutils-docs';
 
 export default function DocsLayout({ children }: { children: React.ReactNode }) {
+  const docs = getCurrentAgentUtilsDocs();
+
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100">
-      <div className="mx-auto flex max-w-7xl">
-        {/* Sidebar */}
-        <aside className="sticky top-0 hidden h-screen w-64 shrink-0 border-r border-zinc-800 overflow-y-auto lg:block">
-          <div className="p-6">
-            <Link href="/docs" className="text-lg font-semibold tracking-tight hover:text-zinc-300 min-h-[44px] flex items-center">
-              AgentUtils Docs
-            </Link>
-
-            <div className="mt-6">
-              <Link
-                href="/signup"
-                className="block rounded-md bg-zinc-100 px-3 py-2.5 text-center text-sm font-medium text-zinc-900 hover:bg-white transition-colors min-h-[44px] flex items-center justify-center"
-              >
-                Get API Key
+    <div className="container mx-auto max-w-6xl px-4 py-10">
+      <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
+        <aside className="lg:sticky lg:top-6 lg:w-64">
+          <Link href="/" className="text-sm text-zinc-500 hover:text-zinc-300">
+            ← Home
+          </Link>
+          <div className="mt-4 rounded-lg border border-zinc-800 bg-zinc-950 p-4">
+            <p className="text-xs uppercase tracking-wide text-zinc-500">Docs navigation</p>
+            <nav className="mt-3 space-y-2 text-sm">
+              <Link href="/docs" className="block text-zinc-200 hover:text-white">
+                Docs index
               </Link>
-            </div>
-
-            <nav className="mt-6 space-y-1">
-              <Link
-                href={`/docs/${v2.slug}`}
-                className="flex items-center gap-2 rounded-md bg-zinc-900 px-3 py-2.5 text-sm text-zinc-100 transition-colors min-h-[44px]"
-              >
-                <span>{v2.icon}</span>
-                {v2.name}
+              <Link href="/docs/v2" className="block text-zinc-400 hover:text-zinc-200">
+                Aggregate v2 reference
               </Link>
-              <div className="pt-3 pb-1 px-3 text-xs font-semibold uppercase tracking-wide text-zinc-600">
-                v1 (legacy)
-              </div>
-              {tools.map((tool) => (
-                <Link
-                  key={tool.slug}
-                  href={`/docs/${tool.slug}`}
-                  className="flex items-center gap-2 rounded-md px-3 py-2.5 text-sm text-zinc-400 hover:bg-zinc-900 hover:text-zinc-100 transition-colors min-h-[44px]"
-                >
-                  <span>{tool.icon}</span>
-                  {tool.name}
+              {docs.map((doc) => (
+                <Link key={doc.slug} href={doc.frontmatter.canonical} className="block text-zinc-400 hover:text-zinc-200">
+                  {doc.title}
                 </Link>
               ))}
+              <Link href="/docs/image-upload" className="block text-zinc-400 hover:text-zinc-200">
+                Image Upload (legacy)
+              </Link>
             </nav>
           </div>
         </aside>
 
-        {/* Mobile nav */}
-        <div className="lg:hidden border-b border-zinc-800 px-4 py-3">
-          <div className="flex items-center justify-between">
-            <Link href="/docs" className="text-sm font-semibold py-3 px-1 min-h-[44px] flex items-center">Docs</Link>
-            <div className="flex gap-1 overflow-x-auto">
-              <Link
-                href={`/docs/${v2.slug}`}
-                className="shrink-0 rounded-md bg-zinc-900 px-2 py-3 text-xs text-zinc-100 min-h-[44px] flex items-center"
-              >
-                {v2.icon} {v2.name}
-              </Link>
-              {tools.map((tool) => (
-                <Link
-                  key={tool.slug}
-                  href={`/docs/${tool.slug}`}
-                  className="shrink-0 rounded-md px-2 py-3 text-xs text-zinc-400 hover:bg-zinc-900 hover:text-zinc-100 min-h-[44px] flex items-center"
-                >
-                  {tool.icon} {tool.name}
-                </Link>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Content */}
-        <main className="min-w-0 flex-1 px-6 py-10 lg:px-12">
-          {children}
-        </main>
+        <main className="flex-1">{children}</main>
       </div>
     </div>
   );

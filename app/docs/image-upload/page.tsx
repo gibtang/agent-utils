@@ -4,34 +4,59 @@ import type { Metadata } from 'next';
 export const dynamic = 'force-static';
 
 export const metadata: Metadata = {
-  title: 'Image Upload API Docs — AgentUtils',
-  description: 'Upload images and receive a hosted URL in a single API call. Complete API reference for the AgentUtils Image Upload tool.',
+  title: 'Image Upload API Docs — AgentUtils (Legacy)',
+  description:
+    'Legacy image upload endpoint kept for discoverability and compatibility. Returns a hosted URL for uploaded files.',
   openGraph: { url: '/docs/image-upload' },
-  alternates: {
-    canonical: '/docs/image-upload',
-  },
+  alternates: { canonical: '/docs/image-upload' },
 };
+
+const FRONTMATTER = `---
+title: Image Upload API Docs — AgentUtils (Legacy)
+description: Legacy image upload endpoint kept for discoverability and compatibility.
+canonical: /docs/image-upload
+status: legacy
+endpoint: POST /api/upload
+method: POST, GET
+keywords:
+  - legacy image upload api
+  - host image url api
+  - screenshot upload endpoint
+---`;
 
 export default function ImageUploadDocs() {
   return (
     <div className="max-w-3xl">
-      <Link href="/docs" className="text-sm text-zinc-500 hover:text-zinc-300">← Docs</Link>
-      <h1 className="mt-4 text-3xl font-bold tracking-tight">🖼️ Image Upload</h1>
-      <p className="mt-3 text-zinc-400">
-        Upload an image and get back a hosted URL. Backed by Backblaze B2 object storage.
+      <Link href="/docs" className="text-sm text-zinc-500 hover:text-zinc-300">
+        ← Docs index
+      </Link>
+      <div className="mt-4 flex flex-wrap items-center gap-3">
+        <h1 className="text-3xl font-bold tracking-tight">🖼️ Image Upload</h1>
+        <span className="rounded-full border border-amber-700 px-2.5 py-1 text-xs uppercase tracking-wide text-amber-300">
+          legacy
+        </span>
+      </div>
+      <p className="mt-3 rounded-lg border border-amber-900/60 bg-amber-950/30 p-4 text-sm text-amber-100">
+        Legacy surface: this endpoint exists for compatibility and discoverability only. New agent flows should prefer the current v2 API pages.
+      </p>
+      <p className="mt-4 text-zinc-400">
+        Upload an image and get back a hosted URL. Backed by object storage.
       </p>
 
       <section className="mt-8">
-        <h2 className="text-xl font-semibold mb-3">Upload an Image</h2>
+        <h2 className="text-xl font-semibold mb-3">YAML frontmatter</h2>
+        <pre className="overflow-x-auto rounded-lg border border-zinc-800 bg-zinc-950 p-4 text-xs font-mono text-zinc-200 whitespace-pre-wrap">{FRONTMATTER}</pre>
+      </section>
+
+      <section className="mt-8">
+        <h2 className="text-xl font-semibold mb-3">Endpoint reference</h2>
         <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4 text-sm font-mono text-zinc-300 overflow-x-auto">
-          <p>curl -X POST https://www.agent-utils.com/api/upload \</p>
-          <p className="ml-4">-H &quot;x-api-key: au_your_key&quot; \</p>
-          <p className="ml-4">-F &quot;file=@screenshot.png&quot; \</p>
+          <p>curl -X POST https://www.agent-utils.com/api/upload \\</p>
+          <p className="ml-4">-H &quot;x-api-key: au_your_key&quot; \\</p>
+          <p className="ml-4">-F &quot;file=@screenshot.png&quot; \\</p>
           <p className="ml-4">-F &quot;retentionHours=24&quot;</p>
         </div>
-        <p className="mt-3 text-sm text-zinc-500">
-          Response (201):
-        </p>
+        <p className="mt-3 text-sm text-zinc-500">Response (201):</p>
         <div className="mt-2 rounded-lg border border-zinc-800 bg-zinc-900 p-4 text-sm font-mono text-zinc-300 overflow-x-auto">
           <p>{`{`}</p>
           <p className="ml-4">{`"success": true,`}</p>
@@ -48,72 +73,27 @@ export default function ImageUploadDocs() {
       </section>
 
       <section className="mt-8">
-        <h2 className="text-xl font-semibold mb-3">Parameters</h2>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm text-left">
-            <thead>
-              <tr className="border-b border-zinc-800 text-zinc-400">
-                <th className="pb-3 pr-4 font-medium">Field</th>
-                <th className="pb-3 pr-4 font-medium">In</th>
-                <th className="pb-3 pr-4 font-medium">Type</th>
-                <th className="pb-3 font-medium">Description</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr className="border-b border-zinc-800/50">
-                <td className="py-3 pr-4 font-mono text-xs">file</td>
-                <td className="py-3 pr-4">form</td>
-                <td className="py-3 pr-4">binary</td>
-                <td className="py-3">Required. The image file (jpeg, png, webp, or gif). Max 10&nbsp;MB.</td>
-              </tr>
-              <tr className="border-b border-zinc-800/50">
-                <td className="py-3 pr-4 font-mono text-xs">retentionHours</td>
-                <td className="py-3 pr-4">form</td>
-                <td className="py-3 pr-4">number</td>
-                <td className="py-3">Optional. Hours until the file expires (default 24). Must be positive.</td>
-              </tr>
-              <tr>
-                <td className="py-3 pr-4 font-mono text-xs">x-api-key</td>
-                <td className="py-3 pr-4">header</td>
-                <td className="py-3 pr-4">string</td>
-                <td className="py-3">Required. Your AgentUtils API key.</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <h2 className="text-xl font-semibold mb-3">Practical use cases</h2>
+        <ul className="space-y-2 text-sm text-zinc-300">
+          <li>Store a screenshot from a browser automation run and pass the URL into a report.</li>
+          <li>Upload a generated image for inclusion in a chat response or email.</li>
+          <li>Keep temporary media accessible without building a separate upload service.</li>
+        </ul>
       </section>
 
       <section className="mt-8">
-        <h2 className="text-xl font-semibold mb-3">Accessing a File</h2>
-        <p className="text-sm text-zinc-400 mb-3">
-          The returned <code className="text-zinc-300">url</code> is publicly accessible — no API key required.
-          It serves the image with the original content type and is cacheable. Files
-          past their <code className="text-zinc-300">expiresAt</code> return a 404.
-        </p>
-        <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4 text-sm font-mono text-zinc-300 overflow-x-auto">
-          <p>curl https://www.agent-utils.com/api/file-host/{`{id}`}</p>
-        </div>
-      </section>
-
-      <section className="mt-8">
-        <h2 className="text-xl font-semibold mb-3">Errors</h2>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm text-left">
-            <thead>
-              <tr className="border-b border-zinc-800 text-zinc-400">
-                <th className="pb-3 pr-4 font-medium">Status</th>
-                <th className="pb-3 font-medium">Cause</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr className="border-b border-zinc-800/50"><td className="py-3 pr-4 font-mono text-xs">400</td><td className="py-3">Missing <code>file</code> field or invalid <code>retentionHours</code>.</td></tr>
-              <tr className="border-b border-zinc-800/50"><td className="py-3 pr-4 font-mono text-xs">401</td><td className="py-3">Missing or invalid API key.</td></tr>
-              <tr className="border-b border-zinc-800/50"><td className="py-3 pr-4 font-mono text-xs">413</td><td className="py-3">File exceeds 10&nbsp;MB.</td></tr>
-              <tr className="border-b border-zinc-800/50"><td className="py-3 pr-4 font-mono text-xs">415</td><td className="py-3">Unsupported content type.</td></tr>
-              <tr><td className="py-3 pr-4 font-mono text-xs">500</td><td className="py-3">Storage backend error.</td></tr>
-            </tbody>
-          </table>
-        </div>
+        <h2 className="text-xl font-semibold mb-3">Machine-readable summary</h2>
+        <pre className="overflow-x-auto rounded-lg border border-zinc-800 bg-zinc-950 p-4 text-xs font-mono text-zinc-200 whitespace-pre-wrap">{JSON.stringify(
+          {
+            slug: 'image-upload',
+            status: 'legacy',
+            canonical: '/docs/image-upload',
+            endpoint: 'POST /api/upload',
+            machine_pattern: 'Upload file -> receive public URL -> reuse downstream',
+          },
+          null,
+          2,
+        )}</pre>
       </section>
     </div>
   );
