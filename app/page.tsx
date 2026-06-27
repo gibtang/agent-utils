@@ -1,5 +1,6 @@
 import Link from "next/link";
 import MobileNav from "@/components/MobileNav";
+import { tools } from "@/lib/seo-tools";
 import type { Metadata } from "next";
 
 export const dynamic = 'force-static';
@@ -215,30 +216,24 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Tools Section — Quick access to DLQ and Checkpoint */}
+        {/* Tools Section — the five v2 tools (+ image upload) */}
         <section className="max-w-[var(--spacing-container-max)] mx-auto px-[var(--spacing-gutter)] mb-32">
           <h2 className="text-[32px] font-semibold leading-10 tracking-[-0.01em] mb-8 text-center">
-            Free Tools
+            Tools
           </h2>
-          <div className="grid md:grid-cols-2 gap-6">
-            <Link href="/tools/dlq" className="bento-card group bg-charcoal-gray border border-border-subtle rounded-xl p-8 hover:border-primary-container/30 transition-colors">
-              <h3 className="text-xl font-semibold mb-3">Dead Letter Queue</h3>
-              <p className="text-sm text-on-surface-variant leading-6">
-                Catch, inspect, and retry failed agent tasks. Never lose state to an API timeout.
-              </p>
-              <span className="inline-block mt-4 text-primary-container font-semibold text-sm group-hover:underline">
-                Try it →
-              </span>
-            </Link>
-            <Link href="/tools/checkpoint" className="bento-card group bg-charcoal-gray border border-border-subtle rounded-xl p-8 hover:border-primary-container/30 transition-colors">
-              <h3 className="text-xl font-semibold mb-3">Checkpoint</h3>
-              <p className="text-sm text-on-surface-variant leading-6">
-                Pause agents until a human approves. Gate dangerous actions with automated alerts.
-              </p>
-              <span className="inline-block mt-4 text-primary-container font-semibold text-sm group-hover:underline">
-                Try it →
-              </span>
-            </Link>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {tools.map((tool) => (
+              <Link key={tool.slug} href={`/tools/${tool.slug}`} className="bento-card group bg-charcoal-gray border border-border-subtle rounded-xl p-8 hover:border-primary-container/30 transition-colors">
+                <div className="text-2xl mb-3">{tool.icon}</div>
+                <h3 className="text-xl font-semibold mb-3">{tool.name}</h3>
+                <p className="text-sm text-on-surface-variant leading-6">
+                  {tool.tagline}
+                </p>
+                <span className="inline-block mt-4 text-primary-container font-semibold text-sm group-hover:underline">
+                  Learn more →
+                </span>
+              </Link>
+            ))}
           </div>
         </section>
 

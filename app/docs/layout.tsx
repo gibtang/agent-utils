@@ -3,8 +3,7 @@ import Link from 'next/link';
 export const dynamic = 'force-static';
 
 const tools = [
-  { slug: 'dlq', name: 'Dead Letter Queue', icon: '📬' },
-  { slug: 'checkpoint', name: 'Human-in-the-Loop', icon: '👤' },
+  { slug: 'image-upload', name: 'Image Upload', icon: '🖼️' },
 ];
 
 const v2 = { slug: 'v2', name: 'v2 API (current)', icon: '⚡' };
@@ -38,7 +37,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
                 {v2.name}
               </Link>
               <div className="pt-3 pb-1 px-3 text-xs font-semibold uppercase tracking-wide text-zinc-600">
-                v1 (legacy)
+                Legacy
               </div>
               {tools.map((tool) => (
                 <Link

@@ -7,6 +7,8 @@ export interface ToolSEO {
   name: string;
   icon: string;
   tagline: string;
+  /** Canonical API-docs URL for this tool's "View API Docs" button. */
+  docsUrl: string;
   metaTitle: string;
   metaDescription: string;
   h1: string;
@@ -23,10 +25,187 @@ export interface ToolSEO {
 
 export const tools: ToolSEO[] = [
   {
+    slug: 'kv-store',
+    name: 'KV Store',
+    icon: '🗃️',
+    tagline: 'Tenant-isolated key-value storage with CAS, TTL, and namespaces.',
+    docsUrl: '/docs/v2',
+    metaTitle: 'Key-Value Store API for AI Agents | AgentUtils',
+    metaDescription: 'Per-agent key-value storage with compare-and-set, TTL, and namespaces. Persistent agent state with a single HTTP call — no Redis, no database to run.',
+    h1: 'Key-Value Store for AI Agent State',
+    subtitle: 'Per-agent state. Compare-and-set. No database to run.',
+    whatItDoes: 'Give every agent its own namespaced key-value store. Read and write JSON values with optional TTL expiry and compare-and-set (CAS) tokens for safe concurrent updates. State is isolated per agent and per tenant — two agents never see each other\'s keys, and you never provision a database.',
+    whyAgentsNeed: [
+      'Agents are stateless by default — they need durable memory between runs to remember context, cursors, and decisions',
+      'Long-running agents need checkpointable progress (last-seen IDs, page tokens) that survives restarts',
+      'Concurrent agent invocations corrupt shared state without optimistic locking',
+      'Running your own Redis or Postgres for agent memory is infrastructure you shouldn\'t have to manage',
+    ],
+    useCases: [
+      { title: 'Conversation memory', description: 'Store per-user chat context so an agent picks up exactly where the last turn left off' },
+      { title: 'Cursor tracking', description: 'Remember the last-processed event ID so a polling agent never reprocesses or skips work' },
+      { title: 'Feature flags & config', description: 'Agents read live config values per namespace without a redeploy or a separate config service' },
+      { title: 'Idempotency keys', description: 'Store request fingerprints with TTL so retried agent actions don\'t double-execute' },
+    ],
+    codeExample: {
+      curl: `curl -X PUT "https://www.agent-utils.com/v1/kv/state/last-seen" \\\n  -H "x-agent-id: poller" -H "x-api-key: agutil_agt_…" \\\n  -H "content-type: application/json" \\\n  -d '{\n    "value": { "event_id": "evt_42" },\n    "ttl_seconds": 86400\n  }'`,
+      python: `import requests
+
+resp = requests.put(
+    "https://www.agent-utils.com/v1/kv/state/last-seen",
+    headers={
+        "x-agent-id": "poller",
+        "x-api-key": "agutil_agt_…",
+        "content-type": "application/json",
+    },
+    json={
+        "value": {"event_id": "evt_42"},
+        "ttl_seconds": 86400,
+    },
+)
+assert resp.status_code == 200`,
+      js: `const res = await fetch("https://www.agent-utils.com/v1/kv/state/last-seen", {
+  method: "PUT",
+  headers: {
+    "x-agent-id": "poller",
+    "x-api-key": "agutil_agt_…",
+    "content-type": "application/json",
+  },
+  body: JSON.stringify({
+    value: { event_id: "evt_42" },
+    ttl_seconds: 86400,
+  }),
+});`,
+    },
+    apiEndpoint: 'PUT /v1/kv/{namespace}/{key}',
+    competitors: ['Redis', 'DynamoDB', 'Upstash Redis', 'Vercel KV'],
+    keywords: ['key value store api', 'agent state storage', 'kv store for ai agents', 'compare and set api', 'serverless key value store', 'persistent agent memory'],
+    relatedTools: ['audit-log', 'scheduler'],
+  },
+  {
+    slug: 'audit-log',
+    name: 'Audit Log',
+    icon: '📜',
+    tagline: 'Append-only, server-timestamped audit trail for every agent action.',
+    docsUrl: '/docs/v2',
+    metaTitle: 'Audit Log API for AI Agents | AgentUtils',
+    metaDescription: 'Immutable, server-timestamped audit trail for AI agent actions. Record every decision with structured metadata — compliance and observability in one API call.',
+    h1: 'Audit Logging for AI Agents',
+    subtitle: 'Immutable records. Server timestamps. Compliance-ready.',
+    whatItDoes: 'Append immutable audit entries that record what your agent did, when, and why. Every entry is server-timestamped and stored append-only — entries cannot be edited or deleted, only read. Query by time range, actor, or action to reconstruct exactly what happened during a run.',
+    whyAgentsNeed: [
+      'Autonomous agents make consequential decisions that regulators and customers will ask you to justify after the fact',
+      'Client-side or self-reported timestamps are unreliable and tamper-able — only server-side stamps hold up in a review',
+      'Reconstructing an incident from scattered logs across services is painful; a single append-only trail is auditable',
+      'SOC 2 / HIPAA / financial controls demand evidence of what an automated system did and when',
+    ],
+    useCases: [
+      { title: 'Decision provenance', description: 'Record each agent decision with its rationale so you can explain why an action was taken weeks later' },
+      { title: 'Access logging', description: 'Log every time an agent reads or writes sensitive data for compliance evidence' },
+      { title: 'Incident reconstruction', description: 'Replay the exact sequence of agent actions during an outage or bad outcome by time range' },
+      { title: 'Cost & usage tracking', description: 'Stamp token spend and model calls per agent run for billing and attribution' },
+    ],
+    codeExample: {
+      curl: `curl -X POST https://www.agent-utils.com/v1/audit \\\n  -H "x-agent-id: support-bot" -H "x-api-key: agutil_agt_…" \\\n  -H "content-type: application/json" \\\n  -d '{\n    "action": "refund.issued",\n    "metadata": { "order_id": "ord_9", "amount": 4999 }\n  }'`,
+      python: `import requests
+
+resp = requests.post(
+    "https://www.agent-utils.com/v1/audit",
+    headers={
+        "x-agent-id": "support-bot",
+        "x-api-key": "agutil_agt_…",
+        "content-type": "application/json",
+    },
+    json={
+        "action": "refund.issued",
+        "metadata": {"order_id": "ord_9", "amount": 4999},
+    },
+)
+event_id = resp.json()["data"]["id"]`,
+      js: `const res = await fetch("https://www.agent-utils.com/v1/audit", {
+  method: "POST",
+  headers: {
+    "x-agent-id": "support-bot",
+    "x-api-key": "agutil_agt_…",
+    "content-type": "application/json",
+  },
+  body: JSON.stringify({
+    action: "refund.issued",
+    metadata: { order_id: "ord_9", amount: 4999 },
+  }),
+});`,
+    },
+    apiEndpoint: 'POST /v1/audit',
+    competitors: ['AWS CloudTrail', 'Datadog Audit Logs', 'Splunk'],
+    keywords: ['audit log api', 'agent audit trail', 'immutable event log', 'compliance logging for ai', 'append only audit log', 'ai agent observability'],
+    relatedTools: ['checkpoint', 'dlq'],
+  },
+  {
+    slug: 'scheduler',
+    name: 'Scheduler',
+    icon: '⏰',
+    tagline: 'Schedule one-shot agent callbacks with retries and DLQ cascade.',
+    docsUrl: '/docs/v2',
+    metaTitle: 'Scheduler & Delayed Callback API for AI Agents | AgentUtils',
+    metaDescription: 'Schedule one-shot callbacks to your agent at a future time, with fixed retries and automatic dead-letter-queue cascade on failure. No cron, no queues to run.',
+    h1: 'Scheduling for AI Agents',
+    subtitle: 'Delayed callbacks. Built-in retries. Automatic failure cascade.',
+    whatItDoes: 'Register a one-shot callback that fires at a future time and POSTs to your agent\'s webhook. If the webhook fails, the scheduler retries on a fixed backoff; if retries are exhausted, the job cascades into the dead letter queue for inspection. No cron daemon, no job queue to host.',
+    whyAgentsNeed: [
+      'Agents need to defer work — "follow up in 24 hours", "check back after the API rate limit resets" — without standing up a cron cluster',
+      'Fire-and-forget scheduling loses jobs on restart; a persistent scheduler survives crashes and redeploys',
+      'Webhook delivery fails transiently — built-in retry prevents silent dropped follow-ups',
+      'Coupling "delay" logic into your agent loop blocks it; an external scheduler keeps the agent responsive',
+    ],
+    useCases: [
+      { title: 'Delayed follow-ups', description: 'Schedule a callback 24 hours after a user message so the agent nudges them without blocking' },
+      { title: 'Rate-limit backoff', description: 'When an external API returns 429, schedule the retry for when the limit resets instead of busy-looping' },
+      { title: 'Time-based triggers', description: 'Fire an agent run at a specific clock time — end-of-day summaries, scheduled reports' },
+      { title: 'Retry orchestration', description: 'Chain a risky agent step with a delayed confirmation callback that verifies the result' },
+    ],
+    codeExample: {
+      curl: `curl -X POST https://www.agent-utils.com/v1/schedules \\\n  -H "x-agent-id: followup-bot" -H "x-api-key: agutil_agt_…" \\\n  -H "content-type: application/json" \\\n  -d '{\n    "callback_url": "https://your-server.com/agent/run",\n    "run_at": "2026-06-28T09:00:00Z",\n    "payload": { "user_id": "u_7" }\n  }'`,
+      python: `import requests
+
+resp = requests.post(
+    "https://www.agent-utils.com/v1/schedules",
+    headers={
+        "x-agent-id": "followup-bot",
+        "x-api-key": "agutil_agt_…",
+        "content-type": "application/json",
+    },
+    json={
+        "callback_url": "https://your-server.com/agent/run",
+        "run_at": "2026-06-28T09:00:00Z",
+        "payload": {"user_id": "u_7"},
+    },
+)
+schedule_id = resp.json()["data"]["id"]`,
+      js: `const res = await fetch("https://www.agent-utils.com/v1/schedules", {
+  method: "POST",
+  headers: {
+    "x-agent-id": "followup-bot",
+    "x-api-key": "agutil_agt_…",
+    "content-type": "application/json",
+  },
+  body: JSON.stringify({
+    callback_url: "https://your-server.com/agent/run",
+    run_at: "2026-06-28T09:00:00Z",
+    payload: { user_id: "u_7" },
+  }),
+});`,
+    },
+    apiEndpoint: 'POST /v1/schedules',
+    competitors: ['AWS EventBridge Scheduler', 'Google Cloud Tasks', 'Upstash QStash', 'BullMQ'],
+    keywords: ['scheduler api for agents', 'delayed callback api', 'agent job scheduling', 'webhook scheduler', 'cron alternative api', 'scheduled agent task'],
+    relatedTools: ['dlq', 'kv-store'],
+  },
+  {
     slug: 'dlq',
     name: 'Dead Letter Queue',
     icon: '📬',
     tagline: 'Catch, inspect, and retry failed agent tasks.',
+    docsUrl: '/docs/v2',
     metaTitle: 'Dead Letter Queue API for AI Agents | AgentUtils',
     metaDescription: 'Capture failed agent tasks, inspect error payloads, and retry via webhook. One API call to set up error handling for any AI agent workflow.',
     h1: 'Dead Letter Queue for AI Agents',
@@ -83,13 +262,14 @@ dlq_id = resp.json()["data"]["id"]`,
     apiEndpoint: 'POST /v1/dlq',
     competitors: ['AWS SQS DLQ', 'RabbitMQ Dead Letter', 'Apache Kafka DLQ'],
     keywords: ['dead letter queue API', 'agent error handling', 'failed task recovery', 'agent retry mechanism', 'dead letter queue for AI', 'error queue for agents'],
-    relatedTools: ['checkpoint'],
+    relatedTools: ['checkpoint', 'scheduler'],
   },
   {
     slug: 'checkpoint',
     name: 'Human-in-the-Loop',
     icon: '👤',
     tagline: 'Pause agents until humans approve.',
+    docsUrl: '/docs/v2',
     metaTitle: 'Checkpoint & Approval Gate API for AI Agents | AgentUtils',
     metaDescription: 'Pause any AI agent and wait for human approval before continuing. Pre-approve, reject, or modify agent actions with a simple API call.',
     h1: 'Human-in-the-Loop Approval for AI Agents',
@@ -153,13 +333,14 @@ const { data } = await res.json();`,
     apiEndpoint: 'POST /v1/checkpoints',
     competitors: ['LangGraph Human-in-the-Loop', 'Inkeep', 'Humanloop'],
     keywords: ['human in the loop API', 'agent approval workflow', 'AI agent guardrails', 'human oversight for AI', 'agent pause resume', 'human approval for agents'],
-    relatedTools: ['dlq'],
+    relatedTools: ['dlq', 'audit-log'],
   },
   {
     slug: 'image-upload',
     name: 'Image Upload',
     icon: '🖼️',
     tagline: 'Upload images and get a hosted URL in one call.',
+    docsUrl: '/docs/image-upload',
     metaTitle: 'Image Upload API for AI Agents | AgentUtils',
     metaDescription: 'Upload JPEG, PNG, WebP, or GIF images and receive a hosted URL in a single API call. No SDK, no S3 config — just multipart form data and an API key.',
     h1: 'Image Upload & Hosting API for AI Agents',

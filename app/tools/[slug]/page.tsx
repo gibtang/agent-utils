@@ -126,7 +126,7 @@ export default async function ToolPage({ params }: { params: Promise<{ slug: str
           <p className="mt-4 text-lg text-zinc-400 max-w-2xl">{tool.subtitle}</p>
           <div className="mt-6 flex gap-3">
             <Link
-              href={`/docs/${tool.slug}`}
+              href={tool.docsUrl}
               className="px-5 py-3 rounded-lg bg-zinc-100 text-zinc-950 font-semibold hover:bg-white transition-colors text-sm min-h-[44px] flex items-center"
             >
               View API Docs
@@ -271,7 +271,7 @@ export default async function ToolPage({ params }: { params: Promise<{ slug: str
               Get API Key
             </Link>
             <Link
-              href={`/docs/${tool.slug}`}
+              href={tool.docsUrl}
               className="px-6 py-3 rounded-lg border border-zinc-700 text-zinc-300 font-medium hover:border-zinc-500 transition-colors"
             >
               Read Docs
