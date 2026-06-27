@@ -1,16 +1,8 @@
 # Agent Instructions
 
-This project uses **bd** (beads)** for issue tracking. Run `bd prime` for full workflow context.
+## Task Tracking
 
-## Quick Reference
-
-```bash
-bd ready              # Find available work
-bd show <id>          # View issue details
-bd update <id> --claim  # Claim work atomically
-bd close <id>         # Complete work
-bd dolt push          # Push beads data to remote
-```
+Use Anban cards only. Do not use Beads/bd for task tracking. See `/home/gibson/my-files/AGENTS.md` for the global Anban workflow.
 
 ## Non-Interactive Shell Commands
 

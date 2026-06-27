@@ -1,4 +1,4 @@
 @AGENTS.md
 
-> **Beads workflow:** See `/home/gibson/my-files/AGENTS.md` for beads issue tracker integration (Quick Reference, Rules, Pre-Implementation, Session Completion).
+> **Task tracking:** Use Anban cards only. See `/home/gibson/my-files/AGENTS.md` for the global Anban task-tracking workflow.
 
