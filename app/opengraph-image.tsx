@@ -47,7 +47,7 @@ export default async function Image() {
             lineHeight: 1.4,
           }}
         >
-          Dead letter queues, human-in-the-loop gates, and redactable memory
+          Dead letter queues, human-in-the-loop gates, and audit trails
           — all behind a single API key.
         </div>
       </div>

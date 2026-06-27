@@ -77,16 +77,6 @@ export default function ToolsPage() {
         </div>
       </main>
 
-      <footer className="bg-charcoal-gray border-t border-border-subtle w-full py-12 mt-auto">
-        <div className="flex flex-col md:flex-row justify-between items-center px-[var(--spacing-gutter)] max-w-[var(--spacing-container-max)] mx-auto gap-8">
-          <span className="text-[32px] font-semibold text-on-surface">AgentUtils</span>
-          <div className="flex flex-wrap justify-center gap-8 font-[family-name:var(--font-jetbrains-mono)] text-xs font-semibold uppercase tracking-[0.05em] text-primary-fixed-dim">
-            <Link href="/docs" className="hover:text-primary transition-colors py-3.5 px-1 min-h-[44px] flex items-center">Documentation</Link>
-            <Link href="/terms" className="hover:text-primary transition-colors py-3.5 px-1 min-h-[44px] flex items-center">Terms</Link>
-            <Link href="/privacy" className="hover:text-primary transition-colors py-3.5 px-1 min-h-[44px] flex items-center">Privacy</Link>
-          </div>
-        </div>
-      </footer>
     </>
   );
 }

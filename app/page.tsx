@@ -42,7 +42,7 @@ export default function Home() {
               href="https://github.com/gibtang/agent-utils"
               target="_blank"
               rel="noopener noreferrer"
-              aria-label="GitHub"
+              aria-label="GitHub repository"
               className="hidden sm:flex items-center gap-2 text-on-surface-variant hover:text-primary transition-all active:opacity-80 p-3 min-w-[44px] min-h-[44px]"
             >
               <svg viewBox="0 0 16 16" className="w-5 h-5 fill-current" aria-hidden="true">
@@ -69,7 +69,7 @@ export default function Home() {
             </h1>
             <p className="text-base text-on-surface-variant max-w-xl leading-6">
               Production-ready dead letter queues, human-in-the-loop gates, and
-              redactable memory—all behind a single API key. No SDKs, just curl
+              audit trails—all behind a single API key. No SDKs, just curl
               and go.
             </p>
             <div className="flex flex-wrap gap-4">
@@ -145,7 +145,7 @@ export default function Home() {
               </div>
               <div className="mt-6 pt-4 border-t border-border-subtle flex items-center justify-between text-on-surface-variant opacity-50">
                 <span className="font-[family-name:var(--font-jetbrains-mono)] text-xs">
-                  // Terminal Output
+                  {"// Terminal Output"}
                 </span>
               </div>
             </div>
@@ -337,74 +337,6 @@ export default function Home() {
         </section>
       </main>
 
-      {/* Footer */}
-      <footer className="bg-charcoal-gray border-t border-border-subtle w-full py-12">
-        <div className="flex flex-col md:flex-row justify-between items-center px-[var(--spacing-gutter)] max-w-[var(--spacing-container-max)] mx-auto gap-8">
-          <div className="flex flex-col items-center md:items-start gap-4">
-            <div className="flex items-center gap-3">
-              <span className="text-[32px] font-semibold text-on-surface">
-                AgentUtils
-              </span>
-            </div>
-            <p className="text-on-surface-variant font-[family-name:var(--font-jetbrains-mono)] text-xs opacity-80">
-              © {new Date().getFullYear()} AgentUtils Infrastructure. All rights
-              reserved.
-            </p>
-          </div>
-          <div className="flex flex-wrap justify-center gap-8 font-[family-name:var(--font-jetbrains-mono)] text-xs font-semibold uppercase tracking-[0.05em] text-primary-fixed-dim">
-            <a
-              href="https://github.com/gibtang/agent-utils"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-primary transition-colors opacity-80 hover:opacity-100 py-3.5 px-1 min-h-[44px] flex items-center"
-            >
-              GitHub
-            </a>
-            <Link
-              href="/docs"
-              className="hover:text-primary transition-colors opacity-80 hover:opacity-100 py-3.5 px-1 min-h-[44px] flex items-center"
-            >
-              Documentation
-            </Link>
-            <Link
-              href="/docs/v2"
-              className="hover:text-primary transition-colors opacity-80 hover:opacity-100 py-3.5 px-1 min-h-[44px] flex items-center"
-            >
-              DLQ Docs
-            </Link>
-            <Link
-              href="/docs/v2"
-              className="hover:text-primary transition-colors opacity-80 hover:opacity-100 py-3.5 px-1 min-h-[44px] flex items-center"
-            >
-              Checkpoint Docs
-            </Link>
-            <Link
-              href="/tools/dlq"
-              className="hover:text-primary transition-colors opacity-80 hover:opacity-100 py-3.5 px-1 min-h-[44px] flex items-center"
-            >
-              DLQ Tool
-            </Link>
-            <Link
-              href="/tools/checkpoint"
-              className="hover:text-primary transition-colors opacity-80 hover:opacity-100 py-3.5 px-1 min-h-[44px] flex items-center"
-            >
-              Checkpoint Tool
-            </Link>
-            <Link
-              href="/terms"
-              className="hover:text-primary transition-colors opacity-80 hover:opacity-100 py-3.5 px-1 min-h-[44px] flex items-center"
-            >
-              Terms
-            </Link>
-            <Link
-              href="/privacy"
-              className="hover:text-primary transition-colors opacity-80 hover:opacity-100 py-3.5 px-1 min-h-[44px] flex items-center"
-            >
-              Privacy
-            </Link>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }

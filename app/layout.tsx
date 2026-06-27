@@ -22,11 +22,11 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.agent-utils.com"),
   title: "AgentUtils — API Utilities for AI Agents",
-  description: "One API key. Production-ready dead letter queues, human-in-the-loop gates, and redactable memory. No SDKs, just curl and go.",
+  description: "One API key. Production-ready dead letter queues, human-in-the-loop gates, and audit trails. No SDKs, just curl and go.",
   keywords: ["ai agents", "dead letter queue", "human in the loop", "agent infrastructure", "api utilities"],
   openGraph: {
     title: "AgentUtils — API Utilities for AI Agents",
-    description: "Production-ready dead letter queues, human-in-the-loop gates, and redactable memory—all behind a single API key.",
+    description: "Production-ready dead letter queues, human-in-the-loop gates, and audit trails—all behind a single API key.",
     siteName: "AgentUtils",
     type: "website",
     locale: "en_US",
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "AgentUtils — API Utilities for AI Agents",
-    description: "Production-ready dead letter queues, human-in-the-loop gates, and redactable memory—all behind a single API key.",
+    description: "Production-ready dead letter queues, human-in-the-loop gates, and audit trails—all behind a single API key.",
   },
   alternates: {
     canonical: "/",
