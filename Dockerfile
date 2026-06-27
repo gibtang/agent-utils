@@ -8,7 +8,7 @@ FROM node:22-alpine AS deps
 WORKDIR /app
 # --ignore-scripts skips postinstall (e.g. husky) which fails with no .git in image.
 COPY package.json package-lock.json* ./
-RUN npm ci --ignore-scripts
+RUN npm install --ignore-scripts
 
 # ---- 2. Build ----
 FROM node:22-alpine AS builder
@@ -50,7 +50,7 @@ RUN npm run build
 FROM node:22-alpine AS prod-deps
 WORKDIR /app
 COPY package.json package-lock.json* ./
-RUN npm ci --omit=dev --ignore-scripts && npm cache clean --force
+RUN npm install --omit=dev --ignore-scripts && npm cache clean --force
 
 # ---- 4. Runtime ----
 FROM node:22-alpine AS runner
