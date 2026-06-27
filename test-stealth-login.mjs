@@ -136,7 +136,7 @@ const PASSWORD = 'nfu@wmt5upk3rgq3FUF';
     // Keep open briefly
     console.log('\n👀 Closing in 5 seconds...');
     await new Promise(r => setTimeout(r, 5000));
-    try { await browser.close(); } catch(e) {}
+    try { await browser.close(); } catch {}
     console.log('🏁 Done.');
   }
 })();

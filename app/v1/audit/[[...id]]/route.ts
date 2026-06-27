@@ -10,7 +10,7 @@ import { createRoute } from '@/lib/v2/route';
 import { agentIdOf } from '@/lib/v2/auth';
 import { Errors } from '@/lib/v2/errors';
 import { resourceId } from '@/lib/v2/ids';
-import AuditLog from '@/models/v2/AuditLog';
+import AuditLog, { type IAuditLog } from '@/models/v2/AuditLog';
 import { quotaFor } from '@/lib/v2/quota';
 import { encodeCursor, decodeCursor, clampLimit } from '@/lib/v2/pagination';
 
@@ -127,13 +127,13 @@ export const GET = createRoute<{ id?: string[] }>({ agentKey: true }, async (ctx
   const rows = await AuditLog.find(filter).sort({ timestamp: asc ? 1 : -1, _id: asc ? 1 : -1 }).limit(limit + 1).lean();
   const hasMore = rows.length > limit;
   const slice = hasMore ? rows.slice(0, limit) : rows;
-  const last = slice[slice.length - 1] as any;
+  const last = slice[slice.length - 1] as IAuditLog | undefined;
   const nextCursor = hasMore && last ? encodeCursor({ ts: last.timestamp instanceof Date ? last.timestamp.toISOString() : String(last.timestamp), _id: String(last._id) }) : undefined;
 
   return { kind: 'list' as const, data: slice.map(serialize), cursor: nextCursor ?? '', has_more: hasMore };
 });
 
-function serialize(e: any) {
+function serialize(e: IAuditLog) {
   return {
     id: e.auditId,
     agent_id: e.agentId,

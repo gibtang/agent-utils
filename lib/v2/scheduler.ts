@@ -56,9 +56,21 @@ export async function fireDueSchedules(opts: { now?: Date; limit?: number } = {}
     .lean();
 
   for (const sched of candidates) {
-    if (!nextAttemptDue(sched as any, new Date(now))) continue;
+    const s = sched as {
+      scheduleId: string;
+      tenantId: string;
+      agentId: string;
+      callbackUrl: string;
+      callbackPayload: unknown;
+      attemptCount: number;
+      dlqOnFailure: boolean;
+      fireAt: Date;
+      status: ScheduleStatus;
+      lastAttemptAt: Date | null;
+    };
+    if (!nextAttemptDue(s, new Date(now))) continue;
     result.processed++;
-    await attemptSchedule(sched as any, new Date(now));
+    await attemptSchedule(s, new Date(now));
   }
   return result;
 }

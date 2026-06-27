@@ -7,12 +7,12 @@
  *   POST   /v1/checkpoints/{id}/reject    (admin OR approval-proxy)
  *   DELETE /v1/checkpoints/{id}           (agent cancels own)
  */
-import { createRoute, type RouteContext } from '@/lib/v2/route';
+import { createRoute } from '@/lib/v2/route';
 import { Errors, ApiError } from '@/lib/v2/errors';
-import { ok, errorResponse, noContent } from '@/lib/v2/envelope';
-import { resolveCredentials, requireAgentKey, requireApprovalOrAdmin, agentIdOf } from '@/lib/v2/auth';
+import { ok, errorResponse } from '@/lib/v2/envelope';
+import { requireApprovalOrAdmin, agentIdOf } from '@/lib/v2/auth';
 import { resourceId } from '@/lib/v2/ids';
-import Checkpoint, { CheckpointStatus, TimeoutAction } from '@/models/v2/Checkpoint';
+import Checkpoint, { CheckpointStatus, TimeoutAction, type ICheckpoint } from '@/models/v2/Checkpoint';
 import { reserveCountedQuota, releaseCountedQuota } from '@/lib/v2/quota';
 import { validateCallbackUrl } from '@/lib/v2/callbackSecurity';
 import { applyResolution } from '@/lib/v2/hitl';
@@ -30,7 +30,7 @@ function utf8Bytes(s: string): number {
   return typeof Buffer !== 'undefined' ? Buffer.byteLength(s, 'utf8') : new TextEncoder().encode(s).length;
 }
 
-function serialize(c: any) {
+function serialize(c: ICheckpoint) {
   return {
     id: c.checkpointId,
     agent_id: c.agentId,
@@ -132,7 +132,7 @@ export const GET = createRoute<{ id?: string[] }>({ agentKey: true }, async (ctx
   const tenantId = ctx.resolved.tenantId;
 
   if (id) {
-    const c = await Checkpoint.findOne({ checkpointId: id }).lean() as any;
+    const c = (await Checkpoint.findOne({ checkpointId: id }).lean()) as ICheckpoint | null;
     if (!c || c.tenantId !== tenantId) return Errors.notFound('checkpoint not found');
     return { kind: 'ok' as const, data: serialize(c) };
   }
@@ -149,7 +149,7 @@ export const GET = createRoute<{ id?: string[] }>({ agentKey: true }, async (ctx
 
   const rows = await Checkpoint.find(filter).sort({ _id: -1 }).limit(limit + 1).lean();
   const hasMore = rows.length > limit;
-  const slice = (hasMore ? rows.slice(0, limit) : rows) as any[];
+  const slice = (hasMore ? rows.slice(0, limit) : rows) as ICheckpoint[];
   const nextCursor = hasMore && slice.length ? encodeCursor({ _id: String(slice[slice.length - 1]._id) }) : undefined;
   return { kind: 'list' as const, data: slice.map(serialize), cursor: nextCursor ?? '', has_more: hasMore };
 });
@@ -160,7 +160,9 @@ async function resolveRoute(
   params: { id?: string[] } | Promise<{ id?: string[] }>,
   decision: 'approved' | 'rejected',
 ): Promise<Response> {
-  const p = (typeof (params as any)?.then === 'function' ? await (params as Promise<{ id?: string[] }>) : params as { id?: string[] });
+  const p = params && typeof (params as { then?: unknown }).then === 'function'
+    ? await (params as Promise<{ id?: string[] }>)
+    : (params as { id?: string[] });
   const requestId = req.headers.get('x-request-id') || '';
   const resolution = await requireApprovalOrAdmin(req);
   if (resolution instanceof ApiError) return errorResponse(resolution, { request_id: requestId || undefined });
@@ -183,7 +185,7 @@ async function resolveRoute(
   }
 
   // Checkpoint must exist in this tenant. Cross-tenant → 404 (R-HITL-6).
-  const cp = await Checkpoint.findOne({ checkpointId: id }).lean() as any;
+  const cp = (await Checkpoint.findOne({ checkpointId: id }).lean()) as ICheckpoint | null;
   if (!cp || cp.tenantId !== resolved.tenantId) {
     return errorResponse(Errors.notFound('checkpoint not found'), { request_id: requestId || undefined });
   }
@@ -197,7 +199,8 @@ async function resolveRoute(
   const res = await applyResolution(id, resolved.tenantId, { decision, by: parsed.by, note: parsed.note ?? null });
   void res;
 
-  const updated = await Checkpoint.findOne({ checkpointId: id }).lean() as any;
+  const updated = (await Checkpoint.findOne({ checkpointId: id }).lean()) as ICheckpoint | null;
+  if (!updated) return errorResponse(Errors.notFound('checkpoint not found'), { request_id: requestId || undefined });
   return ok(serialize(updated), { request_id: requestId || undefined });
 }
 
@@ -209,7 +212,7 @@ export const REJECT = (req: import('next/server').NextRequest, params: { id?: st
 // ── DELETE (agent cancels own) ───────────────────────────────────────────────
 export const DELETE = createRoute<{ id?: string[] }>({ agentKey: true }, async (ctx) => {
   const id = idFromParams(ctx.params);
-  const c = await Checkpoint.findOne({ checkpointId: id }).lean() as any;
+  const c = (await Checkpoint.findOne({ checkpointId: id }).lean()) as ICheckpoint | null;
   if (!c || c.tenantId !== ctx.resolved.tenantId) return Errors.notFound('checkpoint not found');
   // R-HITL-4: only creating agent may cancel.
   if (c.agentId !== agentIdOf(ctx.resolved)) return Errors.forbidden('Only the creating agent may cancel');

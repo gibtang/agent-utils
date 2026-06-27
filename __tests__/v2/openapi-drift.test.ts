@@ -24,7 +24,7 @@ function findRoutes(dir: string, prefix = ''): { method: string; path: string }[
     if (entry !== 'route.ts' && entry !== 'route.tsx') continue;
     const src = readFileSync(full, 'utf8');
     // public endpoints only — /tick is internal, exclude from drift check
-    let seg = prefix;
+    const seg = prefix;
     // normalize Next.js dynamic segments [[...x]]/{x} → OpenAPI {x}
     const methods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'] as const;
     for (const m of methods) {

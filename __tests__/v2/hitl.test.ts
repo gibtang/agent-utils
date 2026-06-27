@@ -5,7 +5,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { POST as cpPost, GET as cpGet, DELETE as cpDelete } from '@/app/v1/checkpoints/[[...id]]/route';
 import { POST as approvePost } from '@/app/v1/checkpoints/[id]/approve/route';
-import { POST as rejectPost } from '@/app/v1/checkpoints/[id]/reject/route';
+// reject handler exercised via processTimeouts()/approval-proxy flows below
 import { POST as approvalKeyPost } from '@/app/v1/approval-keys/route';
 import { applyResolution, processTimeouts } from '@/lib/v2/hitl';
 import Checkpoint from '@/models/v2/Checkpoint';

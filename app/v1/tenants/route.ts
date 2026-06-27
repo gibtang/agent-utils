@@ -4,7 +4,7 @@
  */
 import { createRoute } from '@/lib/v2/route';
 import { Errors } from '@/lib/v2/errors';
-import { resourceId, generateAdminKey, requestId } from '@/lib/v2/ids';
+import { resourceId, generateAdminKey } from '@/lib/v2/ids';
 import { hashKey, randomSecret } from '@/lib/v2/crypto';
 import Tenant, { TenantStatus, TenantPlan } from '@/models/v2/Tenant';
 import ApiCredential from '@/models/v2/ApiCredential';
@@ -66,7 +66,6 @@ export const POST = createRoute({ public: true, idempotent: 'POST /v1/tenants' }
 
   const tenant = await Tenant.findOne({ tenantId }).lean();
   void tenant;
-  const rid = ctx.requestId || requestId();
 
   return {
     kind: 'created' as const,

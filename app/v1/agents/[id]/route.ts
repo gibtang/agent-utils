@@ -4,10 +4,7 @@
  */
 import { createRoute } from '@/lib/v2/route';
 import { Errors } from '@/lib/v2/errors';
-import { generateAgentKey } from '@/lib/v2/ids';
-import { hashKey } from '@/lib/v2/crypto';
 import Agent from '@/models/v2/Agent';
-import ApiCredential from '@/models/v2/ApiCredential';
 
 export const GET = createRoute<{ id: string }>({}, async (ctx) => {
   const targetAgentId = ctx.params.id as string;

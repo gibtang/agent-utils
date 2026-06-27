@@ -5,7 +5,7 @@
  * the same body returns the original response; a different body returns 409
  * CONFLICT.
  */
-import type { NextRequest, NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 import connectDB from './db';
 
 export interface IdempotencyRecord {

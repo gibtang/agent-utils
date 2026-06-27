@@ -13,14 +13,18 @@ export function Toast({ message, visible, onHide, duration = 2000 }: ToastProps)
   const [show, setShow] = useState(false);
 
   useEffect(() => {
-    if (visible) {
-      setShow(true);
-      const timer = setTimeout(() => {
-        setShow(false);
-        setTimeout(onHide, 200); // wait for fade-out
-      }, duration);
-      return () => clearTimeout(timer);
-    }
+    if (!visible) return;
+    // Defer the fade-in one frame so the element first renders at opacity-0,
+    // then transitions to visible — the standard mount-transition pattern.
+    const raf = requestAnimationFrame(() => setShow(true));
+    const timer = setTimeout(() => {
+      setShow(false);
+      setTimeout(onHide, 200); // wait for fade-out
+    }, duration);
+    return () => {
+      cancelAnimationFrame(raf);
+      clearTimeout(timer);
+    };
   }, [visible, duration, onHide]);
 
   if (!visible && !show) return null;

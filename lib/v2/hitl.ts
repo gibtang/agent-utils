@@ -5,7 +5,7 @@
  * and on delivery failure creates a DLQ item (source=checkpoint). The checkpoint
  * status itself is not rolled back — DLQ handles delivery independently.
  */
-import Checkpoint, { CheckpointStatus } from '@/models/v2/Checkpoint';
+import Checkpoint from '@/models/v2/Checkpoint';
 import DlqItem from '@/models/v2/DlqItem';
 import Tenant from '@/models/v2/Tenant';
 import { deliverCallback } from './callbackSecurity';

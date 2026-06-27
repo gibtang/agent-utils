@@ -9,14 +9,12 @@
  * data leaks. All must pass before any real users.
  */
 import { describe, it, expect } from 'vitest';
-import { POST as createTenant } from '@/app/v1/tenants/route';
 import { GET as getTenant } from '@/app/v1/tenants/[id]/route';
-import { POST as createAgent } from '@/app/v1/agents/route';
 import { GET as kvGet, PUT as kvPut } from '@/app/v1/kv/[namespace]/[[...key]]/route';
 import { GET as auditGet, POST as auditPost } from '@/app/v1/audit/[[...id]]/route';
 import { GET as dlqGet, POST as dlqPost } from '@/app/v1/dlq/[[...id]]/route';
 import { POST as schedPost } from '@/app/v1/schedules/[[...id]]/route';
-import { GET as cpGet, POST as cpPost } from '@/app/v1/checkpoints/[[...id]]/route';
+import { POST as cpPost } from '@/app/v1/checkpoints/[[...id]]/route';
 import { POST as approvePost } from '@/app/v1/checkpoints/[id]/approve/route';
 import Tenant from '@/models/v2/Tenant';
 import {

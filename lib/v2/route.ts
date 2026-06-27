@@ -91,7 +91,7 @@ async function resolveParams(segmentParams: unknown): Promise<Record<string, str
   return segmentParams as Record<string, string | string[]>;
 }
 
-export function createRoute<TParams extends Record<string, string | string[]> = {}>(
+export function createRoute<TParams extends Record<string, string | string[]> = Record<string, string | string[]>>(
   options: RouteOptions,
   handler: Handler<TParams>,
 ) {
@@ -202,7 +202,6 @@ export function createRoute<TParams extends Record<string, string | string[]> = 
       return toNextResponse(result, requestId || generateRequestId(), rl);
     } catch (e) {
       const err = e instanceof ApiError ? e : Errors.internal();
-      // eslint-disable-next-line no-console
       console.error('[v2 route error]', e);
       return errorResponse(err, { request_id: requestId || undefined });
     }

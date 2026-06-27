@@ -59,7 +59,7 @@ describe('Card 4 — Audit Log', () => {
 
   it('AL-005: PATCH/DELETE on audit/{id} are not implemented (404/405)', async () => {
     const t = await makeTenant({ name: 'al5' });
-    const a = await makeAgent(t.tenantId, 'rx0');
+    await makeAgent(t.tenantId, 'rx0');
     // DELETE handler isn't exported → Next.js returns 405 at framework level;
     // here we assert the route file only exports POST/GET.
     expect(auditPost).toBeDefined();

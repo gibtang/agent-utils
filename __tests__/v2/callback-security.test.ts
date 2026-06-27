@@ -2,7 +2,7 @@
  * Card 6 (8339): callback security layer — SSRF rejection + HMAC signing.
  * Covers CROSS-007 (signed callback verification) and CROSS-008 (SSRF rejection).
  */
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { validateCallbackUrl, buildSignedHeaders, deliverCallback } from '@/lib/v2/callbackSecurity';
 import { signCallback, verifySignature, randomSecret } from '@/lib/v2/crypto';
 import { createServer, Server } from 'node:http';

@@ -13,6 +13,15 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
   ]),
+  // Tests parse dynamic JSON fixtures via the `call()` helper, where a fully
+  // typed response body would force hundreds of casts for no real safety.
+  // `any` is the pragmatic fixture type here; production code stays strict.
+  {
+    files: ["__tests__/**/*.{ts,tsx,js,mjs}"],
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off",
+    },
+  },
 ]);
 
 export default eslintConfig;

@@ -195,7 +195,7 @@ function buildTelegramText(
   const depUrl = getDepUrl(deploymentUrl);
   const dashUrl = buildDashboardUrl(teamId, projectId, deploymentId);
 
-  let lines: string[] = [];
+  const lines: string[] = [];
   lines.push(`${config.emoji} **${config.title}**`);
   lines.push(`📦 \`${project}\``);
 

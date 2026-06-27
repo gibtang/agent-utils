@@ -24,9 +24,6 @@ import { chromium } from 'playwright';
   // Wait and capture everything
   await page.waitForTimeout(5000);
   
-  // Get the full page HTML for debugging
-  const html = await page.content();
-  
   // Get all text visible on page
   const textContent = await page.evaluate(() => document.body.innerText);
   console.log('=== VISIBLE TEXT ===');

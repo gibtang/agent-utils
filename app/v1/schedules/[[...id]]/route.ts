@@ -10,7 +10,7 @@ import { createRoute } from '@/lib/v2/route';
 import { agentIdOf } from '@/lib/v2/auth';
 import { Errors } from '@/lib/v2/errors';
 import { resourceId } from '@/lib/v2/ids';
-import Schedule, { ScheduleStatus } from '@/models/v2/Schedule';
+import Schedule, { ScheduleStatus, type ISchedule } from '@/models/v2/Schedule';
 import { reserveCountedQuota, releaseCountedQuota } from '@/lib/v2/quota';
 import { validateCallbackUrl } from '@/lib/v2/callbackSecurity';
 import { encodeCursor, decodeCursor, clampLimit } from '@/lib/v2/pagination';
@@ -25,7 +25,7 @@ function utf8Bytes(s: string): number {
   return typeof Buffer !== 'undefined' ? Buffer.byteLength(s, 'utf8') : new TextEncoder().encode(s).length;
 }
 
-function serialize(s: any) {
+function serialize(s: ISchedule) {
   return {
     id: s.scheduleId,
     agent_id: s.agentId,
@@ -126,7 +126,7 @@ export const GET = createRoute<{ id?: string[] }>({ agentKey: true }, async (ctx
 
   const rows = await Schedule.find(filter).sort({ _id: -1 }).limit(limit + 1).lean();
   const hasMore = rows.length > limit;
-  const slice = (hasMore ? rows.slice(0, limit) : rows) as any[];
+  const slice = (hasMore ? rows.slice(0, limit) : rows) as ISchedule[];
   const nextCursor = hasMore && slice.length ? encodeCursor({ _id: String(slice[slice.length - 1]._id) }) : undefined;
   return { kind: 'list' as const, data: slice.map(serialize), cursor: nextCursor ?? '', has_more: hasMore };
 });
@@ -134,7 +134,7 @@ export const GET = createRoute<{ id?: string[] }>({ agentKey: true }, async (ctx
 // ── PATCH ────────────────────────────────────────────────────────────────────
 export const PATCH = createRoute<{ id?: string[] }>({ agentKey: true }, async (ctx) => {
   const id = idFromParams(ctx.params);
-  const s = await Schedule.findOne({ scheduleId: id }).lean() as any;
+  const s = (await Schedule.findOne({ scheduleId: id }).lean()) as ISchedule | null;
   if (!s || s.tenantId !== ctx.resolved.tenantId) return Errors.notFound('schedule not found');
   if (s.agentId !== agentIdOf(ctx.resolved)) return Errors.forbidden();
   if (s.status !== 'pending') return Errors.conflict('Schedule already cancelled', { code: 'SCHEDULE_ALREADY_CANCELLED' });
@@ -180,7 +180,7 @@ export const PATCH = createRoute<{ id?: string[] }>({ agentKey: true }, async (c
 // ── DELETE (cancel) ──────────────────────────────────────────────────────────
 export const DELETE = createRoute<{ id?: string[] }>({ agentKey: true }, async (ctx) => {
   const id = idFromParams(ctx.params);
-  const s = await Schedule.findOne({ scheduleId: id }).lean() as any;
+  const s = (await Schedule.findOne({ scheduleId: id }).lean()) as ISchedule | null;
   if (!s || s.tenantId !== ctx.resolved.tenantId) return Errors.notFound('schedule not found');
   if (s.agentId !== agentIdOf(ctx.resolved)) return Errors.forbidden();
 
