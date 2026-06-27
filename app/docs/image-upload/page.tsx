@@ -18,7 +18,7 @@ export default function ImageUploadDocs() {
       <Link href="/docs" className="text-sm text-zinc-500 hover:text-zinc-300">← Docs</Link>
       <h1 className="mt-4 text-3xl font-bold tracking-tight">🖼️ Image Upload</h1>
       <p className="mt-3 text-zinc-400">
-        Upload an image and get back a hosted URL. Backed by Backblaze B2 object storage.
+        Upload an image and get back a hosted URL.
       </p>
 
       <section className="mt-8">

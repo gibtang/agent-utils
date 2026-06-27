@@ -70,7 +70,7 @@ Each tool solves a problem that agents fundamentally cannot solve on their own b
 | **Styling** | Tailwind CSS 4 |
 | **Database** | MongoDB (Mongoose ODM) |
 | **Auth** | Firebase Auth (client) + Firebase Admin (server) |
-| **Storage** | AWS S3 / Backblaze B2 |
+| **Storage** | Object storage |
 | **Payments** | Stripe (Checkout + Billing webhooks) |
 | **Notifications** | Resend (email), Twilio (SMS) |
 | **Analytics** | Google Analytics (via `@next/third-parties`) |
@@ -150,7 +150,7 @@ Each tool solves a problem that agents fundamentally cannot solve on their own b
 │  ├── firebase-admin.ts     ← Admin SDK                      │
 │  ├── stripe.ts             ← Stripe helpers                  │
 │  ├── pricing.ts            ← Tier config + overage math      │
-│  ├── storage.ts            ← S3/B2 file operations           │
+│  ├── storage.ts            ← file operations                │
 │  ├── rate-limit.ts         ← Token bucket implementation     │
 │  ├── response.ts           ← Standardized API responses      │
 │  ├── analytics.ts          ← Event tracking                  │
@@ -325,7 +325,7 @@ AgentUtils is open source (AGPL-3.0). Self-host for free, or use our cloud:
 - **Styling:** Tailwind CSS 4
 - **Database:** MongoDB (Mongoose)
 - **Auth:** Firebase
-- **Storage:** AWS S3 / Backblaze B2
+- **Storage:** object storage
 - **Payments:** Stripe
 - **Notifications:** Twilio (SMS), Resend (email)
 - **Testing:** Vitest, mongodb-memory-server
