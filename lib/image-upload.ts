@@ -11,6 +11,12 @@ export const ALLOWED_IMAGE_TYPES = [
   'image/png',
   'image/webp',
   'image/gif',
+  'image/avif',
+  // SVG is XML and can carry <script>/event handlers. It is accepted because
+  // SVGs loaded via <img> do not execute scripts; the file-host serving route
+  // additionally forces `Content-Disposition: attachment` for SVGs so that
+  // direct navigation downloads instead of executing embedded scripts.
+  'image/svg+xml',
 ] as const;
 
 /** Maximum accepted upload size (10 MiB). */

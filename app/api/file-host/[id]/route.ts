@@ -26,12 +26,27 @@ export async function GET(
     return new NextResponse(null, { status: 404 });
   }
 
+  const contentType = file.contentType || 'application/octet-stream';
+
+  const headers: Record<string, string> = {
+    'Content-Type': contentType,
+    // Images are immutable per-id; allow browser/CDN caching.
+    'Cache-Control': 'public, max-age=31536000, immutable',
+  };
+
+  // SVG can carry <script> and event handlers. When an SVG is loaded via
+  // <img> the browser disables script execution, so embedding stays safe —
+  // but navigating directly to the SVG URL would render it as a document and
+  // run any embedded scripts on this origin. Force a download on direct
+  // navigation to neutralize that XSS vector. <img>/<picture> embedding is
+  // unaffected by Content-Disposition.
+  if (contentType === 'image/svg+xml') {
+    headers['Content-Disposition'] = 'attachment';
+    headers['Content-Security-Policy'] = "default-src 'none'";
+  }
+
   return new NextResponse(new Uint8Array(file.data), {
     status: 200,
-    headers: {
-      'Content-Type': file.contentType || 'application/octet-stream',
-      // Images are immutable per-id; allow browser/CDN caching.
-      'Cache-Control': 'public, max-age=31536000, immutable',
-    },
+    headers,
   });
 }

@@ -18,7 +18,7 @@ const DEFAULT_RETENTION_HOURS = 24;
  * Auth: v2 agent key (`x-agent-id` + `x-api-key`). Tenant isolation is enforced
  * by the resolved identity; the returned file id is a capability token.
  *
- * Body: multipart/form-data with a `file` field (image/jpeg|png|webp|gif) and
+ * Body: multipart/form-data with a `file` field (image/jpeg|png|webp|gif|avif|svg+xml) and
  * an optional `retentionHours` numeric field (default 24).
  *
  * @returns 201 `{ data: { id, url, filename, contentType, size, expiresAt } }`

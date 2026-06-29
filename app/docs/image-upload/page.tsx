@@ -64,7 +64,7 @@ export default function ImageUploadDocs() {
                 <td className="py-3 pr-4 font-mono text-xs">file</td>
                 <td className="py-3 pr-4">form</td>
                 <td className="py-3 pr-4">binary</td>
-                <td className="py-3">Required. The image file (jpeg, png, webp, or gif). Max 10&nbsp;MB.</td>
+                <td className="py-3">Required. The image file (jpeg, png, webp, gif, avif, or svg). Max 10&nbsp;MB.</td>
               </tr>
               <tr className="border-b border-zinc-800/50">
                 <td className="py-3 pr-4 font-mono text-xs">retentionHours</td>
