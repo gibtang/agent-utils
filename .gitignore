@@ -54,3 +54,6 @@ next-env.d.ts
 
 .claude/worktrees/
 .worktrees/
+
+# OpenAI Codex CLI local config
+.codex/

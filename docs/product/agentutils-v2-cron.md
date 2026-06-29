@@ -13,7 +13,7 @@ Authorization: Bearer <CRON_SECRET>
 - Tenant keys (admin/agent) are intentionally rejected — this endpoint crosses tenant boundaries.
 - Returns `{ data: { schedules: FireResult, timeouts: {...} } }`.
 
-## Wiring (pick one)
+## Wiring
 
 ### Option A — external cron (recommended for Coolify deployments)
 
@@ -52,16 +52,6 @@ WantedBy=timers.target
 ```bash
 systemctl enable --now agentutils-tick.timer
 ```
-
-### Option B — Vercel Cron (if redeployed to Vercel)
-
-Add `vercel.json`:
-```json
-{
-  "crons": [{ "path": "/v1/tick", "schedule": "* * * * *" }]
-}
-```
-Vercel injects `Authorization: Bearer <CRON_SECRET>` automatically when `CRON_SECRET` is set.
 
 ## Idempotency & overlap
 
