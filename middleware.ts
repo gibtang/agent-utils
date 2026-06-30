@@ -30,14 +30,35 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url, 301);
   }
 
+  // --- Auth-aware routing (Firebase sessions are client-side / IndexedDB, so
+  // we mirror auth state into a cookie set by AuthProvider). This is a ROUTING
+  // HINT only — real authorization happens in each API route via the Firebase
+  // Admin SDK (verifyIdToken); a forged cookie just shows an empty dashboard.
+  // These checks run BEFORE the public-paths early-return because /login and
+  // /signup are public paths we still want to bounce for signed-in users. ---
+  const AUTH_COOKIE = '__au_authed';
+  const authed = Boolean(request.cookies.get(AUTH_COOKIE)?.value);
+
+  // Protect /dashboard: bounce unauthenticated users to /login server-side,
+  // so there's no client "Loading…" flash.
+  if ((pathname === '/dashboard' || pathname.startsWith('/dashboard/')) && !authed) {
+    const url = request.nextUrl.clone();
+    url.pathname = '/login';
+    return NextResponse.redirect(url);
+  }
+
+  // Bounce already-authenticated users away from the auth pages.
+  if ((pathname === '/login' || pathname === '/signup') && authed) {
+    const url = request.nextUrl.clone();
+    url.pathname = '/dashboard';
+    return NextResponse.redirect(url);
+  }
+
   // Allow public paths
   if (publicPaths.some(p => pathname === p || pathname.startsWith(p + '/'))) {
     return NextResponse.next();
   }
 
-  // No server-side session cookie check — Firebase Auth manages sessions client-side
-  // The AuthContext handles redirecting unauthenticated users
-  // Only protect routes that need server-side auth (e.g. admin) here
   return NextResponse.next();
 }
 

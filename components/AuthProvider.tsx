@@ -61,6 +61,26 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
+/**
+ * Cookie name mirroring client-side auth state so Next.js middleware (server /
+ * edge) can gate routes without Firebase's IndexedDB-only session. This is a
+ * ROUTING HINT ONLY — every protected resource is verified server-side via the
+ * Firebase Admin SDK (`verifyIdToken`), so a forged cookie only ever shows an
+ * empty dashboard, never real keys.
+ */
+const AUTH_COOKIE = '__au_authed';
+const AUTH_COOKIE_MAX_AGE = 60 * 60 * 24 * 30; // 30d; kept in sync by onAuthStateChanged
+
+function setAuthCookie(uid: string) {
+  if (typeof document === 'undefined') return;
+  document.cookie = `${AUTH_COOKIE}=${encodeURIComponent(uid)}; Path=/; Max-Age=${AUTH_COOKIE_MAX_AGE}; SameSite=Lax`;
+}
+
+function clearAuthCookie() {
+  if (typeof document === 'undefined') return;
+  document.cookie = `${AUTH_COOKIE}=; Path=/; Max-Age=0; SameSite=Lax`;
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
@@ -81,10 +101,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       firebaseUserRef.current = fbUser;
       if (!fbUser) {
         setUser(null);
+        clearAuthCookie();
         lastSyncedUid.current = null;
         setLoading(false);
         return;
       }
+      setAuthCookie(fbUser.uid);
       setUser({
         uid: fbUser.uid,
         email: fbUser.email,
@@ -148,6 +170,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (auth) await signOut(auth);
     setUser(null);
     setNewKey(null);
+    clearAuthCookie();
     lastSyncedUid.current = null;
   };
 

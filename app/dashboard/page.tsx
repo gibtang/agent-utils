@@ -58,6 +58,10 @@ export default function DashboardPage() {
   }, [getIdToken]);
 
   useEffect(() => {
+    // Fallback for the stale-cookie edge case: middleware is the primary gate
+    // (it redirects unauthenticated /dashboard hits to /login server-side), but
+    // if a lingering cookie let someone through whose Firebase session has
+    // since expired, bounce them here once the client confirms no user.
     if (!loading && !user) router.replace('/login');
   }, [user, loading, router]);
 
