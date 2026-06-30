@@ -47,7 +47,10 @@ interface AuthContextValue {
   user: AuthUser | null;
   loading: boolean;
   newKey: NewKey | null;
+  /** Last error from /api/auth/sync (provisioning the user's account/keys). */
+  syncError: string | null;
   clearNewKey: () => void;
+  clearSyncError: () => void;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, name?: string) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
@@ -62,6 +65,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [newKey, setNewKey] = useState<NewKey | null>(null);
+  const [syncError, setSyncError] = useState<string | null>(null);
   const lastSyncedUid = useRef<string | null>(null);
   const firebaseUserRef = useRef<import('firebase/auth').User | null>(null);
 
@@ -101,9 +105,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               data?: { new_key?: NewKey | null };
             };
             if (json.data?.new_key) setNewKey(json.data.new_key);
+            setSyncError(null);
+          } else {
+            // Surface why account/key provisioning failed so the dashboard can
+            // tell the user (e.g. "Auth is not configured" = server missing the
+            // Firebase Admin service-account env vars).
+            const j = (await res.json().catch(() => null)) as { error?: { message?: string } } | null;
+            setSyncError(
+              j?.error?.message ??
+                `Couldn't finish setting up your account (HTTP ${res.status}).`,
+            );
           }
         } catch {
-          // Non-fatal: the user is still authenticated client-side.
+          setSyncError('Network error talking to the account service. Check your connection.');
         }
       }
       setLoading(false);
@@ -146,14 +160,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user,
       loading,
       newKey,
+      syncError,
       clearNewKey: () => setNewKey(null),
+      clearSyncError: () => setSyncError(null),
       signIn,
       signUp,
       signInWithGoogle,
       logout,
       getIdToken,
     }),
-    [user, loading, newKey],
+    [user, loading, newKey, syncError],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

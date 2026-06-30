@@ -25,7 +25,7 @@ interface PlainKey {
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { user, loading, logout, getIdToken, newKey, clearNewKey } = useAuth();
+  const { user, loading, logout, getIdToken, newKey, clearNewKey, syncError } = useAuth();
   const [keys, setKeys] = useState<KeyRow[]>([]);
   const [plan, setPlan] = useState('free');
   const [dataLoading, setDataLoading] = useState(true);
@@ -40,12 +40,18 @@ export default function DashboardPage() {
       const res = await fetch('/api/dashboard/keys', {
         headers: { authorization: `Bearer ${token}` },
       });
-      if (!res.ok) throw new Error('Failed to load keys');
+      if (!res.ok) {
+        // Surface the real server reason (e.g. "Auth is not configured",
+        // "Required auth header(s) missing") instead of a generic string, so
+        // misconfiguration is diagnosable from the UI rather than invisible.
+        const j = (await res.json().catch(() => null)) as { error?: { message?: string } } | null;
+        throw new Error(j?.error?.message ?? `Failed to load keys (HTTP ${res.status})`);
+      }
       const json = (await res.json()) as { data?: { keys?: KeyRow[]; plan?: string } };
       setKeys(json.data?.keys ?? []);
       setPlan(json.data?.plan ?? 'free');
-    } catch {
-      setError('Could not load your keys. Try refreshing.');
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Could not load your keys. Try refreshing.');
     } finally {
       setDataLoading(false);
     }
@@ -144,6 +150,21 @@ export default function DashboardPage() {
         <p className="mt-6 rounded-lg border border-error/40 bg-error-container/20 px-3 py-2 text-sm text-error">
           {error}
         </p>
+      )}
+
+      {/* Provisioning failure (e.g. server Admin SDK not configured) — blocks
+          key creation entirely, so show it prominently above the form. */}
+      {syncError && (
+        <div className="mt-6 rounded-lg border border-error/40 bg-error-container/20 px-4 py-3 text-sm text-error">
+          <p className="font-semibold">Couldn’t finish setting up your account</p>
+          <p className="mt-1 opacity-90">{syncError}</p>
+          {/Auth is not configured/ .test(syncError) && (
+            <p className="mt-2 text-xs opacity-80">
+              This is a server-side configuration issue (missing Firebase Admin
+              service-account env vars), not something you can fix from here.
+            </p>
+          )}
+        </div>
       )}
 
       <CreateKeyForm onCreate={handleCreate} plan={plan} />
