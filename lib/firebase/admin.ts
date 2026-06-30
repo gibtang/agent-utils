@@ -31,7 +31,9 @@ export function getAdminAuth(): ReturnType<typeof getAuth> | null {
   const credential = buildCredential();
   if (!credential) return null;
   const appName = 'agentutils-admin';
-  const app = getApps(appName).length ? getApp(appName) : initializeApp({ credential }, appName);
+  const app = getApps().some((a) => a.name === appName)
+    ? getApp(appName)
+    : initializeApp({ credential }, appName);
   adminAuth = getAuth(app);
   return adminAuth;
 }

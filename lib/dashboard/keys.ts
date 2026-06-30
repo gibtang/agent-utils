@@ -91,10 +91,14 @@ export async function provisionUser(input: {
   });
 
   // Auto-onboarding: one default key so the user can start immediately.
-  const newKey = await mintKey(tenantId, 'default');
+  const minted = await mintKey(tenantId, 'default');
   // Reflect the onboarding key in the tenant's agent quota counter.
   await Tenant.updateOne({ tenantId }, { $inc: { agentCount: 1 } });
-  return { tenantId, isNewUser: true, newKey };
+  return {
+    tenantId,
+    isNewUser: true,
+    newKey: { agentId: minted.agent_id, apiKey: minted.api_key },
+  };
 }
 
 /**

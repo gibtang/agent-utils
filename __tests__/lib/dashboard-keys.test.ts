@@ -9,7 +9,7 @@
  * creds); it is isolated in lib/auth-session and the route layer.
  */
 import '../helpers/mongodb'; // boot MongoMemoryServer + connect mongoose
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import {
   provisionUser,
   listKeys,
@@ -24,14 +24,9 @@ import ApiCredential from '@/models/v2/ApiCredential';
 
 const UID = 'firebase-uid-abc';
 
-beforeEach(async () => {
-  await Promise.all([
-    User.deleteMany({}),
-    Tenant.deleteMany({}),
-    Agent.deleteMany({}),
-    ApiCredential.deleteMany({}),
-  ]);
-});
+// Note: collection cleanup between tests is handled centrally by
+// __tests__/helpers/mongodb.ts (its afterEach wipes every collection), so no
+// per-test teardown is needed here.
 
 describe('provisionUser', () => {
   it('creates a hidden tenant + User + one default key on first login', async () => {
@@ -39,8 +34,8 @@ describe('provisionUser', () => {
 
     expect(result.isNewUser).toBe(true);
     expect(result.tenantId).toMatch(/^ten_/);
-    expect(result.newKey?.agent_id).toBe('default');
-    expect(result.newKey?.api_key).toMatch(/^agutil_agt_/);
+    expect(result.newKey?.agentId).toBe('default');
+    expect(result.newKey?.apiKey).toMatch(/^agutil_agt_/);
 
     const user = await User.findOne({ firebaseUid: UID }).lean();
     expect(user?.tenantId).toBe(result.tenantId);
