@@ -9,27 +9,20 @@
  * copy). Subsequent calls return { new_key: null }.
  */
 import { NextResponse } from 'next/server';
-import { getAdminAuth } from '@/lib/firebase/admin';
+import { verifyFirebaseIdToken } from '@/lib/firebase/verify';
 import { provisionUser } from '@/lib/dashboard/keys';
 import { Errors, isApiError } from '@/lib/v2/errors';
 import { errorResponse } from '@/lib/v2/envelope';
 
 export async function POST(req: Request) {
-  const auth = getAdminAuth();
-  if (!auth) {
-    return errorResponse(Errors.internal('Auth is not configured'));
-  }
-
   const header = req.headers.get('authorization') ?? '';
   if (!/^bearer\s+/i.test(header)) {
     return errorResponse(Errors.missingAuth());
   }
   const idToken = header.replace(/^bearer\s+/i, '').trim();
 
-  let decoded;
-  try {
-    decoded = await auth.verifyIdToken(idToken, true);
-  } catch {
+  const decoded = await verifyFirebaseIdToken(idToken);
+  if (!decoded) {
     return errorResponse(Errors.invalidCreds());
   }
 
