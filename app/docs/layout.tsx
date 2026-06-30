@@ -9,6 +9,7 @@ const tools = [
   { slug: 'checkpoint', name: 'Human-in-the-Loop', icon: '👤', href: '/tools/checkpoint' },
   { slug: 'kv-store', name: 'KV Store', icon: '🗃️', href: '/tools/kv-store' },
   { slug: 'audit-log', name: 'Audit Log', icon: '📜', href: '/tools/audit-log' },
+  { slug: 'image-upload', name: 'Image Upload', icon: '🖼️', href: '/tools/image-upload' },
 ];
 
 export default function DocsLayout({ children }: { children: React.ReactNode }) {

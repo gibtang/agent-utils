@@ -7,7 +7,7 @@ export const dynamic = 'force-static';
 
 export const metadata: Metadata = {
   title: 'All Tools — AgentUtils',
-  description: 'Browse the launch AgentUtils API tools for AI agents: Dead Letter Queue, Checkpoint, KV Store, and Audit Log.',
+  description: 'Browse the launch AgentUtils API tools for AI agents: Dead Letter Queue, Checkpoint, KV Store, Audit Log, and Image Upload.',
   openGraph: { url: '/tools' },
   alternates: {
     canonical: 'https://www.agent-utils.com/tools',
@@ -37,6 +37,9 @@ export default function ToolsPage() {
             </Link>
             <Link href="/tools/audit-log" className="hover:text-primary-fixed-dim transition-colors duration-200 py-3 px-1 min-h-[44px] flex items-center">
               Audit Log
+            </Link>
+            <Link href="/tools/image-upload" className="hover:text-primary-fixed-dim transition-colors duration-200 py-3 px-1 min-h-[44px] flex items-center">
+              Image Upload
             </Link>
           </div>
           <div className="flex items-center gap-4">

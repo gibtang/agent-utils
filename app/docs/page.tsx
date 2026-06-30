@@ -6,7 +6,7 @@ export const dynamic = 'force-static';
 export const metadata: Metadata = {
   title: 'Documentation — AgentUtils',
   description:
-    'AgentUtils v2 API documentation. Dead-letter queue, checkpoint approvals, KV store, and audit log.',
+    'AgentUtils API documentation. Dead-letter queue, checkpoint approvals, KV store, audit log, and image upload.',
   openGraph: { url: '/docs' },
   alternates: { canonical: '/docs' },
 };
@@ -16,6 +16,7 @@ const tools = [
   { slug: 'v2', name: 'Audit Log', desc: 'Append-only, server-timestamped, immutable audit trail.', icon: '📜' },
   { slug: 'v2', name: 'Dead Letter Queue', desc: 'Pull-based failure inbox with atomic claim/release.', icon: '📬' },
   { slug: 'v2', name: 'Human-in-the-Loop', desc: 'Checkpoints requiring human approval before proceeding.', icon: '👤' },
+  { slug: 'image-upload', name: 'Image Upload', desc: 'Upload an image and return a hosted URL.', icon: '🖼️' },
 ];
 
 export default function DocsPage() {
@@ -35,7 +36,7 @@ export default function DocsPage() {
         <span className="text-2xl">⚡</span>
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="font-semibold">AgentUtils v2 API</h3>
+            <h3 className="font-semibold">AgentUtils API</h3>
               <span className="rounded-full bg-emerald-900/60 px-2 py-0.5 text-xs font-medium text-emerald-300">
                 current
               </span>

@@ -76,8 +76,8 @@ export default function Home() {
             </h1>
             <p className="text-base text-on-surface-variant max-w-xl leading-6">
               Production-ready dead letter queues, human-in-the-loop gates,
-              audit trails, and agent state storage behind a single API key.
-              No SDKs, just curl and go.
+              audit trails, agent state storage, and image upload behind a
+              single API key. No SDKs, just curl and go.
             </p>
             <div className="flex flex-wrap gap-4">
               <Link

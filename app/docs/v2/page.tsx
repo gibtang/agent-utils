@@ -6,7 +6,7 @@ export const dynamic = 'force-static';
 export const metadata: Metadata = {
   title: 'AgentUtils v2 API — Multi-tenant Infrastructure',
   description:
-    'Tenant-isolated KV store, audit log, dead-letter queue, and human-in-the-loop checkpoints. v2 API quick start and reference.',
+    'Tenant-isolated KV store, audit log, dead-letter queue, human-in-the-loop checkpoints, and image upload. v2 API quick start and reference.',
   openGraph: { url: '/docs/v2' },
   alternates: { canonical: '/docs/v2' },
 };
@@ -86,7 +86,7 @@ export default function V2Docs() {
       </Link>
       <h1 className="mt-4 text-3xl font-bold tracking-tight">⚡ AgentUtils v2 API</h1>
       <p className="mt-3 text-zinc-400">
-        Multi-tenant, agent-native infrastructure: KV store, audit log, dead-letter queue, and human-in-the-loop checkpoints. Tenant-isolated, callback-signed, idempotent.
+        Multi-tenant, agent-native infrastructure: KV store, audit log, dead-letter queue, human-in-the-loop checkpoints, and image upload. Tenant-isolated, callback-signed, idempotent.
       </p>
 
       <Note>
@@ -195,14 +195,24 @@ export default function V2Docs() {
         <div className="mt-3">
           <Code>{SNIP_HITL}</Code>
         </div>
+
+        <h3 className="mt-6 text-lg font-medium">🖼️ Image Upload — hosted image URLs for handoff</h3>
+        <p className="mt-2 text-zinc-400">
+          Upload an image and get back a hosted URL that downstream tools or humans can use immediately.
+        </p>
+        <div className="mt-3">
+          <Code>{`curl -X POST https://www.agent-utils.com/api/upload \\
+  -H "x-api-key: au_your_key" \\
+  -F "file=@screenshot.png" \\
+  -F "retentionHours=24"`}</Code>
+        </div>
       </section>
 
       {/* Callbacks */}
       <section className="mt-10">
         <h2 className="text-2xl font-semibold">Signed callbacks</h2>
         <p className="mt-3 text-zinc-400">
-          When AgentUtils calls your <code>callback_url</code> (scheduler fire, checkpoint
-          resolution), every request is HMAC-SHA256 signed over the tenant&apos;s{' '}
+          When AgentUtils calls your <code>callback_url</code> for checkpoint resolution, every request is HMAC-SHA256 signed over the tenant&apos;s{' '}
           <code>callback_secret</code>. Verify on receipt and reject callbacks older than 5 minutes.
         </p>
         <div className="mt-3">

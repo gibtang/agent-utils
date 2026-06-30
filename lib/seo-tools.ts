@@ -286,6 +286,60 @@ const { data } = await res.json();`,
     keywords: ['human in the loop api', 'agent approval workflow', 'ai agent guardrails', 'human oversight for ai', 'agent pause resume', 'human approval for agents'],
     relatedTools: ['dlq', 'audit-log'],
   },
+  {
+    slug: 'image-upload',
+    name: 'Image Upload',
+    icon: '🖼️',
+    tagline: 'Upload images and get a hosted URL in one call.',
+    docsUrl: '/docs/image-upload',
+    metaTitle: 'Image Upload API for AI Agents | AgentUtils',
+    metaDescription: 'Upload an image and receive a hosted URL in a single API call. No SDK, no extra setup.',
+    h1: 'Image Upload for AI Agents',
+    subtitle: 'One upload. One URL. Simple handoff.',
+    whatItDoes: 'Upload an image and receive a durable hosted URL that an agent can pass to downstream tools or humans.',
+    whyAgentsNeed: [
+      'Agents that generate or capture images need a place to store them between steps',
+      'Durable URLs are easier to hand off than raw file blobs',
+      'Keeping image storage behind one API keeps the agent workflow simple',
+    ],
+    useCases: [
+      { title: 'Generated images', description: 'Upload model outputs and get a URL for the next agent step' },
+      { title: 'Screenshot sharing', description: 'Store screenshots and send a link in a report or message' },
+      { title: 'User media handoff', description: 'Persist user-provided images for later processing' },
+      { title: 'Pipeline outputs', description: 'Pass a hosted image URL to another service without local storage' },
+    ],
+    codeExample: {
+      curl: `curl -X POST https://www.agent-utils.com/api/upload \\
+  -H "x-api-key: au_your_key" \\
+  -F "file=@screenshot.png" \\
+  -F "retentionHours=24"`,
+      python: `import requests
+
+with open("screenshot.png", "rb") as f:
+    resp = requests.post(
+        "https://www.agent-utils.com/api/upload",
+        headers={"x-api-key": "au_your_key"},
+        files={"file": f},
+        data={"retentionHours": 24},
+    )
+image_url = resp.json()["data"]["url"]`,
+      js: `const form = new FormData();
+form.append("file", fs.createReadStream("screenshot.png"));
+form.append("retentionHours", "24");
+
+const res = await fetch("https://www.agent-utils.com/api/upload", {
+  method: "POST",
+  headers: { "x-api-key": "au_your_key" },
+  body: form,
+});
+const { data } = await res.json();
+console.log(data.url);`,
+    },
+    apiEndpoint: 'POST /api/upload',
+    competitors: ['AWS S3 Presigned URLs', 'Cloudinary', 'Imgix', 'Uploadcare'],
+    keywords: ['image upload api', 'image hosting api', 'agent image storage', 'upload image get url api', 'hosted image api'],
+    relatedTools: ['dlq', 'checkpoint'],
+  },
 ];
 
 export function getToolBySlug(slug: string): ToolSEO | undefined {
