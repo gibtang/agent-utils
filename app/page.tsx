@@ -26,6 +26,9 @@ export default function Home() {
             <Link href="/docs" className="text-primary-container font-bold hover:text-primary-fixed-dim transition-colors duration-200 py-2.5 px-1 min-h-[44px] flex items-center">
               Docs
             </Link>
+            <Link href="/human-in-the-loop" className="hover:text-primary-fixed-dim transition-colors duration-200 py-2.5 px-1 min-h-[44px] flex items-center">
+              Human-in-the-Loop
+            </Link>
             <Link href="/tools/dlq" className="hover:text-primary-fixed-dim transition-colors duration-200 py-2.5 px-1 min-h-[44px] flex items-center">
               DLQ
             </Link>

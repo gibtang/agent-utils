@@ -2,11 +2,14 @@ import Link from 'next/link';
 
 export const dynamic = 'force-static';
 
-const tools = [
-  { slug: 'image-upload', name: 'Image Upload', icon: '🖼️' },
-];
-
 const v2 = { slug: 'v2', name: 'v2 API (current)', icon: '⚡' };
+
+const tools = [
+  { slug: 'dlq', name: 'Dead Letter Queue', icon: '📬', href: '/tools/dlq' },
+  { slug: 'checkpoint', name: 'Human-in-the-Loop', icon: '👤', href: '/tools/checkpoint' },
+  { slug: 'kv-store', name: 'KV Store', icon: '🗃️', href: '/tools/kv-store' },
+  { slug: 'audit-log', name: 'Audit Log', icon: '📜', href: '/tools/audit-log' },
+];
 
 export default function DocsLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -21,7 +24,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
 
             <div className="mt-6">
               <Link
-                href="/signup"
+                href="/docs/v2"
                 className="block rounded-md bg-zinc-100 px-3 py-2.5 text-center text-sm font-medium text-zinc-900 hover:bg-white transition-colors min-h-[44px] flex items-center justify-center"
               >
                 Get API Key
@@ -37,12 +40,12 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
                 {v2.name}
               </Link>
               <div className="pt-3 pb-1 px-3 text-xs font-semibold uppercase tracking-wide text-zinc-600">
-                Legacy
+                Tools
               </div>
               {tools.map((tool) => (
                 <Link
                   key={tool.slug}
-                  href={`/docs/${tool.slug}`}
+                  href={tool.href}
                   className="flex items-center gap-2 rounded-md px-3 py-2.5 text-sm text-zinc-400 hover:bg-zinc-900 hover:text-zinc-100 transition-colors min-h-[44px]"
                 >
                   <span>{tool.icon}</span>
@@ -67,7 +70,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
               {tools.map((tool) => (
                 <Link
                   key={tool.slug}
-                  href={`/docs/${tool.slug}`}
+                  href={tool.href}
                   className="shrink-0 rounded-md px-2 py-3 text-xs text-zinc-400 hover:bg-zinc-900 hover:text-zinc-100 min-h-[44px] flex items-center"
                 >
                   {tool.icon} {tool.name}

@@ -38,6 +38,18 @@ export default function NotFound() {
             >
               Checkpoint
             </Link>
+            <Link
+              href="/tools/kv-store"
+              className="hover:text-primary-fixed-dim transition-colors duration-200 py-2.5 px-1 min-h-[44px] flex items-center"
+            >
+              KV Store
+            </Link>
+            <Link
+              href="/tools/audit-log"
+              className="hover:text-primary-fixed-dim transition-colors duration-200 py-2.5 px-1 min-h-[44px] flex items-center"
+            >
+              Audit Log
+            </Link>
           </div>
           <div className="flex items-center gap-4">
             {/* Mobile hamburger menu */}

@@ -3,6 +3,8 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   async redirects() {
     return [
+      // /signup was never built — redirect to v2 docs where API key creation is documented
+      { source: "/signup", destination: "/docs/v2", permanent: true },
       // Redirect removed tools to their closest surviving equivalent
       { source: "/tools/notify", destination: "/tools/dlq", permanent: true },
       { source: "/tools/audit", destination: "/tools/checkpoint", permanent: true },
