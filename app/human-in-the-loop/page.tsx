@@ -1,5 +1,6 @@
 import { Metadata } from 'next'
 import Link from 'next/link'
+import GetApiKeyButton from '@/components/GetApiKeyButton'
 
 export const dynamic = 'force-static';
 
@@ -61,12 +62,11 @@ export default function HumanInTheLoopPage() {
           <Link href="/tools/checkpoint" className="hover:text-zinc-100 transition-colors py-3 px-1 min-h-[44px] flex items-center">
             API Reference
           </Link>
-          <Link
-            href="/docs/v2"
+          <GetApiKeyButton
             className="px-3 py-3 rounded-md bg-zinc-100 text-zinc-950 font-medium hover:bg-white transition-colors min-h-[44px] flex items-center"
           >
             Get API Key
-          </Link>
+          </GetApiKeyButton>
         </div>
       </nav>
 

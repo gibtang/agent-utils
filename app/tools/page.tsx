@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { type Metadata } from 'next';
 import MobileNav from '@/components/MobileNav';
+import GetApiKeyButton from '@/components/GetApiKeyButton';
 import { tools } from '@/lib/seo-tools';
 
 export const dynamic = 'force-static';
@@ -45,12 +46,11 @@ export default function ToolsPage() {
           <div className="flex items-center gap-4">
             {/* Mobile hamburger menu */}
             <MobileNav />
-            <Link
-              href="/docs/v2"
+            <GetApiKeyButton
               className="bg-primary-container text-on-primary-container px-6 py-3 rounded-md font-bold hover:bg-primary transition-all scale-100 active:scale-95 min-h-[44px] flex items-center"
             >
               Get API Key
-            </Link>
+            </GetApiKeyButton>
           </div>
         </div>
       </nav>

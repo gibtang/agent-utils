@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import GetApiKeyButton from '@/components/GetApiKeyButton';
 
 export const dynamic = 'force-static';
 
@@ -24,12 +25,11 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
             </Link>
 
             <div className="mt-6">
-              <Link
-                href="/docs/v2"
+              <GetApiKeyButton
                 className="block rounded-md bg-zinc-100 px-3 py-2.5 text-center text-sm font-medium text-zinc-900 hover:bg-white transition-colors min-h-[44px] flex items-center justify-center"
               >
                 Get API Key
-              </Link>
+              </GetApiKeyButton>
             </div>
 
             <nav className="mt-6 space-y-1">

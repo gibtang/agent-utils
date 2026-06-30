@@ -14,6 +14,7 @@ export interface ITenant extends Document {
   tenantId: string; // ten_xxx
   name: string;
   ownerEmail: string;
+  ownerUid?: string | null; // Firebase UID of the owning user (hidden user-account tenants)
   plan: TenantPlan;
   status: TenantStatus;
   adminKeyHash: string; // sha256 hex of full admin key
@@ -40,6 +41,7 @@ const TenantSchema = new Schema<ITenant>(
     tenantId: { type: String, required: true, unique: true, index: true },
     name: { type: String, required: true, unique: true, index: true },
     ownerEmail: { type: String, required: true },
+    ownerUid: { type: String, default: null, index: true },
     plan: { type: String, enum: ['free', 'pro'], default: 'free' },
     status: { type: String, enum: ['active', 'suspended', 'pending_deletion', 'deleted'], default: 'active', index: true },
     adminKeyHash: { type: String, required: true },

@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { getToolBySlug, getAllToolSlugs, tools } from '@/lib/seo-tools';
 import { notFound } from 'next/navigation';
 import MobileNav from '@/components/MobileNav';
+import GetApiKeyButton from '@/components/GetApiKeyButton';
 
 export const dynamic = 'force-static';
 
@@ -108,12 +109,11 @@ export default async function ToolPage({ params }: { params: Promise<{ slug: str
             </Link>
             </div>
             <MobileNav />
-            <Link
-              href="/docs/v2"
+            <GetApiKeyButton
               className="bg-primary-container text-on-primary-container px-6 py-3 rounded-md font-bold hover:bg-primary transition-all scale-100 active:scale-95 min-h-[44px] flex items-center"
             >
               Get API Key
-            </Link>
+            </GetApiKeyButton>
           </div>
         </div>
       </nav>
@@ -131,12 +131,11 @@ export default async function ToolPage({ params }: { params: Promise<{ slug: str
             >
               View API Docs
             </Link>
-            <Link
-              href="/docs/v2"
+            <GetApiKeyButton
               className="px-5 py-3 rounded-lg border border-zinc-700 text-zinc-300 font-medium hover:border-zinc-500 transition-colors text-sm min-h-[44px] flex items-center"
             >
               Get API Key Free
-            </Link>
+            </GetApiKeyButton>
           </div>
         </header>
 
@@ -264,12 +263,11 @@ export default async function ToolPage({ params }: { params: Promise<{ slug: str
           <h2 className="text-2xl font-semibold">Start building for free</h2>
           <p className="mt-2 text-zinc-400">500 free API calls per month. No credit card required.</p>
           <div className="mt-6 flex justify-center gap-3">
-            <Link
-              href="/docs/v2"
+            <GetApiKeyButton
               className="px-6 py-3 rounded-lg bg-zinc-100 text-zinc-950 font-semibold hover:bg-white transition-colors"
             >
               Get API Key
-            </Link>
+            </GetApiKeyButton>
             <Link
               href={tool.docsUrl}
               className="px-6 py-3 rounded-lg border border-zinc-700 text-zinc-300 font-medium hover:border-zinc-500 transition-colors"
