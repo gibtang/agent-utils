@@ -11,6 +11,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/components/AuthProvider';
+import { generateKeyName } from '@/lib/dashboard/keynames';
 
 interface KeyRow {
   agent_id: string;
@@ -281,13 +282,14 @@ function CreateKeyForm({
   onCreate: (name: string) => Promise<void>;
   plan: string;
 }) {
-  const [name, setName] = useState('');
+  const [name, setName] = useState(() => generateKeyName());
   const [busy, setBusy] = useState(false);
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
     await onCreate(name);
-    setName('');
+    // Offer a fresh suggestion after each create attempt.
+    setName(generateKeyName());
     setBusy(false);
   }
   return (
@@ -297,15 +299,26 @@ function CreateKeyForm({
           New key name{' '}
           <span className="text-on-surface-variant/60">(lowercase, 3–32 chars)</span>
         </span>
-        <input
-          type="text"
-          pattern="[a-z0-9][a-z0-9-]{2,31}"
-          required
-          placeholder="production"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className="w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2.5 text-sm text-on-surface outline-none focus:border-primary-fixed-dim"
-        />
+        <div className="relative">
+          <input
+            type="text"
+            pattern="[a-z0-9][a-z0-9-]{2,31}"
+            required
+            placeholder="production"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2.5 pr-10 text-sm text-on-surface outline-none focus:border-primary-fixed-dim"
+          />
+          <button
+            type="button"
+            onClick={() => setName(generateKeyName())}
+            title="Suggest another name"
+            aria-label="Suggest another name"
+            className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-md px-2 py-1 text-base leading-none text-on-surface-variant transition-colors hover:bg-surface-container hover:text-on-surface"
+          >
+            ↻
+          </button>
+        </div>
       </label>
       <button
         type="submit"
