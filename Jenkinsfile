@@ -4,7 +4,7 @@
 // GitHub Actions (.github/workflows/deploy.yml) remains the fallback pipeline.
 pipeline {
   agent any
-  options { timestamps(); buildDiscarder(logRotator(numToKeepStr: '20')) }
+  options { timestamps(); disableConcurrentBuilds(); buildDiscarder(logRotator(numToKeepStr: '20')) }
   environment {
     IMAGE       = 'ghcr.io/gibtang/agent-utils'
     TAG         = "${BUILD_NUMBER}"
@@ -54,17 +54,17 @@ pipeline {
     stage('Deploy via Coolify') {
       steps {
         withCredentials([usernamePassword(credentialsId: 'coolify-api', usernameVariable: 'CUSER', passwordVariable: 'CTOK')]) {
-          sh '''#!/bin/bash
+          sh """#!/bin/bash
             set -euo pipefail
-            code=$(curl -s -o /tmp/coolify.resp -w "%{http_code}" -X POST \
-              "${COOLIFY_API}/api/v1/deploy" \
-              -H "Authorization: Bearer ${CTOK}" \
-              -H "Content-Type: application/json" \
-              -d "{\"uuid\":\"${APP_UUID}\"}")
+            code=\$(curl -s -o /tmp/coolify.resp -w '%{http_code}' -X POST \\
+              '${env.COOLIFY_API}/api/v1/deploy' \\
+              -H "Authorization: Bearer \${CTOK}" \\
+              -H 'Content-Type: application/json' \\
+              -d '{"uuid":"${env.APP_UUID}"}')
             cat /tmp/coolify.resp; echo
-            [ "$code" = "200" ] || { echo "Coolify deploy failed (HTTP ${code})"; exit 1; }
-            echo "Coolify deploy queued."
-          '''
+            [ "\$code" = '200' ] || { echo "Coolify deploy failed (HTTP \${code})"; exit 1; }
+            echo 'Coolify deploy queued.'
+          """
         }
       }
     }
