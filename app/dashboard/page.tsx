@@ -106,10 +106,15 @@ export default function DashboardPage() {
         method: 'DELETE',
         headers: { authorization: `Bearer ${token}` },
       });
-      if (!res.ok && res.status !== 204) throw new Error('Could not delete key');
+      if (!res.ok && res.status !== 204) {
+        // Surface the real server reason (e.g. "You must keep at least one API
+        // key…") instead of a generic string.
+        const j = (await res.json().catch(() => null)) as { error?: { message?: string } } | null;
+        throw new Error(j?.error?.message ?? 'Could not delete key');
+      }
       await loadKeys();
-    } catch {
-      setError('Could not delete key. Try again.');
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Could not delete key. Try again.');
     }
   }
 
@@ -200,7 +205,13 @@ export default function DashboardPage() {
                   <SnippetButton agentId={k.agent_id} />
                   <button
                     onClick={() => void handleDelete(k.agent_id)}
-                    className="rounded-md border border-outline-variant px-2.5 py-1 text-xs text-on-surface-variant transition-colors hover:border-error/50 hover:text-error"
+                    disabled={keys.length === 1}
+                    title={
+                      keys.length === 1
+                        ? 'You must keep at least one API key. Create another key first.'
+                        : 'Delete this key'
+                    }
+                    className="rounded-md border border-outline-variant px-2.5 py-1 text-xs text-on-surface-variant transition-colors hover:border-error/50 hover:text-error disabled:cursor-not-allowed disabled:border-outline-variant/40 disabled:text-on-surface-variant/40 disabled:hover:border-outline-variant/40 disabled:hover:text-on-surface-variant/40"
                   >
                     Delete
                   </button>

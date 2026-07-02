@@ -147,4 +147,24 @@ describe('deleteKey', () => {
     const removed = await deleteKey(tenantId, 'does-not-exist');
     expect(removed).toBe(false);
   });
+
+  it('refuses to delete the last remaining key (account must keep ≥1)', async () => {
+    const { tenantId } = await provisionUser({ uid: UID, email: 'a@b.com' });
+    // Only the onboarding 'default' key exists.
+    await expect(deleteKey(tenantId, 'default')).rejects.toBeInstanceOf(ValidationError);
+    // The key must still be present + still active.
+    const keys = await listKeys(tenantId);
+    expect(keys.length).toBe(1);
+    const cred = await ApiCredential.findOne({ tenantId, agentId: 'default' }).lean();
+    expect(cred?.active).toBe(true);
+  });
+
+  it('allows deleting once a second key exists', async () => {
+    const { tenantId } = await provisionUser({ uid: UID, email: 'a@b.com' });
+    await createKey(tenantId, 'free', 'worker-1');
+    const removed = await deleteKey(tenantId, 'default');
+    expect(removed).toBe(true);
+    const keys = await listKeys(tenantId);
+    expect(keys.map((k) => k.agent_id)).toEqual(['worker-1']);
+  });
 });

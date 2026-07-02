@@ -22,6 +22,9 @@ import User from '@/models/v2/User';
 /** Same naming rules as POST /v1/agents. */
 const NAME_RE = /^[a-z0-9][a-z0-9-]{2,31}$/;
 
+/** An account must always keep at least one active API key. */
+const MIN_ACTIVE_KEYS = 1;
+
 export interface ProvisionResult {
   tenantId: string;
   isNewUser: boolean;
@@ -168,11 +171,22 @@ export async function listKeys(tenantId: string): Promise<PublicKeyRow[]> {
 /**
  * Delete (deactivate) a key by name. The credential is deactivated (not
  * deleted) so historical lookups remain consistent; the Agent record is removed.
+ *
+ * Refuses to remove the account's last remaining key — an API key is required
+ * to use the product, so the user must create a replacement key first.
  */
 export async function deleteKey(tenantId: string, agentId: string): Promise<boolean> {
   await connectDB();
   const agent = await Agent.findOne({ tenantId, agentId }).lean();
   if (!agent) return false;
+  // An account must always keep at least one active key. Count the current
+  // named keys (one Agent row = one key) and block deletion when this is it.
+  const activeCount = await Agent.countDocuments({ tenantId });
+  if (activeCount <= MIN_ACTIVE_KEYS) {
+    throw validation(
+      'You must keep at least one API key. Create another key before deleting this one.',
+    );
+  }
   await ApiCredential.updateMany(
     { tenantId, agentId, keyType: 'agent' },
     { $set: { active: false } },
