@@ -4,9 +4,9 @@
  * /dashboard — manage your API keys.
  *
  * Requires authentication: redirects to /login when signed out. Lists the user's
- * keys (masked), lets them create named keys (plaintext shown once) and delete
- * keys. The auto-created onboarding key (from first login) is surfaced once via
- * the AuthProvider's `newKey`.
+ * keys (plaintext), lets them create named keys and delete keys. The auto-created
+ * onboarding key (from first login) is surfaced once via the AuthProvider's
+ * `newKey`. Keys are always re-copyable from the list.
  */
 import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -16,7 +16,14 @@ import { generateKeyName } from '@/lib/dashboard/keynames';
 interface KeyRow {
   agent_id: string;
   created_at: string;
-  api_key_masked: string;
+  api_key: string;
+}
+
+/** Show prefix + masked tail for display; the real key is copied on click. */
+function maskKey(key: string): string {
+  const slash = key.lastIndexOf('_');
+  if (slash === -1) return '••••';
+  return key.slice(0, slash + 1) + '••••';
 }
 
 interface PlainKey {
@@ -199,11 +206,11 @@ export default function DashboardPage() {
                 <div className="min-w-0">
                   <div className="truncate font-mono text-sm text-on-surface">{k.agent_id}</div>
                   <div className="mt-0.5 font-mono text-xs text-on-surface-variant">
-                    {k.api_key_masked}
+                    {maskKey(k.api_key)}
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <CopyKeyButton apiKey={k.api_key_masked} />
+                  <CopyKeyButton apiKey={k.api_key} />
                   <button
                     onClick={() => void handleDelete(k.agent_id)}
                     disabled={keys.length === 1}
@@ -248,8 +255,7 @@ function KeyReveal({
   return (
     <div className="mt-6 rounded-lg border border-primary-fixed-dim/40 bg-primary-fixed/5 px-4 py-4">
       <div className="flex items-center gap-2">
-        <span className="text-sm font-semibold text-primary-fixed-dim">Copy your API key now</span>
-        <span className="text-xs text-on-surface-variant">(shown only once)</span>
+        <span className="text-sm font-semibold text-primary-fixed-dim">Copy your API key</span>
       </div>
       <code className="mt-2 block break-all rounded-md bg-surface-container-lowest px-3 py-2 font-mono text-xs text-on-surface">
         {apiKey}
