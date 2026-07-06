@@ -17,7 +17,7 @@ export interface ITenant extends Document {
   ownerUid?: string | null; // Firebase UID of the owning user (hidden user-account tenants)
   plan: TenantPlan;
   status: TenantStatus;
-  adminKeyHash: string; // sha256 hex of full admin key
+  adminKey: string; // plaintext admin key
   callbackSecret: string; // HMAC secret for signed callbacks
   // quota counters (atomic)
   agentCount: number;
@@ -44,7 +44,7 @@ const TenantSchema = new Schema<ITenant>(
     ownerUid: { type: String, default: null, index: true },
     plan: { type: String, enum: ['free', 'pro'], default: 'free' },
     status: { type: String, enum: ['active', 'suspended', 'pending_deletion', 'deleted'], default: 'active', index: true },
-    adminKeyHash: { type: String, required: true },
+    adminKey: { type: String, required: true },
     callbackSecret: { type: String, required: true },
     agentCount: { type: Number, default: 0 },
     kvKeyCount: { type: Number, default: 0 },

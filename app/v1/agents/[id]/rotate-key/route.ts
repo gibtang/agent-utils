@@ -4,7 +4,6 @@
 import { createRoute } from '@/lib/v2/route';
 import { Errors } from '@/lib/v2/errors';
 import { generateAgentKey } from '@/lib/v2/ids';
-import { hashKey } from '@/lib/v2/crypto';
 import Agent from '@/models/v2/Agent';
 import ApiCredential from '@/models/v2/ApiCredential';
 
@@ -15,21 +14,20 @@ export const POST = createRoute<{ id: string }>({ admin: true }, async (ctx) => 
   if (!agent) return Errors.notFound();
 
   const fullKey = generateAgentKey();
-  const newHash = hashKey(fullKey);
 
   await ApiCredential.updateMany(
     { tenantId, keyType: 'agent', agentId: targetAgentId },
     { $set: { active: false } },
   );
   await ApiCredential.create({
-    keyHash: newHash,
+    apiKey: fullKey,
     keyPrefix: 'agutil_agt_',
     keyType: 'agent',
     tenantId,
     agentId: targetAgentId,
     active: true,
   });
-  await Agent.updateOne({ tenantId, agentId: targetAgentId }, { $set: { apiKeyHash: newHash } });
+  await Agent.updateOne({ tenantId, agentId: targetAgentId }, { $set: { apiKey: fullKey } });
 
   return { kind: 'ok' as const, data: { agent_id: targetAgentId, tenant_id: tenantId, api_key: fullKey } };
 });

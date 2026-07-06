@@ -1,8 +1,8 @@
 /**
  * Dashboard key management — browser-authenticated (Firebase ID token).
  *
- * GET  /api/dashboard/keys        — list the user's keys (masked).
- * POST /api/dashboard/keys        — create a named key; returns plaintext once.
+ * GET  /api/dashboard/keys        — list the user's keys (plaintext).
+ * POST /api/dashboard/keys        — create a named key; returns plaintext.
  */
 import type { NextRequest } from 'next/server';
 import { errorResponse, ok, created } from '@/lib/v2/envelope';

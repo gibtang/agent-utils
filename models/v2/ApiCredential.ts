@@ -1,16 +1,16 @@
 /**
  * AgentUtils v2 — ApiKey lookup index.
  *
- * Keys are stored hashed in Tenant (admin) and Agent (agent). This collection is
- * a fast hash -> {tenantId, agentId, keyType} resolver for the auth layer. It is
- * the single source of truth for credential resolution (PRD §5.1).
+ * Keys are stored as plaintext in Tenant (admin) and Agent (agent). This
+ * collection is a fast key -> {tenantId, agentId, keyType} resolver for the auth
+ * layer. It is the single source of truth for credential resolution (PRD §5.1).
  */
 import mongoose, { Schema, Document } from 'mongoose';
 
 export type KeyType = 'admin' | 'agent' | 'approval-proxy';
 
 export interface IApiCredential extends Document {
-  keyHash: string; // sha256 hex
+  apiKey: string; // plaintext key
   keyPrefix: string; // agutil_adm_ / agutil_agt_
   keyType: KeyType;
   tenantId: string; // ten_xxx
@@ -22,7 +22,7 @@ export interface IApiCredential extends Document {
 
 const ApiCredentialSchema = new Schema<IApiCredential>(
   {
-    keyHash: { type: String, required: true, unique: true, index: true },
+    apiKey: { type: String, required: true, unique: true, index: true },
     keyPrefix: { type: String, required: true },
     keyType: { type: String, enum: ['admin', 'agent', 'approval-proxy'], required: true },
     tenantId: { type: String, required: true, index: true },

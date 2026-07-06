@@ -1,5 +1,5 @@
 /**
- * GET /v1/agents/[id]          — agent metadata (masked key). Admin or same-tenant agent.
+ * GET /v1/agents/[id]          — agent metadata (plaintext key). Admin or same-tenant agent.
  * POST /v1/agents/[id]/rotate-key — rotate agent key (admin).
  */
 import { createRoute } from '@/lib/v2/route';
@@ -19,7 +19,7 @@ export const GET = createRoute<{ id: string }>({}, async (ctx) => {
       tenant_id: agent.tenantId,
       description: agent.description ?? null,
       callback_base_url: agent.callbackBaseUrl ?? null,
-      api_key_masked: 'agutil_agt_••••••',
+      api_key: agent.apiKey,
       created_at: agent.createdAt.toISOString(),
     },
   };

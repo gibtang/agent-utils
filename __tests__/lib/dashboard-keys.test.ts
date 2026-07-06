@@ -45,12 +45,12 @@ describe('provisionUser', () => {
     expect(tenant?.ownerEmail).toBe('a@b.com');
     expect(tenant?.agentCount).toBe(1);
 
-    // The plaintext key is hashed, not stored verbatim.
+    // The plaintext key is stored so it can be retrieved later.
     const cred = await ApiCredential.findOne({
       tenantId: result.tenantId,
       agentId: 'default',
     }).lean();
-    expect(cred?.keyHash).not.toContain('agutil_agt_');
+    expect(cred?.apiKey).toContain('agutil_agt_');
     expect(cred?.active).toBe(true);
   });
 
@@ -68,16 +68,14 @@ describe('provisionUser', () => {
 });
 
 describe('listKeys', () => {
-  it('returns masked keys (never plaintext)', async () => {
+  it('returns plaintext keys (retrievable)', async () => {
     const { tenantId } = await provisionUser({ uid: UID, email: 'a@b.com' });
     await createKey(tenantId, 'free', 'prod-bot');
 
     const keys = await listKeys(tenantId);
     expect(keys.length).toBe(2); // default + prod-bot
     for (const k of keys) {
-      expect(k.api_key_masked).toContain('•••');
-      // The masked prefix is fine; the full secret (prefix + hex) must never leak.
-      expect(JSON.stringify(k)).not.toMatch(/agutil_agt_[0-9a-f]{16,}/);
+      expect(k.api_key).toMatch(/^agutil_agt_[0-9a-f]{16,}/);
     }
     expect(keys.map((k) => k.agent_id).sort()).toEqual(['default', 'prod-bot']);
   });

@@ -5,7 +5,6 @@
 import { createRoute } from '@/lib/v2/route';
 import { Errors } from '@/lib/v2/errors';
 import { generateAdminKey } from '@/lib/v2/ids';
-import { hashKey } from '@/lib/v2/crypto';
 import Tenant from '@/models/v2/Tenant';
 import ApiCredential from '@/models/v2/ApiCredential';
 
@@ -17,7 +16,6 @@ export const POST = createRoute<{ id: string }>({ admin: true }, async (ctx) => 
   if (!tenant) return Errors.notFound();
 
   const fullKey = generateAdminKey();
-  const newHash = hashKey(fullKey);
 
   // Atomically invalidate old credential(s) and write new one.
   await ApiCredential.updateMany(
@@ -25,14 +23,14 @@ export const POST = createRoute<{ id: string }>({ admin: true }, async (ctx) => 
     { $set: { active: false } },
   );
   await ApiCredential.create({
-    keyHash: newHash,
+    apiKey: fullKey,
     keyPrefix: 'agutil_adm_',
     keyType: 'admin',
     tenantId: targetId,
     agentId: null,
     active: true,
   });
-  await Tenant.updateOne({ tenantId: targetId }, { $set: { adminKeyHash: newHash } });
+  await Tenant.updateOne({ tenantId: targetId }, { $set: { adminKey: fullKey } });
 
   return { kind: 'ok' as const, data: { tenant_id: targetId, admin_key: fullKey } };
 });

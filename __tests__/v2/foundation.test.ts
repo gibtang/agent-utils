@@ -12,7 +12,6 @@ import { GET as getAgent } from '@/app/v1/agents/[id]/route';
 import { POST as rotateAgentKey } from '@/app/v1/agents/[id]/rotate-key/route';
 import ApiCredential from '@/models/v2/ApiCredential';
 import Tenant from '@/models/v2/Tenant';
-import { hashKey } from '@/lib/v2/crypto';
 import {
   call,
   adminHeaders,
@@ -31,10 +30,9 @@ describe('Card 1 — Tenant/auth foundation', () => {
       expect(res.body.data.tenant_id).toMatch(/^ten_/);
       expect(res.body.data.admin_key).toMatch(/^agutil_adm_/);
       expect(res.body.data.status).toBe('active');
-      // Admin key stored hashed only.
+      // Admin key stored as plaintext.
       const stored = await Tenant.findOne({ tenantId: res.body.data.tenant_id }).lean();
-      expect(stored!.adminKeyHash).toBe(hashKey(res.body.data.admin_key));
-      expect(stored!.adminKeyHash).not.toBe(res.body.data.admin_key);
+      expect(stored!.adminKey).toBe(res.body.data.admin_key);
     });
 
     it('rejects duplicate tenant names with 409 TENANT_NAME_TAKEN', async () => {
@@ -146,9 +144,9 @@ describe('Card 1 — Tenant/auth foundation', () => {
       expect(res.status).toBe(201);
       expect(res.body.data.agent_id).toBe('rx0');
       expect(res.body.data.api_key).toMatch(/^agutil_agt_/);
-      // key stored hashed
+      // key stored as plaintext
       const cred = await ApiCredential.findOne({ tenantId: t.tenantId, agentId: 'rx0' }).lean();
-      expect(cred!.keyHash).toBe(hashKey(res.body.data.api_key));
+      expect(cred!.apiKey).toBe(res.body.data.api_key);
     });
 
     it('rejects reserved agent name "shared"', async () => {

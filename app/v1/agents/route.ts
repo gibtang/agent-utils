@@ -5,7 +5,6 @@
 import { createRoute } from '@/lib/v2/route';
 import { Errors } from '@/lib/v2/errors';
 import { generateAgentKey } from '@/lib/v2/ids';
-import { hashKey } from '@/lib/v2/crypto';
 import Agent, { RESERVED_AGENT_NAMES } from '@/models/v2/Agent';
 import ApiCredential from '@/models/v2/ApiCredential';
 import { reserveCountedQuota } from '@/lib/v2/quota';
@@ -46,7 +45,6 @@ export const POST = createRoute({ admin: true, idempotent: 'POST /v1/agents' }, 
   }
 
   const fullKey = generateAgentKey();
-  const keyHash = hashKey(fullKey);
 
   try {
     await Agent.create({
@@ -54,7 +52,7 @@ export const POST = createRoute({ admin: true, idempotent: 'POST /v1/agents' }, 
       tenantId,
       description: body.description,
       callbackBaseUrl: body.callback_base_url,
-      apiKeyHash: keyHash,
+      apiKey: fullKey,
     });
   } catch (e) {
     // Roll back the quota reservation on duplicate name / failure.
@@ -67,7 +65,7 @@ export const POST = createRoute({ admin: true, idempotent: 'POST /v1/agents' }, 
   }
 
   await ApiCredential.create({
-    keyHash,
+    apiKey: fullKey,
     keyPrefix: 'agutil_agt_',
     keyType: 'agent',
     tenantId,

@@ -6,11 +6,10 @@
  * trust a client-supplied tenantId — it always comes from the verified session.
  *
  * A "key" in the dashboard maps to a named Agent record (agent key) under the
- * user's hidden tenant. The plaintext is returned exactly once at creation; it
- * is never stored (only its hash). Listing returns masked keys only.
+ * user's hidden tenant. Plaintext is stored so keys can be re-copied from the
+ * dashboard at any time.
  */
 import connectDB from '@/lib/v2/db';
-import { hashKey } from '@/lib/v2/crypto';
 import { generateAgentKey, generateAdminKey, resourceId } from '@/lib/v2/ids';
 import { reserveCountedQuota, releaseCountedQuota } from '@/lib/v2/quota';
 import { RESERVED_AGENT_NAMES } from '@/models/v2/Agent';
@@ -35,7 +34,7 @@ export interface ProvisionResult {
 export interface PublicKeyRow {
   agent_id: string;
   created_at: string;
-  api_key_masked: string;
+  api_key: string;
 }
 
 export interface CreatedKey {
@@ -73,11 +72,11 @@ export async function provisionUser(input: {
     ownerUid: input.uid,
     plan: 'free',
     status: 'active',
-    adminKeyHash: hashKey(adminKey),
+    adminKey,
     callbackSecret: resourceId('sec_'),
   });
   await ApiCredential.create({
-    keyHash: hashKey(adminKey),
+    apiKey: adminKey,
     keyPrefix: 'agutil_adm_',
     keyType: 'admin',
     tenantId,
@@ -142,10 +141,9 @@ export async function createKey(
 /** Internal key minter — assumes name validation + quota already handled. */
 async function mintKey(tenantId: string, agentId: string): Promise<CreatedKey> {
   const fullKey = generateAgentKey();
-  const keyHash = hashKey(fullKey);
-  await Agent.create({ agentId, tenantId, apiKeyHash: keyHash });
+  await Agent.create({ agentId, tenantId, apiKey: fullKey });
   await ApiCredential.create({
-    keyHash,
+    apiKey: fullKey,
     keyPrefix: 'agutil_agt_',
     keyType: 'agent',
     tenantId,
@@ -156,7 +154,7 @@ async function mintKey(tenantId: string, agentId: string): Promise<CreatedKey> {
 }
 
 /**
- * List the user's keys (masked). Plaintext is never returned here.
+ * List the user's keys. Plaintext is returned so keys can be re-copied.
  */
 export async function listKeys(tenantId: string): Promise<PublicKeyRow[]> {
   await connectDB();
@@ -164,7 +162,7 @@ export async function listKeys(tenantId: string): Promise<PublicKeyRow[]> {
   return agents.map((a) => ({
     agent_id: a.agentId,
     created_at: a.createdAt.toISOString(),
-    api_key_masked: 'agutil_agt_••••••••••••',
+    api_key: a.apiKey,
   }));
 }
 

@@ -5,7 +5,6 @@
 import { createRoute } from '@/lib/v2/route';
 import { Errors } from '@/lib/v2/errors';
 import { generateApprovalProxyKey } from '@/lib/v2/ids';
-import { hashKey } from '@/lib/v2/crypto';
 import ApiCredential from '@/models/v2/ApiCredential';
 
 export const POST = createRoute({ admin: true }, async (ctx) => {
@@ -15,7 +14,7 @@ export const POST = createRoute({ admin: true }, async (ctx) => {
 
   const fullKey = generateApprovalProxyKey();
   await ApiCredential.create({
-    keyHash: hashKey(fullKey),
+    apiKey: fullKey,
     keyPrefix: 'agutil_apr_',
     keyType: 'approval-proxy',
     tenantId: ctx.resolved.tenantId,

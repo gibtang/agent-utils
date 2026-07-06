@@ -9,7 +9,7 @@ import Tenant from '@/models/v2/Tenant';
 import Agent from '@/models/v2/Agent';
 import ApiCredential from '@/models/v2/ApiCredential';
 import { resourceId, generateAdminKey, generateAgentKey } from '@/lib/v2/ids';
-import { hashKey, randomSecret } from '@/lib/v2/crypto';
+import { randomSecret } from '@/lib/v2/crypto';
 
 export interface TenantFix {
   tenantId: string;
@@ -39,11 +39,11 @@ export async function makeTenant(
     ownerEmail: `owner-${name}@example.com`,
     plan,
     status,
-    adminKeyHash: hashKey(adminKey),
+    adminKey,
     callbackSecret: randomSecret(),
   });
   await ApiCredential.create({
-    keyHash: hashKey(adminKey),
+    apiKey: adminKey,
     keyPrefix: 'agutil_adm_',
     keyType: 'admin',
     tenantId,
@@ -62,10 +62,10 @@ export async function makeAgent(
   await Agent.create({
     agentId,
     tenantId,
-    apiKeyHash: hashKey(apiKey),
+    apiKey,
   });
   await ApiCredential.create({
-    keyHash: hashKey(apiKey),
+    apiKey,
     keyPrefix: 'agutil_agt_',
     keyType: 'agent',
     tenantId,

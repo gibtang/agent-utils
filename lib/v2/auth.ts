@@ -11,7 +11,6 @@ import ApiCredential from '@/models/v2/ApiCredential';
 import Tenant from '@/models/v2/Tenant';
 import Agent from '@/models/v2/Agent';
 import { Errors, ApiError } from './errors';
-import { hashKey, safeEqualHex } from './crypto';
 
 export interface ResolvedAdmin {
   kind: 'admin';
@@ -109,14 +108,9 @@ export async function resolveCredentials(
     return Errors.invalidCreds();
   }
 
-  // Lookup by hash. A single indexed lookup.
-  const keyHash = hashKey(rawKey);
-  const cred = await ApiCredential.findOne({ keyHash, active: true }).lean();
+  // Lookup by plaintext key. A single indexed lookup.
+  const cred = await ApiCredential.findOne({ apiKey: rawKey, active: true }).lean();
   if (!cred) {
-    return Errors.invalidCreds();
-  }
-  // Defensive double-check the stored hash matches (index is on keyHash).
-  if (!safeEqualHex(cred.keyHash, keyHash)) {
     return Errors.invalidCreds();
   }
 

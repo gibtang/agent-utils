@@ -14,7 +14,7 @@ export interface IAgent extends Document {
   tenantId: string; // ten_xxx
   description?: string;
   callbackBaseUrl?: string;
-  apiKeyHash: string; // sha256 hex of full agent key
+  apiKey: string; // plaintext agent key
   description2?: string; // unused, retained to avoid collision
   createdAt: Date;
   updatedAt: Date;
@@ -26,7 +26,7 @@ const AgentSchema = new Schema<IAgent>(
     tenantId: { type: String, required: true, index: true },
     description: { type: String, maxlength: 256 },
     callbackBaseUrl: { type: String },
-    apiKeyHash: { type: String, required: true },
+    apiKey: { type: String, required: true },
   },
   { timestamps: true },
 );

@@ -5,7 +5,7 @@
 import { createRoute } from '@/lib/v2/route';
 import { Errors } from '@/lib/v2/errors';
 import { resourceId, generateAdminKey } from '@/lib/v2/ids';
-import { hashKey, randomSecret } from '@/lib/v2/crypto';
+import { randomSecret } from '@/lib/v2/crypto';
 import Tenant, { TenantStatus, TenantPlan } from '@/models/v2/Tenant';
 import ApiCredential from '@/models/v2/ApiCredential';
 
@@ -44,7 +44,7 @@ export const POST = createRoute({ public: true, idempotent: 'POST /v1/tenants' }
       ownerEmail,
       plan: plan as TenantPlan,
       status: 'active' as TenantStatus,
-      adminKeyHash: hashKey(fullAdminKey),
+      adminKey: fullAdminKey,
       callbackSecret: randomSecret(),
     });
   } catch (e) {
@@ -56,7 +56,7 @@ export const POST = createRoute({ public: true, idempotent: 'POST /v1/tenants' }
   }
 
   await ApiCredential.create({
-    keyHash: hashKey(fullAdminKey),
+    apiKey: fullAdminKey,
     keyPrefix: 'agutil_adm_',
     keyType: 'admin',
     tenantId,
