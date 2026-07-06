@@ -203,7 +203,7 @@ export default function DashboardPage() {
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <SnippetButton agentId={k.agent_id} />
+                  <CopyKeyButton apiKey={k.api_key_masked} />
                   <button
                     onClick={() => void handleDelete(k.agent_id)}
                     disabled={keys.length === 1}
@@ -332,25 +332,24 @@ function CreateKeyForm({
   );
 }
 
-function SnippetButton({ agentId }: { agentId: string }) {
+function CopyKeyButton({ apiKey }: { apiKey: string }) {
   const [copied, setCopied] = useState(false);
   async function copy() {
-    const snippet = `-H "x-agent-id: ${agentId}" -H "x-api-key: YOUR_KEY"`;
     try {
-      await navigator.clipboard.writeText(snippet);
+      await navigator.clipboard.writeText(apiKey);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      setTimeout(() => setCopied(false), 3000);
     } catch {
-      /* noop */
+      /* clipboard may be unavailable */
     }
   }
   return (
     <button
       onClick={() => void copy()}
       className="rounded-md border border-outline-variant px-2.5 py-1 text-xs text-on-surface-variant transition-colors hover:text-on-surface"
-      title="Copy curl headers"
+      title="Copy API key"
     >
-      {copied ? 'Copied!' : 'Headers'}
+      {copied ? 'Copied' : 'Copy key'}
     </button>
   );
 }
