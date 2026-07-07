@@ -2,21 +2,43 @@
 // Build args sourced from /run/secrets/build-env.agent-utils (gitignored on host).
 // This app has no Mongo build-arg (no build-time prerender against Mongo).
 // GitHub Actions (.github/workflows/deploy.yml) remains the fallback pipeline.
+// tg() — Telegram pipeline notifications. TG_TOKEN/TG_CHAT come from Jenkins
+// secret-text credentials; tg-notify.sh is mounted into the controller. No-ops
+// silently if the creds are unset, so it never breaks a build.
+void tg(String msg) {
+  withEnv(["TG_MSG=${msg}"]) { sh 'tg-notify.sh' }
+}
+
 pipeline {
   agent any
   options { timestamps(); disableConcurrentBuilds(); buildDiscarder(logRotator(numToKeepStr: '20')) }
+  // Poll the repo every minute; Jenkins builds only when new commits are
+  // detected (not every poll). Prefer a GitHub webhook over polling if one is
+  // wired up on the controller — this is a self-healing fallback for when no
+  // webhook fires. Note: pollSCM schedules are only (re)loaded after the
+  // pipeline runs once or the job config is saved in the Jenkins UI.
+  triggers { cron('@hourly'); pollSCM('* * * * *') }
   environment {
     IMAGE       = 'ghcr.io/gibtang/agent-utils'
     TAG         = "${BUILD_NUMBER}"
     APP_UUID    = 'yz21u33pxwy51638mq4fiytd'
     COOLIFY_API = 'https://coolify-api.feedcode.dev'
     BUILDENV    = '/run/secrets/build-env.agent-utils'
+    APP         = 'agent-utils'
+    TG_TOKEN    = credentials('telegram-token')   // Telegram notify (tg-notify.sh)
+    TG_CHAT     = credentials('telegram-chat')
   }
   stages {
-    stage('Checkout') { steps { checkout scm } }
+    stage('Checkout') {
+      steps {
+        tg("🔨 <b>${APP}</b> #${BUILD_NUMBER} — Checkout started")
+        checkout scm
+      }
+    }
 
     stage('Build Image') {
       steps {
+        tg("🔨 <b>${APP}</b> #${BUILD_NUMBER} — Build started")
         sh '''#!/bin/bash
           set -euo pipefail
           set -a; . "${BUILDENV}"; set +a
@@ -40,6 +62,7 @@ pipeline {
 
     stage('Push to GHCR') {
       steps {
+        tg("📤 <b>${APP}</b> #${BUILD_NUMBER} — Push to GHCR started")
         withCredentials([usernamePassword(credentialsId: 'ghcr-token', usernameVariable: 'GHCR_USER', passwordVariable: 'GHCR_PASS')]) {
           sh '''#!/bin/bash
             set -euo pipefail
@@ -48,6 +71,7 @@ pipeline {
             docker push "${IMAGE}:latest"
           '''
         }
+        tg("✅ <b>${APP}</b> #${BUILD_NUMBER} — Pushed to GHCR")
       }
     }
 
@@ -70,6 +94,9 @@ pipeline {
     }
   }
   post {
+    failure {
+      tg("❌ <b>${APP}</b> #${BUILD_NUMBER} — build FAILED: ${env.BUILD_URL}")
+    }
     cleanup { sh "docker image rm ${IMAGE}:${TAG} ${IMAGE}:latest 2>/dev/null || true" }
   }
 }
