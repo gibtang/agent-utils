@@ -42,6 +42,9 @@ export default function Home() {
             <Link href="/tools/audit-log" className="hover:text-primary-fixed-dim transition-colors duration-200 py-2.5 px-1 min-h-[44px] flex items-center">
               Audit Log
             </Link>
+            <Link href="/tools/scheduler" className="hover:text-primary-fixed-dim transition-colors duration-200 py-2.5 px-1 min-h-[44px] flex items-center">
+              Scheduler
+            </Link>
           </div>
           <div className="flex items-center gap-4">
             {/* Mobile hamburger menu */}

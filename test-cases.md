@@ -6,11 +6,11 @@
 ## P0 — Critical User Flows (API-first product)
 
 ### TC-AU-001: Image Upload / File Host — Upload
-- **URL:** POST https://www.agent-utils.com/api/upload
+- **URL:** POST https://www.agent-utils.com/v1/upload
 - **Steps:** POST multipart with image file → verify response
 - **Expected:** 200 with {id, url} — file stored and accessible
 - **Edge:** Empty file → 400. Oversized file → 413. Non-image → error
-- **Note:** Verify `/api/upload` and `/api/file-host` both work (OpenAPI documents `/api/file-host` but examples use `/api/upload`)
+- **Note:** Upload action is `/v1/upload` (v2 agent-key auth); the returned hosted `url` is the public `/api/file-host/{id}` read endpoint (capability token, no auth). Verify both.
 
 ### TC-AU-002: Image Upload / File Host — Retrieve
 - **URL:** GET https://www.agent-utils.com/api/file-host/{id}
@@ -97,7 +97,7 @@
 - **Known Issue:** 8 phantom endpoints may exist in spec without route files (previously identified)
 
 ### TC-AU-017: API endpoint consistency
-- **Steps:** Compare /api/upload vs /api/file-host — verify both exist or consolidate
+- **Steps:** Confirm `/v1/upload` (authed write) returns a `/api/file-host/{id}` url (public read)
 - **Expected:** Consistent endpoint naming, no dead routes
 
 ## P2 — Edge Cases
@@ -139,7 +139,7 @@
 - **Expected:** 200/204, checkpoint removed
 
 ## Known Issues Flagged
-- `/api/upload` vs `/api/file-host` naming inconsistency in docs vs code
+- `/v1/upload` (authed write) vs `/api/file-host/{id}` (public read) — distinct by design, not an inconsistency
 - 8 phantom endpoints in OpenAPI spec without route files (previously identified)
 - Only 3 of 11 tools have public docs pages (image-upload, dlq, checkpoint)
 - Deployment lag previously identified — verify all endpoints return 200 on production

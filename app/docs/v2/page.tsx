@@ -55,6 +55,10 @@ curl -X POST https://www.agent-utils.com/v1/checkpoints \\
 curl -X POST https://www.agent-utils.com/v1/checkpoints/{id}/approve \\
   -H "x-admin-key: agutil_adm_…"`;
 
+const SNIP_IMAGE = `curl -X POST https://www.agent-utils.com/v1/upload \\
+  -H "x-agent-id: worker-1" -H "x-api-key: agutil_agt_…" \\
+  -F "file=@screenshot.png" -F "retentionHours=24"`;
+
 const SNIP_CALLBACK = `# verify (Node.js)
 const sig = crypto.createHmac('sha256', secret)
   .update(\`\${ts}.\${rawBody}\`).digest('hex');
@@ -96,8 +100,8 @@ export default function V2Docs() {
           /openapi-v2.json
         </Link>{' '}
         and the agent-readable summary at{' '}
-        <Link href="/llms-v2.txt" className="underline">
-          /llms-v2.txt
+        <Link href="/llms.txt" className="underline">
+          /llms.txt
         </Link>
         .
       </Note>
@@ -201,10 +205,7 @@ export default function V2Docs() {
           Upload an image and get back a hosted URL that downstream tools or humans can use immediately.
         </p>
         <div className="mt-3">
-          <Code>{`curl -X POST https://www.agent-utils.com/api/upload \\
-  -H "x-api-key: au_your_key" \\
-  -F "file=@screenshot.png" \\
-  -F "retentionHours=24"`}</Code>
+          <Code>{SNIP_IMAGE}</Code>
         </div>
       </section>
 
@@ -260,8 +261,8 @@ export default function V2Docs() {
             </Link>
           </li>
           <li>
-            <Link href="/llms-v2.txt" className="text-zinc-300 underline">
-              llms-v2.txt (agent-readable summary)
+            <Link href="/llms.txt" className="text-zinc-300 underline">
+              llms.txt (agent-readable summary)
             </Link>
           </li>
           <li>

@@ -5,11 +5,12 @@
 
 set -euo pipefail
 
-BASE_URL="https://agentutils.dev/api"
+BASE_URL="https://www.agent-utils.com/v1"
+AGENT_ID="${AGENTUTILS_AGENT_ID:-}"
 API_KEY="${AGENTUTILS_API_KEY:-}"
 
-if [ -z "$API_KEY" ]; then
-  echo "Error: Set AGENTUTILS_API_KEY environment variable (au_...)"
+if [ -z "$AGENT_ID" ] || [ -z "$API_KEY" ]; then
+  echo "Error: Set AGENTUTILS_AGENT_ID and AGENTUTILS_API_KEY environment variables (agent id + agutil_agt_… key)"
   exit 1
 fi
 
@@ -32,6 +33,8 @@ ext_to_mime() {
     png)      echo "image/png" ;;
     webp)     echo "image/webp" ;;
     gif)      echo "image/gif" ;;
+    avif)     echo "image/avif" ;;
+    svg)      echo "image/svg+xml" ;;
     *)        return 1 ;;
   esac
 }
@@ -49,11 +52,11 @@ case "${1:-}" in
     fi
     ext="${file_path##*.}"
     if ! mime="$(ext_to_mime "$ext")"; then
-      echo "Error: Unsupported file type. Allowed: jpg, jpeg, png, webp, gif"
+      echo "Error: Unsupported file type. Allowed: jpg, jpeg, png, webp, gif, avif, svg"
       exit 1
     fi
     rate_limit
-    args=(-s -X POST "${BASE_URL}/upload" -H "x-api-key: ${API_KEY}" -F "file=@${file_path};type=${mime}")
+    args=(-s -X POST "${BASE_URL}/upload" -H "x-agent-id: ${AGENT_ID}" -H "x-api-key: ${API_KEY}" -F "file=@${file_path};type=${mime}")
     if [ -n "${3:-}" ]; then
       args+=(-F "retentionHours=${3}")
     fi
@@ -66,9 +69,9 @@ case "${1:-}" in
     echo "Usage: agentutils-image-upload.sh <command> [arguments]"
     echo ""
     echo "Commands:"
-    echo "  upload <image> [hours]  Upload an image (jpg/png/webp/gif), get a hosted URL"
+    echo "  upload <image> [hours]  Upload an image (jpg/png/webp/gif/avif/svg), get a hosted URL"
     echo "                         retention_hours defaults to 24"
     echo ""
-    echo "Set AGENTUTILS_API_KEY=au_... for authentication."
+    echo "Set AGENTUTILS_AGENT_ID and AGENTUTILS_API_KEY=agutil_agt_... for authentication."
     ;;
 esac

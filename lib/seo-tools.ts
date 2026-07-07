@@ -287,6 +287,77 @@ const { data } = await res.json();`,
     relatedTools: ['dlq', 'audit-log'],
   },
   {
+    slug: 'scheduler',
+    name: 'Scheduler',
+    icon: '⏱️',
+    tagline: 'Queue one-off callbacks with fixed retries and optional DLQ fallback.',
+    docsUrl: '/docs/v2',
+    metaTitle: 'Scheduler API for AI Agents | AgentUtils',
+    metaDescription: 'Schedule one-off callbacks for AI agents with fixed retries, delayed execution, and optional DLQ fallback. One HTTP API for deferred workflows.',
+    h1: 'Scheduler API for AI Agents',
+    subtitle: 'Defer a callback, retry on failure, and keep workflows moving.',
+    whatItDoes: 'Create a one-off scheduled callback for a future time. If delivery fails, the scheduler retries on a fixed cadence and can cascade to the dead letter queue.',
+    whyAgentsNeed: [
+      'Agents often need to defer follow-up work until a future time or external event',
+      'Long-running workflows should not require a worker process to stay alive forever',
+      'Deferred callbacks need retries and failure handling, not just a best-effort timeout',
+      'Rolling your own scheduling stack adds infrastructure that the agent does not need',
+    ],
+    useCases: [
+      { title: 'Delayed follow-up', description: 'Schedule a reminder or status check after a waiting period without keeping state in memory' },
+      { title: 'Callback handoff', description: 'Trigger a webhook at a precise time and continue the workflow later' },
+      { title: 'Retry orchestration', description: 'Retry a failed delivery before escalating to a DLQ or manual review' },
+      { title: 'Workflow checkpoints', description: 'Wake up a paused agent step when the next action becomes due' },
+    ],
+    codeExample: {
+      curl: `curl -X POST https://www.agent-utils.com/v1/schedules \\
+  -H "x-agent-id: worker-1" -H "x-api-key: agutil_agt_…" \\
+  -H "content-type: application/json" \\
+  -d '{
+    "callback_url": "https://your-app.com/hooks/retry",
+    "callback_payload": { "job_id": "job_42", "attempt": 1 },
+    "fire_at": "2026-07-01T00:00:00Z",
+    "dlq_on_failure": true
+  }'`,
+      python: `import requests
+
+resp = requests.post(
+    "https://www.agent-utils.com/v1/schedules",
+    headers={
+        "x-agent-id": "worker-1",
+        "x-api-key": "agutil_agt_…",
+        "content-type": "application/json",
+    },
+    json={
+        "callback_url": "https://your-app.com/hooks/retry",
+        "callback_payload": {"job_id": "job_42", "attempt": 1},
+        "fire_at": "2026-07-01T00:00:00Z",
+        "dlq_on_failure": True,
+    },
+)
+schedule_id = resp.json()["data"]["id"]`,
+      js: `const res = await fetch("https://www.agent-utils.com/v1/schedules", {
+  method: "POST",
+  headers: {
+    "x-agent-id": "worker-1",
+    "x-api-key": "agutil_agt_…",
+    "content-type": "application/json",
+  },
+  body: JSON.stringify({
+    callback_url: "https://your-app.com/hooks/retry",
+    callback_payload: { job_id: "job_42", attempt: 1 },
+    fire_at: "2026-07-01T00:00:00Z",
+    dlq_on_failure: true,
+  }),
+});
+const { data } = await res.json();`,
+    },
+    apiEndpoint: 'POST /v1/schedules',
+    competitors: ['AWS EventBridge Scheduler', 'Cloudflare Cron Triggers', 'Temporal', 'Zapier Delay'],
+    keywords: ['scheduler api', 'delayed callback api', 'agent scheduling api', 'workflow scheduler', 'deferred webhook api', 'retry callback api'],
+    relatedTools: ['checkpoint', 'dlq', 'kv-store'],
+  },
+  {
     slug: 'image-upload',
     name: 'Image Upload',
     icon: '🖼️',
@@ -309,16 +380,19 @@ const { data } = await res.json();`,
       { title: 'Pipeline outputs', description: 'Pass a hosted image URL to another service without local storage' },
     ],
     codeExample: {
-      curl: `curl -X POST https://www.agent-utils.com/api/upload \\
-  -H "x-api-key: au_your_key" \\
+      curl: `curl -X POST https://www.agent-utils.com/v1/upload \\
+  -H "x-agent-id: worker-1" -H "x-api-key: agutil_agt_\u2026" \\
   -F "file=@screenshot.png" \\
   -F "retentionHours=24"`,
       python: `import requests
 
 with open("screenshot.png", "rb") as f:
     resp = requests.post(
-        "https://www.agent-utils.com/api/upload",
-        headers={"x-api-key": "au_your_key"},
+        "https://www.agent-utils.com/v1/upload",
+        headers={
+            "x-agent-id": "worker-1",
+            "x-api-key": "agutil_agt_\u2026",
+        },
         files={"file": f},
         data={"retentionHours": 24},
     )
@@ -327,15 +401,18 @@ image_url = resp.json()["data"]["url"]`,
 form.append("file", fs.createReadStream("screenshot.png"));
 form.append("retentionHours", "24");
 
-const res = await fetch("https://www.agent-utils.com/api/upload", {
+const res = await fetch("https://www.agent-utils.com/v1/upload", {
   method: "POST",
-  headers: { "x-api-key": "au_your_key" },
+  headers: {
+    "x-agent-id": "worker-1",
+    "x-api-key": "agutil_agt_\u2026",
+  },
   body: form,
 });
 const { data } = await res.json();
 console.log(data.url);`,
     },
-    apiEndpoint: 'POST /api/upload',
+    apiEndpoint: 'POST /v1/upload',
     competitors: ['AWS S3 Presigned URLs', 'Cloudinary', 'Imgix', 'Uploadcare'],
     keywords: ['image upload api', 'image hosting api', 'agent image storage', 'upload image get url api', 'hosted image api'],
     relatedTools: ['dlq', 'checkpoint'],

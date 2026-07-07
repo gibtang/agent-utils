@@ -1,5 +1,6 @@
 import { type MetadataRoute } from 'next';
 import { getAllToolSlugs } from '@/lib/seo-tools';
+import { toolDocPages } from '@/lib/docs-pages';
 
 const BASE_URL = 'https://www.agent-utils.com';
 
@@ -16,16 +17,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.8,
   }));
 
-  // Only include docs pages that actually exist as routes.
-  // /docs/dlq and /docs/checkpoint were deleted (commit 03d78af) — only
-  // /docs/v2 and /docs/image-upload remain as sub-routes under /docs/.
-  const existingDocSlugs = ['v2', 'image-upload'];
-  const docPages = existingDocSlugs.map((slug) => ({
-    url: `${BASE_URL}/docs/${slug}`,
-    lastModified: LAST_MOD,
-    changeFrequency: 'weekly' as const,
-    priority: 0.6,
-  }));
+  const docPages = [
+    {
+      url: `${BASE_URL}/docs/v2`,
+      lastModified: LAST_MOD,
+      changeFrequency: 'weekly' as const,
+      priority: 0.6,
+    },
+    ...toolDocPages.map((page) => ({
+      url: `${BASE_URL}${page.canonicalPath}`,
+      lastModified: LAST_MOD,
+      changeFrequency: 'weekly' as const,
+      priority: 0.6,
+    })),
+  ];
 
   return [
     { url: `${BASE_URL}/`, lastModified: LAST_MOD, changeFrequency: 'daily', priority: 1.0 },

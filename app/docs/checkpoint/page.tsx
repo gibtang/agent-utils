@@ -4,7 +4,7 @@ import { getToolDocPageBySlug } from '@/lib/docs-pages';
 
 export const dynamic = 'force-static';
 
-const page = getToolDocPageBySlug('image-upload')!;
+const page = getToolDocPageBySlug('checkpoint')!;
 
 export const metadata: Metadata = {
   title: page.tool.metaTitle,
@@ -13,6 +13,6 @@ export const metadata: Metadata = {
   openGraph: { url: page.canonicalPath },
 };
 
-export default function ImageUploadDocsPage() {
+export default function CheckpointDocsPage() {
   return <ToolDocPageView page={page} />;
 }

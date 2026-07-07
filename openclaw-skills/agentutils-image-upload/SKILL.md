@@ -9,19 +9,20 @@ Image hosting for AI agents. Upload an image, get a hosted URL, files auto-expir
 
 ## API Base
 
-`https://www.agent-utils.com/api`
+`https://www.agent-utils.com/v1`
 
 ## Authentication
 
-All requests require `x-api-key` header. Get a key at https://www.agent-utils.com/dashboard.
+Image upload uses v2 agent credentials: the `x-agent-id` and `x-api-key` headers. Create a tenant and register an agent at https://www.agent-utils.com/dashboard, then use the one-time agent key.
 
 ```
-x-api-key: au_YOUR_KEY
+x-agent-id: worker-1
+x-api-key: agutil_agt_YOUR_KEY
 ```
 
 ## Accepted Formats
 
-- **Types:** JPEG, PNG, WebP, GIF
+- **Types:** JPEG, PNG, WebP, GIF, AVIF, SVG
 - **Max size:** 10 MB (hard limit)
 - **Retention:** 24 hours by default (override with `retentionHours`)
 
@@ -44,13 +45,14 @@ scripts/agentutils-image-upload.sh upload chart.png 12
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/api/upload` | POST | Upload image (multipart, field: "file", optional: `retentionHours`) |
+| `/v1/upload` | POST | Upload image (multipart, field: "file", optional: `retentionHours`) |
 
 ### Upload Example
 
 ```bash
-curl -X POST https://www.agent-utils.com/api/upload \
-  -H "x-api-key: au_YOUR_KEY" \
+curl -X POST https://www.agent-utils.com/v1/upload \
+  -H "x-agent-id: worker-1" \
+  -H "x-api-key: agutil_agt_YOUR_KEY" \
   -F "file=@screenshot.png" \
   -F "retentionHours=24"
 ```
@@ -60,15 +62,15 @@ curl -X POST https://www.agent-utils.com/api/upload \
 **Upload response:**
 ```json
 {
-  "success": true,
   "data": {
     "id": "abc123def456",
-    "url": "https://cdn.agent-utils.com/uploads/abc123def456.png",
+    "url": "https://www.agent-utils.com/api/file-host/abc123def456",
     "filename": "screenshot.png",
     "contentType": "image/png",
     "size": 204800,
     "expiresAt": "2025-01-15T10:00:00Z"
-  }
+  },
+  "meta": { "request_id": "req_…" }
 }
 ```
 
@@ -85,7 +87,7 @@ Retention and file size follow your plan tier:
 | Pro ($49) | 50MB | 24 hours |
 | Enterprise | 500MB | 72 hours |
 
-> Images are additionally capped at **10 MB** and **JPEG/PNG/WebP/GIF** only, regardless of tier.
+> Images are additionally capped at **10 MB** and **JPEG/PNG/WebP/GIF/AVIF/SVG** only, regardless of tier.
 
 ## Tips
 

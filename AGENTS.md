@@ -1,16 +1,13 @@
 # Agent Instructions
 
-This project uses **bd** (beads)** for issue tracking. Run `bd prime` for full workflow context.
+This project uses **Anban** for issue tracking. Use Anban cards for all task tracking and handoff.
 
 ## Quick Reference
 
-```bash
-bd ready              # Find available work
-bd show <id>          # View issue details
-bd update <id> --claim  # Claim work atomically
-bd close <id>         # Complete work
-bd dolt push          # Push beads data to remote
-```
+- Check the relevant Anban board for available work.
+- Create or update an Anban card for the task.
+- Claim the card when appropriate.
+- Close or update the card when work is complete.
 
 ## Non-Interactive Shell Commands
 

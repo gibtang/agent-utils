@@ -42,6 +42,9 @@ export default function ToolsPage() {
             <Link href="/tools/image-upload" className="hover:text-primary-fixed-dim transition-colors duration-200 py-3 px-1 min-h-[44px] flex items-center">
               Image Upload
             </Link>
+            <Link href="/tools/scheduler" className="hover:text-primary-fixed-dim transition-colors duration-200 py-3 px-1 min-h-[44px] flex items-center">
+              Scheduler
+            </Link>
           </div>
           <div className="flex items-center gap-4">
             {/* Mobile hamburger menu */}

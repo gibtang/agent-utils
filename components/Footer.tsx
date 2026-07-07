@@ -19,7 +19,7 @@ export default function Footer() {
           <div>
             <h3 className="text-sm font-semibold text-white mb-4 uppercase tracking-wider">Reference</h3>
             <ul className="space-y-2">
-              <li><Link href="/llms-v2.txt" className="text-sm text-gray-400 hover:text-gray-200">llms-v2.txt</Link></li>
+              <li><Link href="/llms.txt" className="text-sm text-gray-400 hover:text-gray-200">llms.txt</Link></li>
               <li><Link href="/openapi-v2.json" className="text-sm text-gray-400 hover:text-gray-200">OpenAPI spec</Link></li>
               <li><a href="https://github.com/gibtang/agent-utils" target="_blank" rel="noopener noreferrer" className="text-sm text-gray-400 hover:text-gray-200">GitHub</a></li>
             </ul>
