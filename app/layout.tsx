@@ -25,6 +25,16 @@ export const metadata: Metadata = {
   title: "AgentUtils — API Utilities for AI Agents",
   description: "One API key. Production-ready dead letter queues, human-in-the-loop gates, and audit trails. No SDKs, just curl and go.",
   keywords: ["ai agents", "dead letter queue", "human in the loop", "agent infrastructure", "api utilities"],
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
   openGraph: {
     title: "AgentUtils — API Utilities for AI Agents",
     description: "Production-ready dead letter queues, human-in-the-loop gates, and audit trails—all behind a single API key.",
