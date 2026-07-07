@@ -13,7 +13,7 @@ import { validateImage } from '@/lib/image-upload';
 const DEFAULT_RETENTION_HOURS = 24;
 
 /**
- * POST /api/upload — store an image in B2 and return a hosted URL.
+ * POST /v1/upload — store an image in B2 and return a hosted URL.
  *
  * Auth: v2 agent key (`x-agent-id` + `x-api-key`). Tenant isolation is enforced
  * by the resolved identity; the returned file id is a capability token.
@@ -21,7 +21,7 @@ const DEFAULT_RETENTION_HOURS = 24;
  * Body: multipart/form-data with a `file` field (image/jpeg|png|webp|gif|avif|svg+xml) and
  * an optional `retentionHours` numeric field (default 24).
  *
- * @returns 201 `{ data: { id, url, filename, contentType, size, expiresAt } }`
+ * @returns 201 `{ data: { id, url, filename, contentType, size, expiresAt }, meta: { request_id } }`
  */
 export async function POST(request: NextRequest) {
   const resolution = await requireAgentKey(request);

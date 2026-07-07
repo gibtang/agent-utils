@@ -13,7 +13,8 @@ spec = {
         'version': '2.0.0',
         'description': (
             'Multi-tenant, agent-native infrastructure: KV store, audit log, '
-            'dead-letter queue, scheduler, and human-in-the-loop checkpoints. '
+            'dead-letter queue, scheduler, human-in-the-loop checkpoints, and '
+            'image upload. '
             'Tenant-isolated, callback-signed, idempotent.\n\n'
             '## Base URL\nhttps://www.agent-utils.com/v1\n\n'
             '## Authentication\nServer-derived identity from key prefix:\n'
@@ -38,6 +39,7 @@ spec = {
         {'name': 'Dead Letter Queue', 'description': 'Independent pull-based failure inbox'},
         {'name': 'Scheduler', 'description': 'Once-callbacks with fixed retry + DLQ cascade'},
         {'name': 'Human-in-the-Loop', 'description': 'Checkpoints requiring human approval'},
+        {'name': 'Image Upload', 'description': 'Hosted image URLs from a single upload'},
         {'name': 'System', 'description': 'Cron tick (internal)'},
     ],
     'components': {
@@ -200,6 +202,14 @@ spec = {
             'description': 'Internal. Driven by external cron every 30–60s. See docs/product/agentutils-v2-cron.md.',
             'security': [{'cronSecret': []}],
             'responses': {'200': {'description': 'Summary of processed schedules + timeouts'}, '401': {'description': 'UNAUTHORIZED — missing/invalid CRON_SECRET'}}}},
+        '/upload': {'post': {'tags': ['Image Upload'], 'summary': 'Upload an image, get a hosted URL (auto-expires)',
+            'description': 'Multipart form with a `file` field (image/jpeg|png|webp|gif|avif|svg+xml, max 10 MiB) and optional numeric `retentionHours` (default 24). Returns a public `url` that serves the image with no auth; the opaque `id` is a capability token. Files past `expiresAt` return 404.',
+            'security': [{'agentKey': []}],
+            'requestBody': {'required': True, 'content': {'multipart/form-data': {'schema': {'type': 'object',
+                'properties': {'file': {'type': 'string', 'format': 'binary'}, 'retentionHours': {'type': 'number', 'minimum': 1, 'default': 24}}}}}},
+            'responses': {'201': {'description': 'Created — `{ data: { id, url, filename, contentType, size, expiresAt } }`'},
+                '400': {'description': 'Missing file / invalid retentionHours'}, '413': {'description': 'File exceeds 10 MiB'},
+                '415': {'description': 'Unsupported content type'}}}},
     },
 }
 

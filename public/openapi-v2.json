@@ -3,7 +3,7 @@
   "info": {
     "title": "AgentUtils API v2",
     "version": "2.0.0",
-    "description": "Multi-tenant, agent-native infrastructure: KV store, audit log, dead-letter queue, scheduler, and human-in-the-loop checkpoints. Tenant-isolated, callback-signed, idempotent.\n\n## Base URL\nhttps://www.agent-utils.com/v1\n\n## Authentication\nServer-derived identity from key prefix:\n- `agutil_adm_\u2026` \u2014 admin key (tenant scope). Header: `x-admin-key`.\n- `agutil_agt_\u2026` \u2014 agent key (tenant + agent scope). Headers: `x-agent-id` + `x-api-key`.\n- `agutil_apr_\u2026` \u2014 approval-proxy key (HitL approve/reject only). Header: `X-Approval-Key`.\n\n`tenant_id` is always server-derived \u2014 never accepted from the client.\n\n## Standard headers\n- `Idempotency-Key` \u2014 replay-safe on all `POST` creation endpoints.\n- All responses include `X-Request-Id`.\n\n## Error envelope\n`{ \"error\": { \"code\", \"message\", \"details\", \"request_id\" } }`"
+    "description": "Multi-tenant, agent-native infrastructure: KV store, audit log, dead-letter queue, scheduler, human-in-the-loop checkpoints, and image upload. Tenant-isolated, callback-signed, idempotent.\n\n## Base URL\nhttps://www.agent-utils.com/v1\n\n## Authentication\nServer-derived identity from key prefix:\n- `agutil_adm_\u2026` \u2014 admin key (tenant scope). Header: `x-admin-key`.\n- `agutil_agt_\u2026` \u2014 agent key (tenant + agent scope). Headers: `x-agent-id` + `x-api-key`.\n- `agutil_apr_\u2026` \u2014 approval-proxy key (HitL approve/reject only). Header: `X-Approval-Key`.\n\n`tenant_id` is always server-derived \u2014 never accepted from the client.\n\n## Standard headers\n- `Idempotency-Key` \u2014 replay-safe on all `POST` creation endpoints.\n- All responses include `X-Request-Id`.\n\n## Error envelope\n`{ \"error\": { \"code\", \"message\", \"details\", \"request_id\" } }`"
   },
   "servers": [
     {
@@ -42,6 +42,10 @@
     {
       "name": "Human-in-the-Loop",
       "description": "Checkpoints requiring human approval"
+    },
+    {
+      "name": "Image Upload",
+      "description": "Hosted image URLs from a single upload"
     },
     {
       "name": "System",
@@ -1275,6 +1279,55 @@
           },
           "401": {
             "description": "UNAUTHORIZED \u2014 missing/invalid CRON_SECRET"
+          }
+        }
+      }
+    },
+    "/upload": {
+      "post": {
+        "tags": [
+          "Image Upload"
+        ],
+        "summary": "Upload an image, get a hosted URL (auto-expires)",
+        "description": "Multipart form with a `file` field (image/jpeg|png|webp|gif|avif|svg+xml, max 10 MiB) and optional numeric `retentionHours` (default 24). Returns a public `url` that serves the image with no auth; the opaque `id` is a capability token. Files past `expiresAt` return 404.",
+        "security": [
+          {
+            "agentKey": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "retentionHours": {
+                    "type": "number",
+                    "minimum": 1,
+                    "default": 24
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created \u2014 `{ data: { id, url, filename, contentType, size, expiresAt } }`"
+          },
+          "400": {
+            "description": "Missing file / invalid retentionHours"
+          },
+          "413": {
+            "description": "File exceeds 10 MiB"
+          },
+          "415": {
+            "description": "Unsupported content type"
           }
         }
       }
