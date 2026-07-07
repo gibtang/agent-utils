@@ -37,6 +37,11 @@ export interface PublicKeyRow {
   api_key: string;
 }
 
+/** True for Agent docs created before the plaintext-key migration (commit 0e42bda). */
+export function isLegacyAgent(a: { apiKey?: unknown }): boolean {
+  return typeof a.apiKey !== 'string' || a.apiKey.length === 0;
+}
+
 export interface CreatedKey {
   agent_id: string;
   api_key: string;
@@ -155,15 +160,59 @@ async function mintKey(tenantId: string, agentId: string): Promise<CreatedKey> {
 
 /**
  * List the user's keys. Plaintext is returned so keys can be re-copied.
+ *
+ * Agent docs created before the plaintext-key migration (commit 0e42bda) have an
+ * `apiKeyHash` field but no `apiKey`. Those docs are returned with api_key set
+ * to null and `legacy: true` so the UI can offer recovery instead of crashing
+ * in maskKey(). Use `reacquireKey()` to wipe + re-mint them.
  */
-export async function listKeys(tenantId: string): Promise<PublicKeyRow[]> {
+export async function listKeys(
+  tenantId: string,
+): Promise<(PublicKeyRow & { legacy: boolean })[]> {
   await connectDB();
   const agents = await Agent.find({ tenantId }).sort({ createdAt: 1 }).lean();
-  return agents.map((a) => ({
-    agent_id: a.agentId,
-    created_at: a.createdAt.toISOString(),
-    api_key: a.apiKey,
-  }));
+  return agents.map((a) => {
+    if (isLegacyAgent(a)) {
+      return {
+        agent_id: a.agentId,
+        created_at: a.createdAt.toISOString(),
+        api_key: '',
+        legacy: true,
+      };
+    }
+    return {
+      agent_id: a.agentId,
+      created_at: a.createdAt.toISOString(),
+      api_key: a.apiKey,
+      legacy: false,
+    };
+  });
+}
+
+/**
+ * Wipe all Agent + agent-key ApiCredential docs for a tenant and mint a single
+ * fresh default key. Used to recover tenants stuck on the pre-migration hashed
+ * key schema: those plaintext keys are unrecoverable (SHA-256 is one-way), so
+ * the only path back to a working dashboard is to rotate.
+ *
+ * Re-syncs the tenant's agentCount quota counter to the post-wipe state (1).
+ * Returns the new plaintext once, like a normal create.
+ */
+export async function reacquireKey(tenantId: string): Promise<CreatedKey> {
+  await connectDB();
+
+  // Deactivate any agent credentials that may still reference the stale keys,
+  // then remove the Agent docs. Admin/approval credentials are untouched.
+  await ApiCredential.updateMany(
+    { tenantId, keyType: 'agent' },
+    { $set: { active: false } },
+  );
+  await Agent.deleteMany({ tenantId });
+
+  // Mint a single fresh default key and fix the quota counter to match.
+  const minted = await mintKey(tenantId, 'default');
+  await Tenant.updateOne({ tenantId }, { $set: { agentCount: 1 } });
+  return minted;
 }
 
 /**

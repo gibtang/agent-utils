@@ -17,10 +17,13 @@ interface KeyRow {
   agent_id: string;
   created_at: string;
   api_key: string;
+  /** True for pre-migration docs whose hashed key is unrecoverable. */
+  legacy?: boolean;
 }
 
 /** Show prefix + masked tail for display; the real key is copied on click. */
 function maskKey(key: string): string {
+  if (!key) return '••••';
   const slash = key.lastIndexOf('_');
   if (slash === -1) return '••••';
   return key.slice(0, slash + 1) + '••••';
@@ -39,6 +42,7 @@ export default function DashboardPage() {
   const [dataLoading, setDataLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [justCreated, setJustCreated] = useState<PlainKey | null>(null);
+  const [needsRecovery, setNeedsRecovery] = useState(false);
 
   const loadKeys = useCallback(async () => {
     const token = await getIdToken();
@@ -55,9 +59,12 @@ export default function DashboardPage() {
         const j = (await res.json().catch(() => null)) as { error?: { message?: string } } | null;
         throw new Error(j?.error?.message ?? `Failed to load keys (HTTP ${res.status})`);
       }
-      const json = (await res.json()) as { data?: { keys?: KeyRow[]; plan?: string } };
+      const json = (await res.json()) as {
+        data?: { keys?: KeyRow[]; plan?: string; needs_recovery?: boolean };
+      };
       setKeys(json.data?.keys ?? []);
       setPlan(json.data?.plan ?? 'free');
+      setNeedsRecovery(Boolean(json.data?.needs_recovery));
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not load your keys. Try refreshing.');
     } finally {
@@ -126,6 +133,31 @@ export default function DashboardPage() {
     }
   }
 
+  async function handleReacquire() {
+    setError(null);
+    const token = await getIdToken();
+    if (!token) return;
+    try {
+      const res = await fetch('/api/dashboard/keys', {
+        method: 'POST',
+        headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' },
+        body: JSON.stringify({ action: 'reacquire' }),
+      });
+      if (!res.ok) {
+        const j = (await res.json().catch(() => null)) as { error?: { message?: string } } | null;
+        throw new Error(j?.error?.message ?? 'Could not recover keys');
+      }
+      const json = (await res.json()) as { data?: { key?: PlainKey } };
+      await loadKeys();
+      if (json.data?.key) {
+        clearNewKey();
+        setJustCreated(json.data.key);
+      }
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Could not recover keys. Try again.');
+    }
+  }
+
   function dismissFlash() {
     if (newKey) clearNewKey();
     setJustCreated(null);
@@ -184,6 +216,26 @@ export default function DashboardPage() {
         </div>
       )}
 
+      {/* Legacy-key recovery: pre-migration Agent docs have an unrecoverable
+          hashed key. Offer a one-click wipe + re-mint so the dashboard is
+          usable again. */}
+      {needsRecovery && (
+        <div className="mt-6 rounded-lg border border-error/40 bg-error-container/20 px-4 py-3 text-sm text-error">
+          <p className="font-semibold">Some keys need recovery</p>
+          <p className="mt-1 opacity-90">
+            These keys were created before a storage change and their secret can no
+            longer be displayed. Recovering will remove them and issue a fresh
+            default key.
+          </p>
+          <button
+            onClick={() => void handleReacquire()}
+            className="mt-2 rounded-md bg-error px-3 py-1.5 text-xs font-semibold text-on-error transition-opacity hover:opacity-90"
+          >
+            Recover keys
+          </button>
+        </div>
+      )}
+
       <CreateKeyForm onCreate={handleCreate} plan={plan} />
 
       <section className="mt-8">
@@ -206,11 +258,11 @@ export default function DashboardPage() {
                 <div className="min-w-0">
                   <div className="truncate font-mono text-sm text-on-surface">{k.agent_id}</div>
                   <div className="mt-0.5 font-mono text-xs text-on-surface-variant">
-                    {maskKey(k.api_key)}
+                    {k.legacy ? 'legacy key — recover to view' : maskKey(k.api_key)}
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <CopyKeyButton apiKey={k.api_key} />
+                  {!k.legacy && <CopyKeyButton apiKey={k.api_key} />}
                   <button
                     onClick={() => void handleDelete(k.agent_id)}
                     disabled={keys.length === 1}
