@@ -36,6 +36,29 @@ pipeline {
       }
     }
 
+    stage('Test') {
+      steps {
+        tg("🧪 <b>${APP}</b> #${BUILD_NUMBER} — Test started")
+        // Run the vitest suite in a throwaway node:22 container before building
+        // the image, so a test failure blocks the deploy. Uses bookworm-slim
+        // (glibc) rather than alpine to avoid musl-binary issues with
+        // mongodb-memory-server. The suite is self-contained — it spins up an
+        // in-memory Mongo, so no external DB or secrets are needed.
+        // .inside() maps the Jenkins uid so workspace files stay writable.
+        script {
+          docker.image('node:22-bookworm-slim').inside() {
+            sh '''#!/bin/bash
+              set -euo pipefail
+              # --ignore-scripts skips husky's postinstall (fails with no .git).
+              npm ci --ignore-scripts
+              npm test
+            '''
+          }
+        }
+        tg("✅ <b>${APP}</b> #${BUILD_NUMBER} — Tests passed")
+      }
+    }
+
     stage('Build Image') {
       steps {
         tg("🔨 <b>${APP}</b> #${BUILD_NUMBER} — Build started")
