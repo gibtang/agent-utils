@@ -40,13 +40,15 @@ pipeline {
       steps {
         tg("🧪 <b>${APP}</b> #${BUILD_NUMBER} — Test started")
         // Run the vitest suite in a throwaway node:22 container before building
-        // the image, so a test failure blocks the deploy. Uses bookworm-slim
-        // (glibc) rather than alpine to avoid musl-binary issues with
-        // mongodb-memory-server. The suite is self-contained — it spins up an
-        // in-memory Mongo, so no external DB or secrets are needed.
+        // the image, so a test failure blocks the deploy. Uses the FULL bookworm
+        // image (not -slim): mongodb-memory-server's downloaded mongod needs
+        // libcurl.so.4, which debian:bookworm-slim omits — without it mongod
+        // exits with SIGSEGV / "cannot open shared object file: libcurl.so.4".
+        // The suite is self-contained — it spins up an in-memory Mongo, so no
+        // external DB or secrets are needed.
         // .inside() maps the Jenkins uid so workspace files stay writable.
         script {
-          docker.image('node:22-bookworm-slim').inside() {
+          docker.image('node:22-bookworm').inside() {
             sh '''#!/bin/bash
               set -euo pipefail
               # --ignore-scripts skips husky's postinstall (fails with no .git).
