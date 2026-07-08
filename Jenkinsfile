@@ -17,7 +17,7 @@ pipeline {
   // wired up on the controller — this is a self-healing fallback for when no
   // webhook fires. Note: pollSCM schedules are only (re)loaded after the
   // pipeline runs once or the job config is saved in the Jenkins UI.
-  triggers { cron('@hourly'); pollSCM('* * * * *') }
+  triggers { pollSCM('* * * * *') }
   environment {
     IMAGE       = 'ghcr.io/gibtang/agent-utils'
     TAG         = "${BUILD_NUMBER}"
