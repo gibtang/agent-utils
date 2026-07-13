@@ -122,6 +122,11 @@ pipeline {
     failure {
       tg("❌ <b>${APP}</b> #${BUILD_NUMBER} — build FAILED: ${env.BUILD_URL}")
     }
-    cleanup { sh "docker image rm ${IMAGE}:${TAG} ${IMAGE}:latest 2>/dev/null || true" }
+    cleanup {
+      sh "docker image rm ${IMAGE}:${TAG} ${IMAGE}:latest 2>/dev/null || true"
+      // Wipe the workspace after every build so node_modules / checked-out
+      // source don't accumulate on disk. Next build re-checks-out via scm.
+      cleanWs()
+    }
   }
 }
