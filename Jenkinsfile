@@ -122,6 +122,12 @@ pipeline {
     failure {
       tg("❌ <b>${APP}</b> #${BUILD_NUMBER} — build FAILED: ${env.BUILD_URL}")
     }
+    success {
+      tg("✅ <b>${APP}</b> #${BUILD_NUMBER} — build SUCCESS: ${env.BUILD_URL}")
+    }
+    aborted {
+      tg("⏹ <b>${APP}</b> #${BUILD_NUMBER} — build ABORTED")
+    }
     cleanup {
       sh "docker image rm ${IMAGE}:${TAG} ${IMAGE}:latest 2>/dev/null || true"
       // Wipe the workspace after every build so node_modules / checked-out
