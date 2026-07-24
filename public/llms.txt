@@ -85,6 +85,14 @@ Callbacks are HMAC-signed (see Callbacks below). Driven by `POST /v1/tick`.
 - `POST /v1/checkpoints/{id}/reject` — reject (admin OR approval-proxy key). DLQ cascade if `timeout_action=dlq`.
 Create an approval-proxy key (`POST /v1/approval-keys`) to delegate approve/reject to a reviewer without giving them tenant admin.
 
+### Confessions — cloud agents ask humans for steering
+- `POST /v1/confessions` — report uncertainty. Body: `{ summary, concerns, confidence, context?, urgency?, blocking?, timeout_seconds?, timeout_action?, callback_url? }`.
+- `GET /v1/confessions` — list only the caller tenant's records. `?status=open|resolved|expired`, `?agent_id=`, cursor pagination.
+- `GET /v1/confessions/{id}` — poll status and, once resolved, guidance/action.
+- `POST /v1/confessions/{id}/respond` — resolve using an admin or approval-proxy key. Body: `{ guidance, action: continue|pivot|abort }`.
+- Human reviewers can open `/c/{id}` and enter an approval-proxy key; no approval credential is exposed by the page.
+Timeouts are driven by `POST /v1/tick`: `continue`/`abort` auto-resolve; `escalate_to_dlq` expires and creates a DLQ item. MCP is not currently implemented in this repository.
+
 ### Image Upload — hosted image URL from a single upload
 - `POST /v1/upload` — upload an image (multipart `file`, optional `retentionHours` default 24). Agent-key auth (`x-agent-id` + `x-api-key`). Returns `{ data: { id, url, filename, contentType, size, expiresAt } }`.
 Accepted types: `image/jpeg|png|webp|gif|avif|svg+xml`. Max 10 MiB. The returned `url` is public (no auth — the opaque `id` is a capability token) and auto-expires at `expiresAt` (then 404).

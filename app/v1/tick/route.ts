@@ -14,6 +14,7 @@
 import { NextRequest } from 'next/server';
 import { fireDueSchedules } from '@/lib/v2/scheduler';
 import { processTimeouts } from '@/lib/v2/hitl';
+import { processConfessionTimeouts } from '@/lib/v2/confessions';
 import { ok } from '@/lib/v2/envelope';
 
 function unauthorized(): Response {
@@ -43,10 +44,11 @@ export async function POST(req: NextRequest): Promise<Response> {
     return unauthorized();
   }
 
-  const [schedules, timeouts] = await Promise.all([
+  const [schedules, timeouts, confessions] = await Promise.all([
     fireDueSchedules(),
     processTimeouts(),
+    processConfessionTimeouts(),
   ]);
 
-  return ok({ schedules, timeouts });
+  return ok({ schedules, timeouts, confessions });
 }

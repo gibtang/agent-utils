@@ -26,6 +26,8 @@ export interface ITenant extends Document {
   activeScheduleCount: number;
   pendingCheckpointCount: number;
   dlqItemCount: number;
+  confessionQuotaMonth?: string | null;
+  confessionMonthlyCount: number;
   lastActivityAt: Date;
   // rate-limit minute bucket counter
   rlBucket?: string;
@@ -52,6 +54,8 @@ const TenantSchema = new Schema<ITenant>(
     activeScheduleCount: { type: Number, default: 0 },
     pendingCheckpointCount: { type: Number, default: 0 },
     dlqItemCount: { type: Number, default: 0 },
+    confessionQuotaMonth: { type: String, default: null },
+    confessionMonthlyCount: { type: Number, default: 0 },
     lastActivityAt: { type: Date, default: () => new Date() },
     rlBucket: { type: String, default: null },
     rlCount: { type: Number, default: 0 },

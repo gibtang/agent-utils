@@ -39,6 +39,7 @@ spec = {
         {'name': 'Dead Letter Queue', 'description': 'Independent pull-based failure inbox'},
         {'name': 'Scheduler', 'description': 'Once-callbacks with fixed retry + DLQ cascade'},
         {'name': 'Human-in-the-Loop', 'description': 'Checkpoints requiring human approval'},
+        {'name': 'Confessions', 'description': 'Cloud-agent uncertainty reports and human steering'},
         {'name': 'Image Upload', 'description': 'Hosted image URLs from a single upload'},
         {'name': 'System', 'description': 'Cron tick (internal)'},
     ],
@@ -54,6 +55,7 @@ spec = {
             'agentId': {'name': 'id', 'in': 'path', 'required': True, 'schema': {'type': 'string'}},
             'dlqId': {'name': 'id', 'in': 'path', 'required': True, 'schema': {'type': 'string'}},
             'checkpointId': {'name': 'id', 'in': 'path', 'required': True, 'schema': {'type': 'string'}},
+            'confessionId': {'name': 'id', 'in': 'path', 'required': True, 'schema': {'type': 'string'}},
         },
         'schemas': {
             'Error': {
@@ -85,6 +87,8 @@ spec = {
                 'callback_url': {'type': 'string', 'format': 'uri'}, 'callback_payload': {},
                 'timeout_action': {'type': 'string', 'enum': ['auto_reject', 'dlq'], 'default': 'auto_reject'},
                 'timeout_seconds': {'type': 'integer', 'minimum': 60}, 'expires_at': {'type': 'string', 'format': 'date-time'}}},
+            'ConfessionCreate': {'type': 'object', 'required': ['summary', 'concerns', 'confidence'], 'properties': {'summary': {'type': 'string', 'maxLength': 4096}, 'concerns': {'type': 'array', 'minItems': 1, 'maxItems': 100, 'items': {'type': 'string', 'maxLength': 2048}}, 'confidence': {'type': 'number', 'minimum': 0, 'maximum': 1}, 'context': {}, 'urgency': {'type': 'string', 'enum': ['low', 'medium', 'high', 'blocking']}, 'blocking': {'type': 'boolean'}, 'timeout_seconds': {'type': 'integer', 'minimum': 60, 'maximum': 604800}, 'timeout_action': {'type': 'string', 'enum': ['continue', 'abort', 'escalate_to_dlq']}, 'callback_url': {'type': 'string', 'format': 'uri'}}},
+            'ConfessionResponse': {'type': 'object', 'required': ['guidance', 'action'], 'properties': {'guidance': {'type': 'string', 'maxLength': 4096}, 'action': {'type': 'string', 'enum': ['continue', 'pivot', 'abort']}}},
             'AuditAppend': {'type': 'object', 'required': ['action'], 'properties': {
                 'action': {'type': 'string'}, 'workflow_id': {'type': 'string'},
                 'actor': {'type': 'string'}, 'metadata': {'type': 'object'}}},
@@ -198,7 +202,19 @@ spec = {
             'security': [{'adminKey': []}, {'approvalKey': []}], 'parameters': [P('checkpointId')],
             'requestBody': {'content': {'application/json': {'schema': {'type': 'object', 'properties': {'reason': {'type': 'string'}}}}}},
             'responses': {'200': {'description': 'Rejected'}, '404': {'description': 'Cross-tenant / not found'}}}},
-        '/tick': {'post': {'tags': ['System'], 'summary': 'Cron tick — fires due schedules + processes checkpoint timeouts',
+        '/confessions': {
+            'post': {'tags': ['Confessions'], 'summary': 'Create an uncertainty report', 'description': 'Creation is always asynchronous. When `blocking=true`, the server returns `poll_after_seconds`; clients must poll GET /confessions/{id} and no request is held open. Monthly quota: free 10, pro 1000.', 'security': [{'agentKey': []}],
+                'requestBody': {'required': True, 'content': {'application/json': {'schema': {'$ref': '#/components/schemas/ConfessionCreate'}}}}, 'responses': {'201': {'description': 'Open confession created'}, '429': {'description': 'QUOTA_EXCEEDED (confessions_monthly)'}}},
+            'get': {'tags': ['Confessions'], 'summary': 'List/poll tenant confessions', 'security': [{'agentKey': []}],
+                'parameters': [{'name': 'status', 'in': 'query', 'schema': {'type': 'string', 'enum': ['open', 'resolved', 'expired']}}, {'name': 'agent_id', 'in': 'query', 'schema': {'type': 'string'}}, {'name': 'cursor', 'in': 'query', 'schema': {'type': 'string'}}], 'responses': {'200': {'description': 'List'}}}},
+        '/confessions/{id}': {
+            'get': {'tags': ['Confessions'], 'summary': 'Get/poll one confession', 'security': [{'agentKey': []}], 'parameters': [P('confessionId')], 'responses': {'200': {'description': 'Confession'}, '404': {'description': 'Cross-tenant / not found'}}}},
+        '/confessions/{id}/review': {'get': {'tags': ['Confessions'], 'summary': 'Fetch confession for authenticated browser review',
+            'description': 'Reviewer-only endpoint used by the public review shell; no confession fields are embedded in server HTML.', 'security': [{'adminKey': []}, {'approvalKey': []}], 'parameters': [P('confessionId')], 'responses': {'200': {'description': 'Confession review data'}, '403': {'description': 'Reviewer credential required'}, '404': {'description': 'Cross-tenant / not found'}}}},
+        '/confessions/{id}/respond': {'post': {'tags': ['Confessions'], 'summary': 'Resolve a confession with human guidance',
+            'description': 'Admin key or approval-proxy key only. Resolution is atomic; repeat responses return 409.', 'security': [{'adminKey': []}, {'approvalKey': []}], 'parameters': [P('confessionId')],
+            'requestBody': {'required': True, 'content': {'application/json': {'schema': {'$ref': '#/components/schemas/ConfessionResponse'}}}}, 'responses': {'200': {'description': 'Resolved'}, '409': {'description': 'Already resolved'}, '404': {'description': 'Cross-tenant / not found'}}}},
+        '/tick': {'post': {'tags': ['System'], 'summary': 'Cron tick — fires due schedules + processes checkpoint and confession timeouts',
             'description': 'Internal. Driven by external cron every 30–60s. See docs/product/agentutils-v2-cron.md.',
             'security': [{'cronSecret': []}],
             'responses': {'200': {'description': 'Summary of processed schedules + timeouts'}, '401': {'description': 'UNAUTHORIZED — missing/invalid CRON_SECRET'}}}},

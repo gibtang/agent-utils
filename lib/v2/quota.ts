@@ -16,6 +16,7 @@ export interface QuotaConfig {
   dlqItems: number;
   checkpointsPending: number;
   auditRetentionDays: number;
+  confessionsMonthly: number;
 }
 
 export const QUOTAS: Record<'free' | 'pro', QuotaConfig> = {
@@ -27,6 +28,7 @@ export const QUOTAS: Record<'free' | 'pro', QuotaConfig> = {
     dlqItems: 500,
     checkpointsPending: 5,
     auditRetentionDays: 7,
+    confessionsMonthly: 10,
   },
   pro: {
     agents: 50,
@@ -36,11 +38,35 @@ export const QUOTAS: Record<'free' | 'pro', QuotaConfig> = {
     dlqItems: 20_000,
     checkpointsPending: 50,
     auditRetentionDays: 30,
+    // Pro remains bounded at 1,000/month so quota accounting is explicit and atomic.
+    confessionsMonthly: 1000,
   },
 };
 
 export function quotaFor(plan: string): QuotaConfig {
   return QUOTAS[(plan as 'free' | 'pro')] ?? QUOTAS.free;
+}
+
+/** Atomically reserve one confession in the current UTC calendar month. */
+export async function reserveMonthlyConfessionQuota(tenantId: string, plan: string, now = new Date()): Promise<{ ok: boolean; used: number; limit: number; month: string }> {
+  await connectDB();
+  const limit = quotaFor(plan).confessionsMonthly;
+  const month = now.toISOString().slice(0, 7);
+  const updated = await Tenant.findOneAndUpdate(
+    { tenantId, $or: [{ confessionQuotaMonth: { $ne: month } }, { confessionMonthlyCount: { $lt: limit } }] },
+    [{ $set: { confessionQuotaMonth: month, confessionMonthlyCount: { $cond: [{ $eq: ['$confessionQuotaMonth', month] }, { $add: [{ $ifNull: ['$confessionMonthlyCount', 0] }, 1] }, 1] } } }],
+    { returnDocument: 'after', updatePipeline: true },
+  ).lean() as (ITenant | null);
+  return { ok: !!updated, used: updated?.confessionMonthlyCount ?? limit, limit, month };
+}
+
+/** Compensate a failed confession insert without decrementing a later month. */
+export async function releaseMonthlyConfessionQuota(tenantId: string, month: string): Promise<void> {
+  await connectDB();
+  await Tenant.updateOne(
+    { tenantId, confessionQuotaMonth: month, confessionMonthlyCount: { $gt: 0 } },
+    { $inc: { confessionMonthlyCount: -1 } },
+  );
 }
 
 /**

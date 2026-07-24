@@ -73,6 +73,8 @@ const DlqSchema = new Schema<IDlqItem>(
 
 DlqSchema.index({ tenantId: 1, agentId: 1, status: 1 });
 DlqSchema.index({ tenantId: 1, workflowId: 1 });
+// A timeout retry must never create a second escalation record for one confession.
+DlqSchema.index({ source: 1, sourceId: 1 }, { unique: true, partialFilterExpression: { source: 'confession', sourceId: { $type: 'string' } } });
 DlqSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
 export default (mongoose.models.DlqItemV2 as mongoose.Model<IDlqItem>) ||
