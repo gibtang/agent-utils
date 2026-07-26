@@ -12,6 +12,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/components/AuthProvider';
 import { generateKeyName } from '@/lib/dashboard/keynames';
+import { ConfessionsInbox } from '@/components/ConfessionsInbox';
 
 interface KeyRow {
   agent_id: string;
@@ -281,6 +282,8 @@ export default function DashboardPage() {
           </ul>
         )}
       </section>
+
+      <ConfessionsInbox />
     </main>
   );
 }

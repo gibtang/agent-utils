@@ -25,6 +25,7 @@ export interface ITenant extends Document {
   kvStorageBytes: number;
   activeScheduleCount: number;
   pendingCheckpointCount: number;
+  pendingConfessionCount: number;
   dlqItemCount: number;
   lastActivityAt: Date;
   // rate-limit minute bucket counter
@@ -51,6 +52,7 @@ const TenantSchema = new Schema<ITenant>(
     kvStorageBytes: { type: Number, default: 0 },
     activeScheduleCount: { type: Number, default: 0 },
     pendingCheckpointCount: { type: Number, default: 0 },
+    pendingConfessionCount: { type: Number, default: 0 },
     dlqItemCount: { type: Number, default: 0 },
     lastActivityAt: { type: Date, default: () => new Date() },
     rlBucket: { type: String, default: null },

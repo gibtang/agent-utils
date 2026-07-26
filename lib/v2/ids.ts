@@ -64,3 +64,8 @@ export function generateAgentKey(): string {
 export function generateApprovalProxyKey(): string {
   return `agutil_apr_${randomHex()}`;
 }
+
+/** Opaque magic-link token for Confession reviewer access (shown once). */
+export function generateConfessionToken(): string {
+  return `ct_${randomHex()}`;
+}
