@@ -15,6 +15,7 @@ export interface QuotaConfig {
   schedulesActive: number;
   dlqItems: number;
   checkpointsPending: number;
+  confessionsPending: number;
   auditRetentionDays: number;
 }
 
@@ -26,6 +27,7 @@ export const QUOTAS: Record<'free' | 'pro', QuotaConfig> = {
     schedulesActive: 10,
     dlqItems: 500,
     checkpointsPending: 5,
+    confessionsPending: 25,
     auditRetentionDays: 7,
   },
   pro: {
@@ -35,6 +37,7 @@ export const QUOTAS: Record<'free' | 'pro', QuotaConfig> = {
     schedulesActive: 1000,
     dlqItems: 20_000,
     checkpointsPending: 50,
+    confessionsPending: 1000,
     auditRetentionDays: 30,
   },
 };
@@ -50,8 +53,8 @@ export function quotaFor(plan: string): QuotaConfig {
 export async function reserveCountedQuota(
   tenantId: string,
   plan: string,
-  field: 'agentCount' | 'activeScheduleCount' | 'pendingCheckpointCount' | 'dlqItemCount',
-  quotaKey: 'agents' | 'schedulesActive' | 'checkpointsPending' | 'dlqItems',
+  field: 'agentCount' | 'activeScheduleCount' | 'pendingCheckpointCount' | 'pendingConfessionCount' | 'dlqItemCount',
+  quotaKey: 'agents' | 'schedulesActive' | 'checkpointsPending' | 'confessionsPending' | 'dlqItems',
 ): Promise<{ ok: boolean; used: number; limit: number }> {
   await connectDB();
   const limit = quotaFor(plan)[quotaKey];
@@ -68,7 +71,7 @@ export async function reserveCountedQuota(
 /** Release 1 unit back to a counted quota (on delete/cancel/resolve). */
 export async function releaseCountedQuota(
   tenantId: string,
-  field: 'agentCount' | 'activeScheduleCount' | 'pendingCheckpointCount' | 'dlqItemCount',
+  field: 'agentCount' | 'activeScheduleCount' | 'pendingCheckpointCount' | 'pendingConfessionCount' | 'dlqItemCount',
 ): Promise<void> {
   await connectDB();
   await Tenant.updateOne({ tenantId, [field]: { $gt: 0 } }, { $inc: { [field]: -1 } });

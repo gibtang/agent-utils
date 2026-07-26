@@ -34,6 +34,9 @@ export const ErrorCode = {
   DLQ_ITEM_ALREADY_RESOLVED: 'DLQ_ITEM_ALREADY_RESOLVED',
   CHECKPOINT_NOT_FOUND: 'CHECKPOINT_NOT_FOUND',
   CHECKPOINT_ALREADY_RESOLVED: 'CHECKPOINT_ALREADY_RESOLVED',
+  CONFESSION_NOT_FOUND: 'CONFESSION_NOT_FOUND',
+  CONFESSION_ALREADY_RESOLVED: 'CONFESSION_ALREADY_RESOLVED',
+  CONFESSION_TOKEN_INVALID: 'CONFESSION_TOKEN_INVALID',
   AGENT_NAME_TAKEN: 'AGENT_NAME_TAKEN',
   TENANT_NAME_TAKEN: 'TENANT_NAME_TAKEN',
   INTERNAL_ERROR: 'INTERNAL_ERROR',
@@ -103,6 +106,9 @@ export const Errors = {
   conflict: (msg: string, details?: Record<string, unknown>) =>
     apiError(ErrorCode.CONFLICT, msg, 409, details),
   checkpointAlreadyResolved: () => apiError(ErrorCode.CHECKPOINT_ALREADY_RESOLVED, 'Checkpoint already resolved', 409),
+  confessionNotFound: () => apiError(ErrorCode.CONFESSION_NOT_FOUND, 'Confession not found', 404),
+  confessionAlreadyResolved: () => apiError(ErrorCode.CONFESSION_ALREADY_RESOLVED, 'Confession already resolved, cancelled, or expired', 409),
+  confessionTokenInvalid: () => apiError(ErrorCode.CONFESSION_TOKEN_INVALID, 'Review link is invalid, expired, or already used', 401),
   tenantNameTaken: () => apiError(ErrorCode.TENANT_NAME_TAKEN, 'Tenant name already registered', 409),
   agentNameTaken: () => apiError(ErrorCode.AGENT_NAME_TAKEN, 'Agent name already exists in this tenant', 409),
   rateLimited: (retryAfterSeconds: number) =>
