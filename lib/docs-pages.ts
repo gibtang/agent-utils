@@ -169,6 +169,48 @@ export const toolDocPages: ToolDocPage[] = [
     ],
     relatedSlugs: ['audit-log', 'dlq'],
   }),
+  buildDocPage('confession', {
+    title: 'Agent Confessions',
+    canonicalPath: '/docs/confessions',
+    summary: 'A secure steering loop: an uncertain cloud agent reports its concerns, a human gives guidance, and the agent resumes safely.',
+    endpoint: 'POST /v1/confessions',
+    method: 'POST',
+    auth: 'x-agent-id + x-api-key (creation and polling); x-admin-key, X-Approval-Key, or a short-lived review token (resolution)',
+    machineReadable: true,
+    whatItDoes:
+      'Confessions let an agent ask a human to choose a direction when it lacks enough confidence to proceed. Creation persists the item, returns a one-time review URL, and asynchronously queues email notification. A reviewer approves or rejects it; the agent polls or receives a signed confession.resolved callback to resume.',
+    whenToUse: [
+      'The agent finds competing valid approaches and needs a human to choose the business or technical direction.',
+      'Proceeding with a guess could be costly, unsafe, or difficult to reverse.',
+      'A long-running cloud agent needs help without losing its current context or workflow state.',
+    ],
+    whenNotToUse: [
+      'You only need approval or rejection for one proposed, well-defined action; use a checkpoint instead.',
+      'The task has already failed and needs retry or inspection; use the dead letter queue instead.',
+      'The agent can safely apply a deterministic fallback without human input.',
+    ],
+    agentWorkflows: [
+      'Create a Confession with a title, optional summary/context, urgency, required callback URL, and optional reviewer email.',
+      'Use the returned one-time review_url or tenant email notification to bring an authorized reviewer to /c/{id}.',
+      'Poll GET /v1/confessions/{id}, or verify the signed confession.resolved callback, then resume according to the approved or rejected decision.',
+    ],
+    requestShape: [
+      'title: string — the decision or uncertainty that needs human review (required, max 256 characters)',
+      'summary?: string — optional concise context for the reviewer (max 4096 characters)',
+      'context?: JSON — private supporting context, maximum 50 KB',
+      'urgency?: normal | high | blocking; reviewer_email?: string',
+      'callback_url: HTTPS URL (required); callback_payload?: JSON up to 100 KB',
+      'expires_in_seconds?: integer (300–604800; defaults to 24 hours)',
+    ],
+    codeExamples: requireTool('confession').codeExample,
+    failureModes: [
+      'An agent key can create, list, poll, and cancel only its own tenant’s Confessions; it cannot resolve one.',
+      'Resolution is terminal. A second resolution returns a conflict, so consumers must handle the callback idempotently.',
+      'An expired unanswered Confession is marked expired; pending notification work is cancelled and callback delivery failure is recoverable through the DLQ.',
+      'Email notification is asynchronous and non-blocking. If no reviewer email is configured, creation still succeeds and the agent can distribute review_url itself.',
+    ],
+    relatedSlugs: ['checkpoint', 'dlq', 'audit-log'],
+  }),
   buildDocPage('scheduler', {
     title: 'Scheduler',
     canonicalPath: '/docs/scheduler',

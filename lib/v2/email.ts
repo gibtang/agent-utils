@@ -19,7 +19,9 @@ export interface ResendSendResult {
   status?: number;
 }
 
-let cachedClient: unknown = null;
+type ResendClient = { emails: { send: (args: unknown) => Promise<unknown> } };
+
+let cachedClient: ResendClient | null = null;
 let cachedKey = '';
 
 /** Lazily build the Resend client. Returns null if not configured. */

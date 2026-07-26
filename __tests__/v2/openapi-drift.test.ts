@@ -32,10 +32,22 @@ function findRoutes(dir: string, prefix = ''): { method: string; path: string }[
       if (re.test(src)) {
         // /tick is internal (cron) — skip
         if (seg === '/tick') continue;
-        // collapse catch-all [[...id]] and [id] to {id}
+        // Optional catch-all handlers can expose both collection and item paths.
+        // Confessions uses one file: POST/GET collection, GET/DELETE item.
+        if (seg.includes('[[...')) {
+          const collectionPath = seg
+            .replace(/\/\[\[\.\.\.\w+\]\]/g, '')
+            .replace(/\[(\w+)\]/g, '{$1}');
+          const itemPath = seg
+            .replace(/\[\[\.\.\.(\w+)\]\]/g, '{$1}')
+            .replace(/\[(\w+)\]/g, '{$1}');
+          const isConfessionCollection = seg === '/confessions/[[...id]]' && (m === 'POST' || m === 'GET');
+          out.push({ method: m, path: isConfessionCollection ? collectionPath : itemPath });
+          continue;
+        }
+        // collapse catch-all [..id] and [id] to {id}
         const openapiPath = seg
-          .replace(/\[\[\.\.\.(\w+)\]\]/g, '{$1}')
-          .replace(/\[\.\.\.(\w+)\]\]/g, '{$1}')
+          .replace(/\[\.\.\.(\w+)\]/g, '{$1}')
           .replace(/\[(\w+)\]/g, '{$1}');
         out.push({ method: m, path: openapiPath });
       }

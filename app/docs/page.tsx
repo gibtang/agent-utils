@@ -7,7 +7,7 @@ export const dynamic = 'force-static';
 export const metadata: Metadata = {
   title: 'Documentation — AgentUtils',
   description:
-    'AgentUtils API documentation. Dead-letter queue, checkpoint approvals, KV store, audit log, and image upload.',
+    'AgentUtils API documentation. Dead-letter queue, checkpoint approvals, agent confessions, KV store, audit log, and image upload.',
   openGraph: { url: '/docs' },
   alternates: { canonical: '/docs' },
 };

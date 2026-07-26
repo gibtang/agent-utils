@@ -319,79 +319,65 @@
       "ConfessionCreate": {
         "type": "object",
         "required": [
-          "summary",
-          "concerns",
-          "confidence"
+          "title",
+          "callback_url"
         ],
         "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 256
+          },
           "summary": {
             "type": "string",
             "maxLength": 4096
-          },
-          "concerns": {
-            "type": "array",
-            "minItems": 1,
-            "maxItems": 100,
-            "items": {
-              "type": "string",
-              "maxLength": 2048
-            }
-          },
-          "confidence": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 1
           },
           "context": {},
           "urgency": {
             "type": "string",
             "enum": [
-              "low",
-              "medium",
+              "normal",
               "high",
               "blocking"
-            ]
+            ],
+            "default": "normal"
           },
-          "blocking": {
-            "type": "boolean"
-          },
-          "timeout_seconds": {
-            "type": "integer",
-            "minimum": 60,
-            "maximum": 604800
-          },
-          "timeout_action": {
+          "reviewer_email": {
             "type": "string",
-            "enum": [
-              "continue",
-              "abort",
-              "escalate_to_dlq"
-            ]
+            "format": "email"
+          },
+          "expires_in_seconds": {
+            "type": "integer",
+            "minimum": 300,
+            "maximum": 604800,
+            "default": 86400
           },
           "callback_url": {
             "type": "string",
             "format": "uri"
-          }
+          },
+          "callback_payload": {}
         }
       },
-      "ConfessionResponse": {
+      "ConfessionResolve": {
         "type": "object",
         "required": [
-          "guidance",
-          "action"
+          "decision"
         ],
         "properties": {
-          "guidance": {
-            "type": "string",
-            "maxLength": 4096
-          },
-          "action": {
+          "decision": {
             "type": "string",
             "enum": [
-              "continue",
-              "pivot",
-              "abort"
+              "approved",
+              "rejected"
             ]
+          },
+          "by": {
+            "type": "string",
+            "maxLength": 128
+          },
+          "note": {
+            "type": "string",
+            "maxLength": 1024
           }
         }
       },
@@ -1358,7 +1344,7 @@
           "Confessions"
         ],
         "summary": "Create an uncertainty report",
-        "description": "Creation is always asynchronous. When `blocking=true`, the server returns `poll_after_seconds`; clients must poll GET /confessions/{id} and no request is held open. Monthly quota: free 10, pro 1000.",
+        "description": "Persists the Confession, returns a one-time review URL, and queues a default reviewer email asynchronously. The agent can poll or receive a signed resolution callback.",
         "security": [
           {
             "agentKey": []
@@ -1376,10 +1362,10 @@
         },
         "responses": {
           "201": {
-            "description": "Open confession created"
+            "description": "Created \u2014 includes review_url"
           },
-          "429": {
-            "description": "QUOTA_EXCEEDED (confessions_monthly)"
+          "402": {
+            "description": "QUOTA_EXCEEDED (confessions_pending)"
           }
         }
       },
@@ -1387,7 +1373,7 @@
         "tags": [
           "Confessions"
         ],
-        "summary": "List/poll tenant confessions",
+        "summary": "List tenant confessions",
         "security": [
           {
             "agentKey": []
@@ -1400,8 +1386,9 @@
             "schema": {
               "type": "string",
               "enum": [
-                "open",
+                "pending",
                 "resolved",
+                "cancelled",
                 "expired"
               ]
             }
@@ -1452,21 +1439,15 @@
             "description": "Cross-tenant / not found"
           }
         }
-      }
-    },
-    "/confessions/{id}/review": {
-      "get": {
+      },
+      "delete": {
         "tags": [
           "Confessions"
         ],
-        "summary": "Fetch confession for authenticated browser review",
-        "description": "Reviewer-only endpoint used by the public review shell; no confession fields are embedded in server HTML.",
+        "summary": "Cancel a pending confession (creating agent only)",
         "security": [
           {
-            "adminKey": []
-          },
-          {
-            "approvalKey": []
+            "agentKey": []
           }
         ],
         "parameters": [
@@ -1475,25 +1456,25 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Confession review data"
+          "204": {
+            "description": "Cancelled"
           },
           "403": {
-            "description": "Reviewer credential required"
+            "description": "Not the creating agent"
           },
-          "404": {
-            "description": "Cross-tenant / not found"
+          "409": {
+            "description": "Already resolved"
           }
         }
       }
     },
-    "/confessions/{id}/respond": {
+    "/confessions/{id}/resolve": {
       "post": {
         "tags": [
           "Confessions"
         ],
-        "summary": "Resolve a confession with human guidance",
-        "description": "Admin key or approval-proxy key only. Resolution is atomic; repeat responses return 409.",
+        "summary": "Resolve a confession",
+        "description": "Admin key, approval-proxy key, or a one-time reviewer token. Resolution fires a signed callback and cancels pending notification work.",
         "security": [
           {
             "adminKey": []
@@ -1512,7 +1493,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ConfessionResponse"
+                "$ref": "#/components/schemas/ConfessionResolve"
               }
             }
           }

@@ -6,7 +6,7 @@ export const dynamic = 'force-static';
 export const metadata: Metadata = {
   title: 'AgentUtils v2 API — Multi-tenant Infrastructure',
   description:
-    'Tenant-isolated KV store, audit log, dead-letter queue, human-in-the-loop checkpoints, and image upload. v2 API quick start and reference.',
+    'Tenant-isolated KV store, audit log, dead-letter queue, human-in-the-loop checkpoints, agent confessions, and image upload. v2 API quick start and reference.',
   openGraph: { url: '/docs/v2' },
   alternates: { canonical: '/docs/v2' },
 };
@@ -55,6 +55,27 @@ curl -X POST https://www.agent-utils.com/v1/checkpoints \\
 curl -X POST https://www.agent-utils.com/v1/checkpoints/{id}/approve \\
   -H "x-admin-key: agutil_adm_…"`;
 
+const SNIP_CONFESSION = `# 1. Let an uncertain agent request human steering
+curl -X POST https://www.agent-utils.com/v1/confessions \\
+  -H "x-agent-id: worker-1" -H "x-api-key: agutil_agt_…" \\
+  -H "content-type: application/json" \\
+  -d '{
+    "title":"Which migration should we ship?",
+    "summary":"Both schemas are active.",
+    "urgency":"high",
+    "callback_url":"https://myapp.com/confession-resolved"
+  }'
+
+# 2. Poll for the reviewer’s decision (agent key)
+curl https://www.agent-utils.com/v1/confessions/{id} \\
+  -H "x-agent-id: worker-1" -H "x-api-key: agutil_agt_…"
+
+# 3. Resolve with a reviewer credential or one-time review token
+curl -X POST https://www.agent-utils.com/v1/confessions/{id}/resolve \\
+  -H "x-admin-key: agutil_adm_…" \\
+  -H "content-type: application/json" \\
+  -d '{ "decision":"approved", "by":"release-manager", "note":"Ship the new schema first." }'`;
+
 const SNIP_IMAGE = `curl -X POST https://www.agent-utils.com/v1/upload \\
   -H "x-agent-id: worker-1" -H "x-api-key: agutil_agt_…" \\
   -F "file=@screenshot.png" -F "retentionHours=24"`;
@@ -90,7 +111,7 @@ export default function V2Docs() {
       </Link>
       <h1 className="mt-4 text-3xl font-bold tracking-tight">⚡ AgentUtils v2 API</h1>
       <p className="mt-3 text-zinc-400">
-        Multi-tenant, agent-native infrastructure: KV store, audit log, dead-letter queue, human-in-the-loop checkpoints, and image upload. Tenant-isolated, callback-signed, idempotent.
+        Multi-tenant, agent-native infrastructure: KV store, audit log, dead-letter queue, human-in-the-loop checkpoints, agent confessions, and image upload. Tenant-isolated, callback-signed, idempotent.
       </p>
 
       <Note>
@@ -198,6 +219,15 @@ export default function V2Docs() {
         </p>
         <div className="mt-3">
           <Code>{SNIP_HITL}</Code>
+        </div>
+
+        <h3 className="mt-6 text-lg font-medium">🧭 Agent Confessions — ask humans for steering</h3>
+        <p className="mt-2 text-zinc-400">
+          Use a Confession when an agent is uncertain which path to take, rather than when it merely needs approval for a proposed action. Creation returns a one-time review URL and queues a reviewer notification; the reviewer records an <code>approved</code> or <code>rejected</code> decision, and the agent polls or receives a signed callback to resume.{' '}
+          <Link href="/docs/confessions" className="underline hover:text-zinc-300">Read the Confessions guide</Link>.
+        </p>
+        <div className="mt-3">
+          <Code>{SNIP_CONFESSION}</Code>
         </div>
 
         <h3 className="mt-6 text-lg font-medium">🖼️ Image Upload — hosted image URLs for handoff</h3>

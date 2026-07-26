@@ -21,13 +21,10 @@ import { serializeConfession } from '@/lib/v2/confessionsApi';
 
 export async function POST(
   req: NextRequest,
-  params: { id?: string[] } | Promise<{ id?: string[] }>,
+  ctx: { params: Promise<{ id: string }> },
 ): Promise<Response> {
-  const p = params && typeof (params as { then?: unknown }).then === 'function'
-    ? await (params as Promise<{ id?: string[] }>)
-    : (params as { id?: string[] });
+  const { id } = await ctx.params;
   const requestId = req.headers.get('x-request-id') || '';
-  const id = Array.isArray(p.id) && p.id.length ? p.id[0] : '';
 
   // Parse decision/note (same shape as checkpoint approve/reject).
   let parsed: { decision?: string; note?: string; by?: string };

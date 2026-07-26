@@ -291,7 +291,7 @@ const { data } = await res.json();`,
     name: 'Agent Confession',
     icon: '🧭',
     tagline: 'Let cloud agents report uncertainty and get human steering.',
-    docsUrl: '/docs/v2',
+    docsUrl: '/docs/confessions',
     metaTitle: 'Agent Confession API for Cloud-Agent Steering | AgentUtils',
     metaDescription: 'Give cloud agents a secure human steering loop: confess uncertainty, collect guidance, and resume safely.',
     h1: 'Cloud-Agent Steering with Confessions',
@@ -301,10 +301,39 @@ const { data } = await res.json();`,
     useCases: [{ title: 'Ambiguous refactor', description: 'Ask a maintainer which of several code patterns is canonical' }, { title: 'Risk escalation', description: 'Pause or redirect an uncertain production workflow before it causes harm' }],
     codeExample: {
       curl: `curl -X POST https://www.agent-utils.com/v1/confessions \\
-  -H "x-agent-id: worker" -H "x-api-key: agutil_agt_…" -H "content-type: application/json" \\
-  -d '{"summary":"Unsure which migration path is safe","concerns":["Two schemas are active"],"confidence":0.4}'`,
-      python: `requests.post("https://www.agent-utils.com/v1/confessions", headers={"x-agent-id":"worker", "x-api-key":"agutil_agt_…"}, json={"summary":"Need direction", "concerns":["ambiguous state"], "confidence":0.4})`,
-      js: `await fetch("https://www.agent-utils.com/v1/confessions", { method: "POST", headers: { "x-agent-id": "worker", "x-api-key": "agutil_agt_…", "content-type": "application/json" }, body: JSON.stringify({ summary: "Need direction", concerns: ["ambiguous state"], confidence: 0.4 }) });`,
+  -H "x-agent-id: worker" -H "x-api-key: agutil_agt_…" \\
+  -H "content-type: application/json" \\
+  -d '{
+    "title":"Which migration should we ship?",
+    "summary":"Both schemas are active; I need a reviewer decision.",
+    "urgency":"high",
+    "callback_url":"https://your-app.example/confessions/resolved"
+  }'`,
+      python: `import requests
+
+resp = requests.post(
+    "https://www.agent-utils.com/v1/confessions",
+    headers={"x-agent-id": "worker", "x-api-key": "agutil_agt_…"},
+    json={
+        "title": "Which migration should we ship?",
+        "summary": "Both schemas are active; I need a reviewer decision.",
+        "urgency": "high",
+        "callback_url": "https://your-app.example/confessions/resolved",
+    },
+)
+review_url = resp.json()["data"]["review_url"]`,
+      js: `const res = await fetch("https://www.agent-utils.com/v1/confessions", {
+  method: "POST",
+  headers: { "x-agent-id": "worker", "x-api-key": "agutil_agt_…", "content-type": "application/json" },
+  body: JSON.stringify({
+    title: "Which migration should we ship?",
+    summary: "Both schemas are active; I need a reviewer decision.",
+    urgency: "high",
+    callback_url: "https://your-app.example/confessions/resolved",
+  }),
+});
+const { data } = await res.json();
+console.log(data.review_url);`,
     },
     apiEndpoint: 'POST /v1/confessions',
     competitors: ['Custom internal agent orchestration'],
