@@ -25,6 +25,7 @@ export interface ITenant extends Document {
   kvStorageBytes: number;
   activeScheduleCount: number;
   pendingCheckpointCount: number;
+  pendingConfessionCount: number;
   dlqItemCount: number;
   confessionQuotaMonth?: string | null;
   confessionMonthlyCount: number;
@@ -53,6 +54,7 @@ const TenantSchema = new Schema<ITenant>(
     kvStorageBytes: { type: Number, default: 0 },
     activeScheduleCount: { type: Number, default: 0 },
     pendingCheckpointCount: { type: Number, default: 0 },
+    pendingConfessionCount: { type: Number, default: 0 },
     dlqItemCount: { type: Number, default: 0 },
     confessionQuotaMonth: { type: String, default: null },
     confessionMonthlyCount: { type: Number, default: 0 },

@@ -1,9 +1,12 @@
 /**
  * POST /v1/tick — production cron tick (issue au-2r3).
  *
- * Drives the two time-based v2 engines that cannot run in-request:
- *   1. fireDueSchedules()  — Scheduler retries + DLQ cascade
- *   2. processTimeouts()   — HitL checkpoint auto_reject / dlq expiry
+ * Drives the time-based v2 engines that cannot run in-request:
+ *   1. fireDueSchedules()                — Scheduler retries + DLQ cascade
+ *   2. processTimeouts()                 — HitL checkpoint auto_reject / dlq expiry
+ *   3. processConfessionNotifications()  — Confession email delivery (idempotent)
+ *   4. processConfessionEscalations()    — Confession tier-1 escalation (15min)
+ *   5. processConfessionExpiries()       — Confession auto-expire past expiresAt
  *
  * Authentication: a shared secret in CRON_SECRET, verified via the standard
  * `Authorization: Bearer <secret>` header. Tenant keys (admin/agent) are
@@ -14,8 +17,13 @@
 import { NextRequest } from 'next/server';
 import { fireDueSchedules } from '@/lib/v2/scheduler';
 import { processTimeouts } from '@/lib/v2/hitl';
-import { processConfessionTimeouts } from '@/lib/v2/confessions';
+import {
+  processConfessionNotifications,
+  processConfessionEscalations,
+  processConfessionExpiries,
+} from '@/lib/v2/confessions';
 import { ok } from '@/lib/v2/envelope';
+import connectDB from '@/lib/v2/db';
 
 function unauthorized(): Response {
   return Response.json(
@@ -44,11 +52,26 @@ export async function POST(req: NextRequest): Promise<Response> {
     return unauthorized();
   }
 
-  const [schedules, timeouts, confessions] = await Promise.all([
+  // Ensure the mongoose connection is established before fan-out. The tick
+  // handler bypasses createRoute()/auth.ts (which normally call connectDB), so
+  // an explicit connect here protects cold starts for all five engines.
+  await connectDB();
+
+  const [schedules, timeouts, confessionNotifications, confessionEscalations, confessionExpiries] = await Promise.all([
     fireDueSchedules(),
     processTimeouts(),
-    processConfessionTimeouts(),
+    processConfessionNotifications(),
+    processConfessionEscalations(),
+    processConfessionExpiries(),
   ]);
 
-  return ok({ schedules, timeouts, confessions });
+  return ok({
+    schedules,
+    timeouts,
+    confessions: {
+      notifications: confessionNotifications,
+      escalations: confessionEscalations,
+      expiries: confessionExpiries,
+    },
+  });
 }

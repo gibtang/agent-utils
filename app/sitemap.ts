@@ -4,9 +4,9 @@ import { toolDocPages } from '@/lib/docs-pages';
 
 const BASE_URL = 'https://www.agent-utils.com';
 
-// Static dates — only update when content actually changes.
-// Using new Date() on every build makes Google distrust lastmod.
-const LAST_MOD = '2026-06-03';
+// The tool and docs registries do not expose source-backed per-page update
+// dates. Omit lastmod instead of keeping one stale date for every URL.
+const LAST_MOD: Date | undefined = undefined;
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const toolSlugs = getAllToolSlugs();
