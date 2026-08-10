@@ -41,7 +41,7 @@ export function getResend(): { client: { emails: { send: (args: unknown) => Prom
 
 /** Verified sender (`RESEND_FROM_EMAIL`). */
 export function fromEmail(): string {
-  return process.env.RESEND_FROM_EMAIL || 'AgentUtils <no-reply@agent-utils.com>';
+  return process.env.RESEND_FROM_EMAIL || 'AgentUtils <admin@a2z-soft.co>';
 }
 
 function urgencyLabel(u: ConfessionUrgency): string {

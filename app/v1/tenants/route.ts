@@ -8,6 +8,7 @@ import { resourceId, generateAdminKey } from '@/lib/v2/ids';
 import { randomSecret } from '@/lib/v2/crypto';
 import Tenant, { TenantStatus, TenantPlan } from '@/models/v2/Tenant';
 import ApiCredential from '@/models/v2/ApiCredential';
+import { notifyFreeRegistration } from '@/lib/registration-notifications';
 
 const NAME_RE = /^[a-z0-9][a-z0-9-]{2,31}$/;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -63,6 +64,12 @@ export const POST = createRoute({ public: true, idempotent: 'POST /v1/tenants' }
     agentId: null,
     active: true,
   });
+
+  // A free tenant is now durably created. Delivery is fail-soft and does not
+  // affect the registration response if either external provider is unavailable.
+  if (plan === 'free') {
+    await notifyFreeRegistration({ email: ownerEmail, tenantId, source: 'public_api', name });
+  }
 
   const tenant = await Tenant.findOne({ tenantId }).lean();
   void tenant;

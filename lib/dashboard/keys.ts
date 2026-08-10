@@ -17,6 +17,7 @@ import Agent from '@/models/v2/Agent';
 import ApiCredential from '@/models/v2/ApiCredential';
 import Tenant from '@/models/v2/Tenant';
 import User from '@/models/v2/User';
+import { notifyFreeRegistration } from '@/lib/registration-notifications';
 
 /** Same naming rules as POST /v1/agents. */
 const NAME_RE = /^[a-z0-9][a-z0-9-]{2,31}$/;
@@ -95,6 +96,15 @@ export async function provisionUser(input: {
     displayName: input.displayName,
     photoURL: input.photoURL,
     tenantId,
+  });
+
+  // The User document is the durable first-registration marker. Subsequent
+  // Firebase sync calls return above, so this notification is triggered once.
+  await notifyFreeRegistration({
+    email: input.email,
+    tenantId,
+    source: 'firebase',
+    name: input.displayName,
   });
 
   // Auto-onboarding: one default key so the user can start immediately.
