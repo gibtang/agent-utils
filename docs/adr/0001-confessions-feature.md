@@ -1,6 +1,6 @@
 # ADR 0001 — Confessions feature
 
-- **Status:** Accepted
+- **Status:** Superseded by ADR 0002
 - **Date:** 2026-07-26
 - **Service:** agent-utils (v2)
 - **Supersedes:** none
