@@ -1,7 +1,7 @@
 # AgentUtils Product Reset Design
 
 Date: 06-Sep-2026
-Status: Approved design; pending final written-spec review
+Status: Approved for implementation on 06-Sep-2026
 Decision record: docs/adr/0002 through docs/adr/0027
 Domain language: CONTEXT.md
 
