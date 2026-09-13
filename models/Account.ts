@@ -20,6 +20,7 @@ const AccountSchema = new mongoose.Schema({
   currentPeriodEnd: { type: Date, default: null },
   downgradeAt: { type: Date, default: null },
   pendingPlan: { type: String, enum: ['free', 'plus', 'pro'], default: null },
+  handoffDek: { type: String, default: null },
 }, { timestamps: true, versionKey: false });
 
 export type AccountDocument = InferSchemaType<typeof AccountSchema> & { plan: PlanName };
