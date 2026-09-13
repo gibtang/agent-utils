@@ -90,6 +90,17 @@ export async function closeHandoff(handoffId: string, actor: ConnectionActor | O
   await Handoff.updateOne(filter, { $set: { status: 'closed', closureReason: reason, ...erasure, closedAt: now, expiresAtPurge: new Date(now.getTime() + PURGE) } });
 }
 
+/**
+ * Non-secret polling view. Any active connection in the owning account may
+ * inspect this metadata; creator-only scoping remains mandatory for decrypt.
+ */
+export async function statusHandoff(handoffId: string, actor: ConnectionActor): Promise<{ handoffId: string; status: 'awaiting' | 'submitted' | 'closed' | 'expired'; closureReason: 'done' | 'revoked' | null; retrievalCount: number; linkExpiresAt: Date; sessionExpiresAt: Date; createdAt: Date }> {
+  await connectDB();
+  const handoff = await Handoff.findOne({ handoffId, accountId: actor.accountId }).select({ handoffId: 1, status: 1, closureReason: 1, retrievalCount: 1, linkExpiresAt: 1, sessionExpiresAt: 1, createdAt: 1, _id: 0 }).lean();
+  if (!handoff) throw Errors.notFound();
+  return { handoffId: handoff.handoffId, status: handoff.status as 'awaiting' | 'submitted' | 'closed' | 'expired', closureReason: handoff.closureReason as 'done' | 'revoked' | null, retrievalCount: handoff.retrievalCount, linkExpiresAt: handoff.linkExpiresAt, sessionExpiresAt: handoff.sessionExpiresAt, createdAt: handoff.createdAt };
+}
+
 export async function expireStaleHandoffs(opts: Clock = {}): Promise<number> {
   const now = at(opts); await connectDB(); const purge = new Date(now.getTime() + PURGE);
   const [submitted, awaiting] = await Promise.all([

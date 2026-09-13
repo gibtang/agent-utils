@@ -29,6 +29,8 @@ import { DomainError, Errors } from '@/lib/core/errors';
 import { resourceId } from '@/lib/core/ids';
 import { listMcpOperations } from '@/lib/contracts/registry';
 import type { OperationActor, OperationContext, OperationDefinition } from '@/lib/contracts/operation';
+import '@/lib/connections/operations';
+import '@/lib/handoff/operations';
 
 /** The caller resolved by the transport's auth step; undefined when public. */
 type Actor = OperationContext['actor'];

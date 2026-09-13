@@ -95,7 +95,7 @@ describe('mcp tool surface', () => {
     const names = await toolNames(client);
     expect(names).toContain('pair_connection');
     expect(names).toContain('connection_status');
-    expect(names).toHaveLength(2);
+    expect(names).toHaveLength(6);
   });
 
   it('describes tools from registry metadata with mcp annotations', async () => {

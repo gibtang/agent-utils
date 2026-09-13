@@ -622,6 +622,1190 @@
         },
         "parameters": []
       }
+    },
+    "/v1/handoffs": {
+      "post": {
+        "operationId": "handoff_create",
+        "summary": "Create a secure credential handoff link.",
+        "description": "Creates a handoff owned by the calling connection and returns its one-time view and submit tokens. The HTTP route applies connection rate limits.",
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "https://json-schema.org/draft/2020-12/schema",
+                  "type": "object",
+                  "properties": {
+                    "handoffId": {
+                      "type": "string"
+                    },
+                    "linkPath": {
+                      "type": "string"
+                    },
+                    "linkExpiresAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                    },
+                    "submitToken": {
+                      "type": "string"
+                    },
+                    "viewToken": {
+                      "type": "string"
+                    },
+                    "callbackSecret": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "handoffId",
+                    "linkPath",
+                    "linkExpiresAt",
+                    "submitToken",
+                    "viewToken"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "validation_failed: Some submitted values are invalid.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "https://json-schema.org/draft/2020-12/schema",
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string",
+                          "enum": [
+                            "validation_failed"
+                          ]
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "data_preserved": {
+                          "type": "boolean"
+                        },
+                        "retry_safe": {
+                          "type": "boolean"
+                        },
+                        "next_action": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "message",
+                        "data_preserved",
+                        "retry_safe",
+                        "next_action",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "permission_denied: You do not have permission to perform this action.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "https://json-schema.org/draft/2020-12/schema",
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string",
+                          "enum": [
+                            "permission_denied"
+                          ]
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "data_preserved": {
+                          "type": "boolean"
+                        },
+                        "retry_safe": {
+                          "type": "boolean"
+                        },
+                        "next_action": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "message",
+                        "data_preserved",
+                        "retry_safe",
+                        "next_action",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "temporarily_unavailable: The service is temporarily unavailable.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "https://json-schema.org/draft/2020-12/schema",
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string",
+                          "enum": [
+                            "temporarily_unavailable"
+                          ]
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "data_preserved": {
+                          "type": "boolean"
+                        },
+                        "retry_safe": {
+                          "type": "boolean"
+                        },
+                        "next_action": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "message",
+                        "data_preserved",
+                        "retry_safe",
+                        "next_action",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        },
+        "x-mcp": {
+          "readOnly": false,
+          "destructive": false,
+          "idempotent": false
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$schema": "https://json-schema.org/draft/2020-12/schema",
+                "type": "object",
+                "properties": {
+                  "fieldSchema": {
+                    "maxItems": 12,
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "pattern": "^[a-z0-9_]{1,64}$"
+                        },
+                        "label": {
+                          "type": "string",
+                          "maxLength": 120
+                        },
+                        "helpText": {
+                          "type": "string",
+                          "maxLength": 240
+                        },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "email",
+                            "text",
+                            "password",
+                            "textarea"
+                          ]
+                        },
+                        "required": {
+                          "type": "boolean"
+                        },
+                        "prefill": {
+                          "type": "string",
+                          "maxLength": 256
+                        }
+                      },
+                      "required": [
+                        "name",
+                        "label",
+                        "type",
+                        "required"
+                      ]
+                    }
+                  },
+                  "title": {
+                    "type": "string",
+                    "maxLength": 120
+                  },
+                  "linkTtlHours": {
+                    "type": "number",
+                    "minimum": 0.5,
+                    "maximum": 24
+                  },
+                  "callbackUrl": {
+                    "type": "string",
+                    "format": "uri"
+                  }
+                },
+                "required": [
+                  "fieldSchema"
+                ]
+              }
+            }
+          }
+        },
+        "parameters": []
+      }
+    },
+    "/v1/handoffs/decrypt": {
+      "post": {
+        "operationId": "handoff_decrypt",
+        "summary": "Decrypt values submitted to a handoff created by this connection.",
+        "description": "Returns plaintext values only to the creating connection. Uses POST /v1/handoffs/decrypt with handoffId in the body so the shared registry has a single JSON input schema.",
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "https://json-schema.org/draft/2020-12/schema",
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "additionalProperties": {
+                    "type": "string",
+                    "maxLength": 4096
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "authentication_required: Authentication is required.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "https://json-schema.org/draft/2020-12/schema",
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string",
+                          "enum": [
+                            "authentication_required"
+                          ]
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "data_preserved": {
+                          "type": "boolean"
+                        },
+                        "retry_safe": {
+                          "type": "boolean"
+                        },
+                        "next_action": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "message",
+                        "data_preserved",
+                        "retry_safe",
+                        "next_action",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "permission_denied: You do not have permission to perform this action.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "https://json-schema.org/draft/2020-12/schema",
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string",
+                          "enum": [
+                            "permission_denied"
+                          ]
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "data_preserved": {
+                          "type": "boolean"
+                        },
+                        "retry_safe": {
+                          "type": "boolean"
+                        },
+                        "next_action": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "message",
+                        "data_preserved",
+                        "retry_safe",
+                        "next_action",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "not_found: The requested resource was not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "https://json-schema.org/draft/2020-12/schema",
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string",
+                          "enum": [
+                            "not_found"
+                          ]
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "data_preserved": {
+                          "type": "boolean"
+                        },
+                        "retry_safe": {
+                          "type": "boolean"
+                        },
+                        "next_action": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "message",
+                        "data_preserved",
+                        "retry_safe",
+                        "next_action",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "resource_expired: This resource has expired. / resource_deleted: This resource has been deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "https://json-schema.org/draft/2020-12/schema",
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string",
+                          "enum": [
+                            "resource_expired",
+                            "resource_deleted"
+                          ]
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "data_preserved": {
+                          "type": "boolean"
+                        },
+                        "retry_safe": {
+                          "type": "boolean"
+                        },
+                        "next_action": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "message",
+                        "data_preserved",
+                        "retry_safe",
+                        "next_action",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "temporarily_unavailable: The service is temporarily unavailable.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "https://json-schema.org/draft/2020-12/schema",
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string",
+                          "enum": [
+                            "temporarily_unavailable"
+                          ]
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "data_preserved": {
+                          "type": "boolean"
+                        },
+                        "retry_safe": {
+                          "type": "boolean"
+                        },
+                        "next_action": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "message",
+                        "data_preserved",
+                        "retry_safe",
+                        "next_action",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        },
+        "x-mcp": {
+          "readOnly": false,
+          "destructive": false,
+          "idempotent": true
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$schema": "https://json-schema.org/draft/2020-12/schema",
+                "type": "object",
+                "properties": {
+                  "handoffId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128
+                  }
+                },
+                "required": [
+                  "handoffId"
+                ]
+              }
+            }
+          }
+        },
+        "parameters": []
+      }
+    },
+    "/v1/handoffs/close": {
+      "post": {
+        "operationId": "handoff_close",
+        "summary": "Close a handoff created by this connection.",
+        "description": "Crypto-erases a handoff with the done reason. Owner revocation is intentionally owner-route-only and is never an MCP operation.",
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "https://json-schema.org/draft/2020-12/schema",
+                  "type": "object",
+                  "properties": {
+                    "closed": {
+                      "type": "boolean",
+                      "const": true
+                    }
+                  },
+                  "required": [
+                    "closed"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "validation_failed: Some submitted values are invalid.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "https://json-schema.org/draft/2020-12/schema",
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string",
+                          "enum": [
+                            "validation_failed"
+                          ]
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "data_preserved": {
+                          "type": "boolean"
+                        },
+                        "retry_safe": {
+                          "type": "boolean"
+                        },
+                        "next_action": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "message",
+                        "data_preserved",
+                        "retry_safe",
+                        "next_action",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "permission_denied: You do not have permission to perform this action.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "https://json-schema.org/draft/2020-12/schema",
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string",
+                          "enum": [
+                            "permission_denied"
+                          ]
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "data_preserved": {
+                          "type": "boolean"
+                        },
+                        "retry_safe": {
+                          "type": "boolean"
+                        },
+                        "next_action": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "message",
+                        "data_preserved",
+                        "retry_safe",
+                        "next_action",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "not_found: The requested resource was not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "https://json-schema.org/draft/2020-12/schema",
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string",
+                          "enum": [
+                            "not_found"
+                          ]
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "data_preserved": {
+                          "type": "boolean"
+                        },
+                        "retry_safe": {
+                          "type": "boolean"
+                        },
+                        "next_action": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "message",
+                        "data_preserved",
+                        "retry_safe",
+                        "next_action",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "resource_deleted: This resource has been deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "https://json-schema.org/draft/2020-12/schema",
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string",
+                          "enum": [
+                            "resource_deleted"
+                          ]
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "data_preserved": {
+                          "type": "boolean"
+                        },
+                        "retry_safe": {
+                          "type": "boolean"
+                        },
+                        "next_action": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "message",
+                        "data_preserved",
+                        "retry_safe",
+                        "next_action",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "temporarily_unavailable: The service is temporarily unavailable.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "https://json-schema.org/draft/2020-12/schema",
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string",
+                          "enum": [
+                            "temporarily_unavailable"
+                          ]
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "data_preserved": {
+                          "type": "boolean"
+                        },
+                        "retry_safe": {
+                          "type": "boolean"
+                        },
+                        "next_action": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "message",
+                        "data_preserved",
+                        "retry_safe",
+                        "next_action",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        },
+        "x-mcp": {
+          "readOnly": false,
+          "destructive": true,
+          "idempotent": true
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$schema": "https://json-schema.org/draft/2020-12/schema",
+                "type": "object",
+                "properties": {
+                  "handoffId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128
+                  },
+                  "reason": {
+                    "type": "string",
+                    "enum": [
+                      "done"
+                    ]
+                  }
+                },
+                "required": [
+                  "handoffId",
+                  "reason"
+                ]
+              }
+            }
+          }
+        },
+        "parameters": []
+      }
+    },
+    "/v1/handoffs/status": {
+      "post": {
+        "operationId": "handoff_status",
+        "summary": "Return metadata-only status for an account handoff.",
+        "description": "Any connection in the owning account may poll non-secret metadata. Uses POST /v1/handoffs/status with handoffId in the body; it never returns field values, tokens, or ciphertext metadata.",
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "https://json-schema.org/draft/2020-12/schema",
+                  "type": "object",
+                  "properties": {
+                    "handoffId": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "awaiting",
+                        "submitted",
+                        "closed",
+                        "expired"
+                      ]
+                    },
+                    "closureReason": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "done",
+                            "revoked"
+                          ]
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "retrievalCount": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    "linkExpiresAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                    },
+                    "sessionExpiresAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                    }
+                  },
+                  "required": [
+                    "handoffId",
+                    "status",
+                    "closureReason",
+                    "retrievalCount",
+                    "linkExpiresAt",
+                    "sessionExpiresAt",
+                    "createdAt"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "authentication_required: Authentication is required.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "https://json-schema.org/draft/2020-12/schema",
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string",
+                          "enum": [
+                            "authentication_required"
+                          ]
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "data_preserved": {
+                          "type": "boolean"
+                        },
+                        "retry_safe": {
+                          "type": "boolean"
+                        },
+                        "next_action": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "message",
+                        "data_preserved",
+                        "retry_safe",
+                        "next_action",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "not_found: The requested resource was not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "https://json-schema.org/draft/2020-12/schema",
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string",
+                          "enum": [
+                            "not_found"
+                          ]
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "data_preserved": {
+                          "type": "boolean"
+                        },
+                        "retry_safe": {
+                          "type": "boolean"
+                        },
+                        "next_action": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "message",
+                        "data_preserved",
+                        "retry_safe",
+                        "next_action",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "temporarily_unavailable: The service is temporarily unavailable.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "https://json-schema.org/draft/2020-12/schema",
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string",
+                          "enum": [
+                            "temporarily_unavailable"
+                          ]
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "data_preserved": {
+                          "type": "boolean"
+                        },
+                        "retry_safe": {
+                          "type": "boolean"
+                        },
+                        "next_action": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "message",
+                        "data_preserved",
+                        "retry_safe",
+                        "next_action",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        },
+        "x-mcp": {
+          "readOnly": true,
+          "destructive": false,
+          "idempotent": true
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$schema": "https://json-schema.org/draft/2020-12/schema",
+                "type": "object",
+                "properties": {
+                  "handoffId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128
+                  }
+                },
+                "required": [
+                  "handoffId"
+                ]
+              }
+            }
+          }
+        },
+        "parameters": []
+      }
     }
   }
 }

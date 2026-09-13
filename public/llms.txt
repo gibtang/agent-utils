@@ -42,3 +42,47 @@ Renames an agent. Names are unique per account; unknown or cross-account ids are
 
 - actor: owner
 - errors: authentication_required, not_found, validation_failed, temporarily_unavailable
+
+## handoff_create
+
+Create a secure credential handoff link.
+
+Creates a handoff owned by the calling connection and returns its one-time view and submit tokens. The HTTP route applies connection rate limits.
+
+- actor: connection
+- http: POST /v1/handoffs
+- mcp: writes, non-destructive, not idempotent
+- errors: validation_failed, permission_denied, temporarily_unavailable
+
+## handoff_decrypt
+
+Decrypt values submitted to a handoff created by this connection.
+
+Returns plaintext values only to the creating connection. Uses POST /v1/handoffs/decrypt with handoffId in the body so the shared registry has a single JSON input schema.
+
+- actor: connection
+- http: POST /v1/handoffs/decrypt
+- mcp: writes, non-destructive, idempotent
+- errors: not_found, resource_expired, resource_deleted, permission_denied, authentication_required, temporarily_unavailable
+
+## handoff_close
+
+Close a handoff created by this connection.
+
+Crypto-erases a handoff with the done reason. Owner revocation is intentionally owner-route-only and is never an MCP operation.
+
+- actor: connection
+- http: POST /v1/handoffs/close
+- mcp: writes, destructive, idempotent
+- errors: not_found, resource_deleted, permission_denied, validation_failed, temporarily_unavailable
+
+## handoff_status
+
+Return metadata-only status for an account handoff.
+
+Any connection in the owning account may poll non-secret metadata. Uses POST /v1/handoffs/status with handoffId in the body; it never returns field values, tokens, or ciphertext metadata.
+
+- actor: connection
+- http: POST /v1/handoffs/status
+- mcp: read-only, non-destructive, idempotent
+- errors: not_found, authentication_required, temporarily_unavailable

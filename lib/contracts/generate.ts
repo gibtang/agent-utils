@@ -9,6 +9,7 @@ import { toOpenAPISpec } from '@/lib/contracts/openapi';
 import { toLlmsTxt } from '@/lib/contracts/docs';
 // Importing the operations module registers every operation as a side effect.
 import '@/lib/connections/operations';
+import '@/lib/handoff/operations';
 
 export function generateContracts(): { openapi: Record<string, unknown>; llmsTxt: string } {
   const openapi = toOpenAPISpec();
