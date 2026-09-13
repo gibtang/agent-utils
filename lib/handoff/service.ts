@@ -49,15 +49,28 @@ export async function createHandoff(actor: ConnectionActor, input: { fieldSchema
   return { handoffId: handoff.handoffId, viewToken, submitToken, linkPath, linkExpiresAt, ...(callbackSecret ? { callbackSecret } : {}) };
 }
 
+export type PublicHandoffForm = { handoffId: string; title: string | null; fields: Array<{ name: string; label: string; helpText?: string; type: HandoffFieldSchema['type']; required: boolean; prefill?: string }> };
+
+/** Possession-only public form metadata. Deliberately excludes every token/hash. */
+export async function viewHandoffForForm(viewToken: string, opts: Clock = {}): Promise<PublicHandoffForm> {
+  const now = at(opts); await connectDB();
+  const handoff = await Handoff.findOne({ viewTokenHash: hashHandoffToken(viewToken), status: 'awaiting', linkExpiresAt: { $gte: now } }).select({ handoffId: 1, title: 1, fieldSchema: 1, _id: 0 }).lean();
+  if (!handoff) throw Errors.notFound();
+  return { handoffId: handoff.handoffId, title: handoff.title ?? null, fields: (handoff.fieldSchema as HandoffFieldSchema[]).map((field) => ({ name: field.name, label: field.label, ...(field.helpText ? { helpText: field.helpText } : {}), type: field.type, required: field.required, ...(field.type !== 'password' && field.prefill ? { prefill: field.prefill } : {}) })) };
+}
+
 export async function submitHandoffValues(plaintextSubmitToken: string, values: Record<string, string>, opts: Clock & { ipHash?: string } = {}): Promise<{ handoffId: string; status: 'submitted' }> {
   const now = at(opts); const submitTokenHash = hashHandoffToken(plaintextSubmitToken); await connectDB();
-  const candidate = await Handoff.findOne({ submitTokenHash, status: 'awaiting', linkExpiresAt: { $gt: now } }).lean();
+  // The browser holds the view token from the possession URL; API callers may
+  // also use the separately-issued submit token. Both are high-entropy secrets.
+  const tokenFilter = { $or: [{ submitTokenHash }, { viewTokenHash: submitTokenHash }] };
+  const candidate = await Handoff.findOne({ ...tokenFilter, status: 'awaiting', linkExpiresAt: { $gt: now } }).lean();
   if (!candidate) throw Errors.notFound();
   validateValues(candidate.fieldSchema as HandoffFieldSchema[], values);
   const dek = await getOrCreateAccountDek(candidate.accountId);
   const envelope = encryptHandoffValues(dek, values);
   const handoff = await Handoff.findOneAndUpdate(
-    { submitTokenHash, status: 'awaiting', linkExpiresAt: { $gt: now } },
+    { ...tokenFilter, status: 'awaiting', linkExpiresAt: { $gt: now } },
     { $set: { status: 'submitted', ...envelope, submittedAt: now, sessionExpiresAt: new Date(now.getTime() + DAY), submitIpHash: opts.ipHash ?? null } },
     { returnDocument: 'after' },
   ).lean();
