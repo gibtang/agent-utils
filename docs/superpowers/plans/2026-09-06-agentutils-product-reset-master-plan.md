@@ -214,6 +214,7 @@ app/v1/upload/
 components/ConfessionsInbox.tsx
 components/GetApiKeyButton.tsx
 components/docs/ToolDocPage.tsx
+lib/auth-session.ts
 lib/mongodb.ts
 lib/storage.ts
 lib/dashboard/keynames.ts
@@ -231,6 +232,8 @@ public/vercel.svg
 public/window.svg
 scripts/gen-openapi-v2.py
 __tests__/lib/dashboard-keys.test.ts
+__tests__/lib/auth-session.test.ts
+__tests__/lib/registration-triggers.test.ts
 __tests__/lib/image-upload.test.ts
 __tests__/lib/keynames.test.ts
 __tests__/v2/
