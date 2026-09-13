@@ -41,8 +41,30 @@ describe('core secrets', () => {
 
   it('rejects tampered ciphertext and a different encryption key', () => {
     const ciphertext = encryptSecret('private-value');
-    const tampered = `${ciphertext.slice(0, -1)}${ciphertext.endsWith('A') ? 'B' : 'A'}`;
-    expect(() => decryptSecret(tampered)).toThrow();
+
+    // Flip a byte INSIDE a base64url segment rather than its last character:
+    // the final base64url char carries non-canonical trailing bits, so changing
+    // it can decode to byte-identical data and leave the GCM tag valid.
+    const tamperSegment = (segment: string): string => {
+      const bytes = Buffer.from(segment, 'base64url');
+      bytes[bytes.length >> 1] ^= 0x01;
+      return bytes.toString('base64url');
+    };
+    const [version, ivText, tagText, bodyText] = ciphertext.split(':');
+    expect(version).toBe('v1');
+
+    const tamperedIv = `v1:${tamperSegment(ivText)}:${tagText}:${bodyText}`;
+    expect(() => decryptSecret(tamperedIv)).toThrow();
+
+    const tamperedTag = `v1:${ivText}:${tamperSegment(tagText)}:${bodyText}`;
+    expect(() => decryptSecret(tamperedTag)).toThrow();
+
+    const tamperedBody = `v1:${ivText}:${tagText}:${tamperSegment(bodyText)}`;
+    expect(() => decryptSecret(tamperedBody)).toThrow();
+
+    // The byte flip must actually change the decoded ciphertext.
+    expect(Buffer.from(tamperSegment(bodyText), 'base64url')).not.toEqual(Buffer.from(bodyText, 'base64url'));
+
     process.env.SECRET_ENCRYPTION_KEY = 'different-encryption-key-at-least-16-chars';
     resetConfigCacheForTests();
     expect(() => decryptSecret(ciphertext)).toThrow();
