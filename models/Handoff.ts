@@ -25,8 +25,8 @@ const HandoffSchema = new mongoose.Schema({
       'fieldSchema may contain at most 12 fields',
     ],
   },
-  viewTokenHash: { type: String, required: true, unique: true },
-  submitTokenHash: { type: String, required: true, unique: true },
+  viewTokenHash: { type: String, required: true },
+  submitTokenHash: { type: String, required: true },
   linkExpiresAt: { type: Date, required: true },
   sessionExpiresAt: { type: Date, required: true },
   retrievalCount: { type: Number, default: 0, min: 0 },
@@ -37,6 +37,8 @@ const HandoffSchema = new mongoose.Schema({
   ciphertext: { type: String, default: null },
   iv: { type: String, default: null },
   tag: { type: String, default: null },
+  submittedAt: { type: Date, default: null },
+  closedAt: { type: Date, default: null },
   expiresAtPurge: { type: Date, required: true },
 }, { timestamps: true, versionKey: false });
 
@@ -48,6 +50,8 @@ HandoffSchema.path('fieldSchema').validate((fields: Array<{ name: string; type: 
     return true;
   });
 }, 'field names must be unique and password fields cannot have prefill');
+HandoffSchema.index({ viewTokenHash: 1 }, { unique: true, partialFilterExpression: { viewTokenHash: { $type: 'string' } } });
+HandoffSchema.index({ submitTokenHash: 1 }, { unique: true, partialFilterExpression: { submitTokenHash: { $type: 'string' } } });
 HandoffSchema.index({ accountId: 1, status: 1 });
 HandoffSchema.index({ expiresAtPurge: 1 }, { expireAfterSeconds: 0 });
 

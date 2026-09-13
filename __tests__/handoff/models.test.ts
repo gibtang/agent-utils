@@ -64,8 +64,8 @@ describe('handoff field schema', () => {
 describe('Handoff model', () => {
   it('defines token, listing, and purge indexes', () => {
     const indexes = Handoff.schema.indexes();
-    expect(indexes).toContainEqual([{ viewTokenHash: 1 }, { unique: true }]);
-    expect(indexes).toContainEqual([{ submitTokenHash: 1 }, { unique: true }]);
+    expect(indexes).toContainEqual([{ viewTokenHash: 1 }, { unique: true, partialFilterExpression: { viewTokenHash: { $type: 'string' } } }]);
+    expect(indexes).toContainEqual([{ submitTokenHash: 1 }, { unique: true, partialFilterExpression: { submitTokenHash: { $type: 'string' } } }]);
     expect(indexes).toContainEqual([{ accountId: 1, status: 1 }, {}]);
     expect(indexes).toContainEqual([{ expiresAtPurge: 1 }, { expireAfterSeconds: 0 }]);
   });
