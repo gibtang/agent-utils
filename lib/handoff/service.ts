@@ -12,10 +12,12 @@ export type ConnectionActor = { connectionId: string; agentId: string; accountId
 export type OwnerActor = { accountId: string };
 export type HandoffField = HandoffFieldSchema;
 type Clock = { now?: Date };
-type CreateResult = { handoffId: string; viewToken: string; submitToken: string; linkExpiresAt: Date; callbackSecret?: string };
+type CreateResult = { handoffId: string; viewToken: string; submitToken: string; linkPath: string; linkExpiresAt: Date; callbackSecret?: string };
 const DAY = 24 * 60 * 60_000;
 const PURGE = 30 * DAY;
-const erasure = { ciphertext: null, iv: null, tag: null, viewTokenHash: null, submitTokenHash: null };
+// Crypto-erasure policy: audit needs are served by the activity/audit trail, not by retaining hashes in the handoff
+// document — under the crypto-erasure posture nothing derived from the secret or pseudonymous material is retained.
+const erasure = { ciphertext: null, iv: null, tag: null, viewTokenHash: null, submitTokenHash: null, submitIpHash: null, callbackSecretHash: null };
 const at = (opts?: Clock) => opts?.now ?? new Date();
 
 function validateValues(fields: HandoffFieldSchema[], values: Record<string, string>): void {
@@ -42,7 +44,9 @@ export async function createHandoff(actor: ConnectionActor, input: { fieldSchema
     linkExpiresAt, sessionExpiresAt: new Date(now.getTime() + DAY), expiresAtPurge: new Date(now.getTime() + PURGE),
     callbackUrl: parsed.data.callbackUrl ?? null, callbackSecretHash: callbackSecret ? hashHandoffToken(callbackSecret) : null,
   });
-  return { handoffId: handoff.handoffId, viewToken, submitToken, linkExpiresAt, ...(callbackSecret ? { callbackSecret } : {}) };
+  // D4: the public link is possession-only — the URL itself carries the view token (?t=); Task 5's public form reads it.
+  const linkPath = `/h/${handoff.handoffId}?t=${viewToken}`;
+  return { handoffId: handoff.handoffId, viewToken, submitToken, linkPath, linkExpiresAt, ...(callbackSecret ? { callbackSecret } : {}) };
 }
 
 export async function submitHandoffValues(plaintextSubmitToken: string, values: Record<string, string>, opts: Clock & { ipHash?: string } = {}): Promise<{ handoffId: string; status: 'submitted' }> {
@@ -89,8 +93,8 @@ export async function closeHandoff(handoffId: string, actor: ConnectionActor | O
 export async function expireStaleHandoffs(opts: Clock = {}): Promise<number> {
   const now = at(opts); await connectDB(); const purge = new Date(now.getTime() + PURGE);
   const [submitted, awaiting] = await Promise.all([
-    Handoff.updateMany({ status: 'submitted', sessionExpiresAt: { $lt: now } }, { $set: { status: 'expired', ...erasure, expiresAtPurge: purge } }),
-    Handoff.updateMany({ status: 'awaiting', linkExpiresAt: { $lt: now } }, { $set: { status: 'expired', ...erasure, expiresAtPurge: purge } }),
+    Handoff.updateMany({ status: 'submitted', sessionExpiresAt: { $lte: now } }, { $set: { status: 'expired', ...erasure, expiresAtPurge: purge } }),
+    Handoff.updateMany({ status: 'awaiting', linkExpiresAt: { $lte: now } }, { $set: { status: 'expired', ...erasure, expiresAtPurge: purge } }),
   ]);
   return submitted.modifiedCount + awaiting.modifiedCount;
 }
