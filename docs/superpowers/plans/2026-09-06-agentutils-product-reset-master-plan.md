@@ -37,6 +37,7 @@ Execute these plans in order. Do not start a dependent plan until its prerequisi
 | Order | Plan | Depends on | Deliverable |
 |---|---|---|---|
 | 1 | `2026-09-06-agentutils-foundation-connections-plan.md` | None | Account, Agent, Connection, pairing, shared contracts, MCP and HTTP foundations |
+| 1.5 | `2026-09-13-agentutils-credential-handoff-plan.md` | 1 | Credential Handoff (ADR-0028): possession-only link, per-account DEK encryption, decrypt-on-demand sessions, webhook notify, owner tools |
 | 2 | `2026-09-06-agentutils-inbox-plan.md` | 1 | Stable receiving addresses, source verification, immutable Events, Claims |
 | 3 | `2026-09-06-agentutils-state-plan.md` | 1 | Private versioned JSON State with explicit same-account grants |
 | 4 | `2026-09-06-agentutils-files-plan.md` | 1, then integrate with 2 | Private B2 payload transport, grants, temporary links, Inbox attachments |
