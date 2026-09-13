@@ -28,7 +28,9 @@ function isPrivateV4(address: string): boolean {
   const octets = address.split('.').map(Number);
   if (octets.length !== 4 || octets.some((part) => !Number.isInteger(part) || part < 0 || part > 255)) return true;
   const [a, b] = octets;
-  return a === 0 || a === 10 || a === 127 || (a === 169 && b === 254) || (a === 172 && b >= 16 && b <= 31) || (a === 192 && b === 168) || a >= 224;
+  // CGNAT 100.64/10, benchmarking 198.18/15, and 192.0.0.0/24 are treated as
+  // non-global (not loopback/metadata/RFC1918, but rarely routable).
+  return a === 0 || a === 10 || a === 127 || (a === 169 && b === 254) || (a === 172 && b >= 16 && b <= 31) || (a === 192 && b === 168) || a >= 224 || (a === 100 && b >= 64 && b <= 127) || (a === 198 && (b === 18 || b === 19)) || (a === 192 && b === 0);
 }
 
 function isPrivateV6(address: string): boolean {
@@ -85,7 +87,7 @@ export async function notifySubmission(handoff: CallbackHandoff, callbackSecretH
   await guard(handoff.callbackUrl);
   const submittedAt = handoff.submittedAt ?? opts.now ?? new Date();
   const body = JSON.stringify({ event: 'handoff.submitted', handoffId: handoff.handoffId, accountId: handoff.accountId, submittedAt: submittedAt.toISOString() });
-  const timestamp = (opts.now ?? new Date()).getTime(); const controller = new AbortController();
+  const timestamp = submittedAt.getTime(); const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), opts.timeoutMs ?? 10_000);
   let result: NotifyResult;
   try {
