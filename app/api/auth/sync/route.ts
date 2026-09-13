@@ -18,7 +18,6 @@ import { Errors } from '@/lib/core/errors';
 import { success, failure } from '@/lib/core/envelope';
 import { verifyFirebaseIdToken } from '@/lib/firebase/verify';
 import { provisionAccount } from '@/lib/accounts/service';
-import { connectDB } from '@/lib/core/db';
 import { resourceId } from '@/lib/core/ids';
 import { NextResponse } from 'next/server';
 import Agent from '@/models/Agent';
