@@ -1,0 +1,627 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "AgentUtils API",
+    "version": "0.1.0",
+    "description": "Agent-facing and owner-facing HTTP API. One registry drives this document, llms.txt and the MCP tool surface."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000"
+    }
+  ],
+  "jsonSchemaDialect": "https://json-schema.org/draft/2020-12/schema",
+  "paths": {
+    "/v1/connections/pair": {
+      "post": {
+        "operationId": "pair_connection",
+        "summary": "Pair a runtime with an agent using a pairing code.",
+        "description": "Exchanges a one-time pairing code for a connection credential. Codes are single-use and expire 10 minutes after issue. The HTTP route enforces per-account rate limits; exceed them and the call fails with plan_limit_reached.",
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "https://json-schema.org/draft/2020-12/schema",
+                  "type": "object",
+                  "properties": {
+                    "connection": {
+                      "type": "object",
+                      "properties": {
+                        "connectionId": {
+                          "type": "string",
+                          "pattern": "^conn_"
+                        },
+                        "agentId": {
+                          "type": "string"
+                        },
+                        "accountId": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "string"
+                        },
+                        "runtime": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "displayPrefix": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        }
+                      },
+                      "required": [
+                        "connectionId",
+                        "agentId",
+                        "accountId",
+                        "status",
+                        "runtime",
+                        "displayPrefix",
+                        "createdAt"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "credential": {
+                      "type": "string",
+                      "pattern": "^au_conn_"
+                    }
+                  },
+                  "required": [
+                    "connection",
+                    "credential"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "validation_failed: Some submitted values are invalid.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "https://json-schema.org/draft/2020-12/schema",
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string",
+                          "enum": [
+                            "validation_failed"
+                          ]
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "data_preserved": {
+                          "type": "boolean"
+                        },
+                        "retry_safe": {
+                          "type": "boolean"
+                        },
+                        "next_action": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "message",
+                        "data_preserved",
+                        "retry_safe",
+                        "next_action",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "not_found: The requested resource was not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "https://json-schema.org/draft/2020-12/schema",
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string",
+                          "enum": [
+                            "not_found"
+                          ]
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "data_preserved": {
+                          "type": "boolean"
+                        },
+                        "retry_safe": {
+                          "type": "boolean"
+                        },
+                        "next_action": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "message",
+                        "data_preserved",
+                        "retry_safe",
+                        "next_action",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "plan_limit_reached: Your plan limit has been reached.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "https://json-schema.org/draft/2020-12/schema",
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string",
+                          "enum": [
+                            "plan_limit_reached"
+                          ]
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "data_preserved": {
+                          "type": "boolean"
+                        },
+                        "retry_safe": {
+                          "type": "boolean"
+                        },
+                        "next_action": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "message",
+                        "data_preserved",
+                        "retry_safe",
+                        "next_action",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "temporarily_unavailable: The service is temporarily unavailable.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "https://json-schema.org/draft/2020-12/schema",
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string",
+                          "enum": [
+                            "temporarily_unavailable"
+                          ]
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "data_preserved": {
+                          "type": "boolean"
+                        },
+                        "retry_safe": {
+                          "type": "boolean"
+                        },
+                        "next_action": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "message",
+                        "data_preserved",
+                        "retry_safe",
+                        "next_action",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        },
+        "x-mcp": {
+          "readOnly": false,
+          "destructive": false,
+          "idempotent": false
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$schema": "https://json-schema.org/draft/2020-12/schema",
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 256
+                  },
+                  "runtimeVersion": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 120
+                  }
+                },
+                "required": [
+                  "code"
+                ]
+              }
+            }
+          }
+        },
+        "parameters": []
+      }
+    },
+    "/v1/connections/status": {
+      "get": {
+        "operationId": "connection_status",
+        "summary": "Return the status of the calling connection.",
+        "description": "Returns the connection record, the paired agent name, the account plan and the granted capabilities. Requires a valid connection credential (Bearer au_conn_…).",
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "https://json-schema.org/draft/2020-12/schema",
+                  "type": "object",
+                  "properties": {
+                    "agentName": {
+                      "type": "string"
+                    },
+                    "connection": {
+                      "type": "object",
+                      "properties": {
+                        "connectionId": {
+                          "type": "string",
+                          "pattern": "^conn_"
+                        },
+                        "agentId": {
+                          "type": "string"
+                        },
+                        "accountId": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "string"
+                        },
+                        "runtime": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "displayPrefix": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        }
+                      },
+                      "required": [
+                        "connectionId",
+                        "agentId",
+                        "accountId",
+                        "status",
+                        "runtime",
+                        "displayPrefix",
+                        "createdAt"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "plan": {
+                      "type": "string"
+                    },
+                    "capabilities": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": [
+                    "agentName",
+                    "connection",
+                    "plan",
+                    "capabilities"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "authentication_required: Authentication is required.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "https://json-schema.org/draft/2020-12/schema",
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string",
+                          "enum": [
+                            "authentication_required"
+                          ]
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "data_preserved": {
+                          "type": "boolean"
+                        },
+                        "retry_safe": {
+                          "type": "boolean"
+                        },
+                        "next_action": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "message",
+                        "data_preserved",
+                        "retry_safe",
+                        "next_action",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "connection_revoked: This connection has been revoked. / permission_denied: You do not have permission to perform this action.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "https://json-schema.org/draft/2020-12/schema",
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string",
+                          "enum": [
+                            "connection_revoked",
+                            "permission_denied"
+                          ]
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "data_preserved": {
+                          "type": "boolean"
+                        },
+                        "retry_safe": {
+                          "type": "boolean"
+                        },
+                        "next_action": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "message",
+                        "data_preserved",
+                        "retry_safe",
+                        "next_action",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "not_found: The requested resource was not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "https://json-schema.org/draft/2020-12/schema",
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string",
+                          "enum": [
+                            "not_found"
+                          ]
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "data_preserved": {
+                          "type": "boolean"
+                        },
+                        "retry_safe": {
+                          "type": "boolean"
+                        },
+                        "next_action": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "message",
+                        "data_preserved",
+                        "retry_safe",
+                        "next_action",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "temporarily_unavailable: The service is temporarily unavailable.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "https://json-schema.org/draft/2020-12/schema",
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string",
+                          "enum": [
+                            "temporarily_unavailable"
+                          ]
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "data_preserved": {
+                          "type": "boolean"
+                        },
+                        "retry_safe": {
+                          "type": "boolean"
+                        },
+                        "next_action": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "message",
+                        "data_preserved",
+                        "retry_safe",
+                        "next_action",
+                        "request_id"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        },
+        "x-mcp": {
+          "readOnly": true,
+          "destructive": false,
+          "idempotent": true
+        },
+        "parameters": []
+      }
+    }
+  }
+}

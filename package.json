@@ -12,7 +12,9 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "prepare": "husky",
-    "gen:openapi": "python3 scripts/gen-openapi-v2.py"
+    "gen:openapi": "python3 scripts/gen-openapi-v2.py",
+    "generate:contracts": "tsx scripts/generate-contracts.ts",
+    "check:contracts": "npm run generate:contracts && git diff --exit-code -- public/openapi.json public/llms.txt"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": "eslint --max-warnings=0"
