@@ -1,14 +1,14 @@
 'use client';
 
 /**
- * AgentUtils — AuthProvider.
+ * AgentUtils foundation — AuthProvider.
  *
- * Wraps the app in a Firebase-Auth-backed context. On mount it initialises the
- * Firebase client SDK and registers onAuthStateChanged. When a user is present
- * it POSTs their ID token to /api/auth/sync, which upserts the user + hidden
- * tenant and (on first login) returns a one-time API key we surface to the UI.
+ * Wraps the app in a Firebase-Auth-backed context. Google is the only sign-in
+ * method. When a user is present it POSTs their ID token to /api/auth/sync,
+ * which idempotently provisions the owner's Account and reports onboarding
+ * state — the handshake issues NO credentials of any kind.
  *
- * Exposes useAuth(): { user, loading, newKey, clearNewKey, signIn, signUp,
+ * Exposes useAuth(): { user, loading, syncError, clearSyncError,
  * signInWithGoogle, logout, getIdToken }.
  */
 import {
@@ -20,15 +20,7 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import {
-  GoogleAuthProvider,
-  createUserWithEmailAndPassword,
-  onAuthStateChanged,
-  signInWithEmailAndPassword,
-  signInWithPopup,
-  signOut,
-  updateProfile,
-} from 'firebase/auth';
+import { GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut } from 'firebase/auth';
 import { getFirebaseAuth } from '@/lib/firebase/client';
 
 export interface AuthUser {
@@ -38,21 +30,12 @@ export interface AuthUser {
   photoURL: string | null;
 }
 
-export interface NewKey {
-  agent_id: string;
-  api_key: string;
-}
-
 interface AuthContextValue {
   user: AuthUser | null;
   loading: boolean;
-  newKey: NewKey | null;
-  /** Last error from /api/auth/sync (provisioning the user's account/keys). */
+  /** Last error from /api/auth/sync (provisioning the owner's account). */
   syncError: string | null;
-  clearNewKey: () => void;
   clearSyncError: () => void;
-  signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string, name?: string) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
   /** Current Firebase ID token for calling bearer-protected routes. */
@@ -64,9 +47,9 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 /**
  * Cookie name mirroring client-side auth state so Next.js middleware (server /
  * edge) can gate routes without Firebase's IndexedDB-only session. This is a
- * ROUTING HINT ONLY — every protected resource is verified server-side via the
- * Firebase Admin SDK (`verifyIdToken`), so a forged cookie only ever shows an
- * empty dashboard, never real keys.
+ * ROUTING HINT ONLY — every protected resource is verified server-side via
+ * lib/owner/auth (Firebase ID token → Account), so a forged cookie only ever
+ * shows an empty shell, never another owner's data.
  */
 const AUTH_COOKIE = '__au_authed';
 const AUTH_COOKIE_MAX_AGE = 60 * 60 * 24 * 30; // 30d; kept in sync by onAuthStateChanged
@@ -84,7 +67,6 @@ function clearAuthCookie() {
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
-  const [newKey, setNewKey] = useState<NewKey | null>(null);
   const [syncError, setSyncError] = useState<string | null>(null);
   const lastSyncedUid = useRef<string | null>(null);
   const firebaseUserRef = useRef<import('firebase/auth').User | null>(null);
@@ -113,7 +95,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         displayName: fbUser.displayName,
         photoURL: fbUser.photoURL,
       });
-      // Sync (upsert + onboarding) only when the identity actually changes.
+      // Sync (account provisioning) only when the identity actually changes.
       if (lastSyncedUid.current !== fbUser.uid) {
         lastSyncedUid.current = fbUser.uid;
         try {
@@ -123,15 +105,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             headers: { authorization: `Bearer ${idToken}`, 'content-type': 'application/json' },
           });
           if (res.ok) {
-            const json = (await res.json()) as {
-              data?: { new_key?: NewKey | null };
-            };
-            if (json.data?.new_key) setNewKey(json.data.new_key);
             setSyncError(null);
           } else {
-            // Surface why account/key provisioning failed so the dashboard can
-            // tell the user (e.g. "Auth is not configured" = server missing the
-            // Firebase Admin service-account env vars).
+            // Surface why account provisioning failed so the app can tell the
+            // user (e.g. server missing the Firebase project env vars).
             const j = (await res.json().catch(() => null)) as { error?: { message?: string } } | null;
             setSyncError(
               j?.error?.message ??
@@ -146,19 +123,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
-  const signIn = async (email: string, password: string) => {
-    const auth = getFirebaseAuth();
-    if (!auth) throw new Error('Auth is not configured');
-    await signInWithEmailAndPassword(auth, email, password);
-  };
-
-  const signUp = async (email: string, password: string, name?: string) => {
-    const auth = getFirebaseAuth();
-    if (!auth) throw new Error('Auth is not configured');
-    const cred = await createUserWithEmailAndPassword(auth, email, password);
-    if (name) await updateProfile(cred.user, { displayName: name });
-  };
-
   const signInWithGoogle = async () => {
     const auth = getFirebaseAuth();
     if (!auth) throw new Error('Auth is not configured');
@@ -169,7 +133,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const auth = getFirebaseAuth();
     if (auth) await signOut(auth);
     setUser(null);
-    setNewKey(null);
     clearAuthCookie();
     lastSyncedUid.current = null;
   };
@@ -182,17 +145,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     () => ({
       user,
       loading,
-      newKey,
       syncError,
-      clearNewKey: () => setNewKey(null),
       clearSyncError: () => setSyncError(null),
-      signIn,
-      signUp,
       signInWithGoogle,
       logout,
       getIdToken,
     }),
-    [user, loading, newKey, syncError],
+    [user, loading, syncError],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

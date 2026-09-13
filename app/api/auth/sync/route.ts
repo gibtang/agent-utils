@@ -1,55 +1,75 @@
 /**
- * POST /api/auth/sync — upsert the signed-in user + run first-login onboarding.
+ * POST /api/auth/sync — sign-in handshake for browser owners.
  *
- * Auth: Firebase ID token via `Authorization: Bearer <idToken>`.
+ * Auth: Firebase ID token via `Authorization: Bearer <token>` (verified with
+ * the shared public-JWKS verifier — never the routing-hint cookie).
  *
- * On every call this is idempotent: it ensures a User + hidden Tenant exist for
- * the Firebase identity. On FIRST-EVER login it also mints one default API key
- * and returns its plaintext once (so the client can show it for the user to
- * copy). Subsequent calls return { new_key: null }.
+ * Behavior: idempotently provisions the owner's Account (provisionAccount is
+ * atomic + idempotent per Firebase uid) and reports onboarding state. The
+ * response carries NO credentials of any kind — no tenant_id, no new_key, no
+ * API key material. API keys/Agents are created through the Agent pairing
+ * flow, never by sign-in.
+ *
+ * NOTE: this route verifies the token directly instead of calling
+ * requireOwner() because first-ever sign-in legitimately has no Account yet;
+ * requireOwner() authorizes already-provisioned owners on other routes.
  */
-import { NextResponse } from 'next/server';
+import { Errors } from '@/lib/core/errors';
+import { success, failure } from '@/lib/core/envelope';
 import { verifyFirebaseIdToken } from '@/lib/firebase/verify';
-import { provisionUser } from '@/lib/dashboard/keys';
-import { Errors, isApiError } from '@/lib/v2/errors';
-import { errorResponse } from '@/lib/v2/envelope';
+import { provisionAccount } from '@/lib/accounts/service';
+import { connectDB } from '@/lib/core/db';
+import { resourceId } from '@/lib/core/ids';
+import { NextResponse } from 'next/server';
+import Agent from '@/models/Agent';
 
 export async function POST(req: Request) {
   const header = req.headers.get('authorization') ?? '';
   if (!/^bearer\s+/i.test(header)) {
-    return errorResponse(Errors.missingAuth());
+    return nextFailure(Errors.authenticationRequired());
   }
   const idToken = header.replace(/^bearer\s+/i, '').trim();
+  if (!idToken) {
+    return nextFailure(Errors.authenticationRequired());
+  }
 
   const decoded = await verifyFirebaseIdToken(idToken);
   if (!decoded) {
-    return errorResponse(Errors.invalidCreds());
+    return nextFailure(Errors.authenticationRequired());
   }
 
   try {
-    const result = await provisionUser({
+    const account = await provisionAccount({
       uid: decoded.uid,
-      email: decoded.email ?? '',
-      displayName: decoded.name,
-      photoURL: decoded.picture,
+      email: decoded.email ?? null,
+      displayName: decoded.name ?? null,
+      photoURL: decoded.picture ?? null,
     });
+
+    const hasAgent = (await Agent.countDocuments({ accountId: account.accountId })) > 0;
+
     return NextResponse.json(
-      {
-        data: {
-          uid: decoded.uid,
-          email: decoded.email ?? null,
-          is_new_user: result.isNewUser,
-          tenant_id: result.tenantId,
-          new_key: result.newKey
-            ? { agent_id: result.newKey.agentId, api_key: result.newKey.apiKey }
-            : null,
+      success(
+        {
+          account: { accountId: account.accountId, plan: account.plan, status: account.status },
+          profile: {
+            displayName: account.ownerDisplayName ?? null,
+            photoUrl: account.ownerPhotoUrl ?? null,
+            email: account.ownerEmail ?? null,
+          },
+          onboarding: { hasAgent },
         },
-      },
+        resourceId('req_'),
+        { status: 200 },
+      ).body,
       { status: 200 },
     );
   } catch (e) {
-    if (isApiError(e)) return errorResponse(e);
     console.error('[auth/sync]', e);
-    return errorResponse(Errors.internal());
+    return nextFailure(Errors.temporarilyUnavailable());
   }
+}
+
+function nextFailure(error: ReturnType<typeof Errors.authenticationRequired>) {
+  return NextResponse.json(failure(error, resourceId('req_')).body, { status: error.http });
 }
