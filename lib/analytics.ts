@@ -7,7 +7,8 @@
  * sources. Never pass emails, Firebase UIDs, API keys, request bodies, or
  * arbitrary URL/query-string values here.
  */
-export const ACTIVATION_KEY_EVENT = 'api_key_activated';
+/** The first successful Agent connection is the single activation milestone. */
+export const ACTIVATION_EVENT = 'connection_confirmed';
 
 declare global {
   interface Window {
@@ -32,13 +33,17 @@ export function trackEvent(
   window.dataLayer?.push({ event: eventName, ...parameters });
 }
 
-export function trackApiActivation(source: 'auth_sync' | 'dashboard_key'): void {
+export function trackConnectionConfirmed(runtime: 'codex' | 'hermes' | 'other'): void {
   if (typeof window === 'undefined') return;
   try {
-    if (window.sessionStorage.getItem(ACTIVATION_KEY_EVENT)) return;
-    window.sessionStorage.setItem(ACTIVATION_KEY_EVENT, '1');
+    if (window.sessionStorage.getItem(ACTIVATION_EVENT)) return;
+    window.sessionStorage.setItem(ACTIVATION_EVENT, '1');
   } catch {
     // Private browsing/storage-disabled browsers still get the event once.
   }
-  trackEvent(ACTIVATION_KEY_EVENT, { source });
+  trackEvent(ACTIVATION_EVENT, { source: 'pairing', runtime });
+}
+
+export function trackPairingCodeCreated(runtime: 'codex' | 'hermes' | 'other'): void {
+  trackEvent('pairing_code_created', { source: 'dashboard', runtime });
 }

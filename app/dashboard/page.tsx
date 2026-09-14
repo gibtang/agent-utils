@@ -3,15 +3,15 @@
 /**
  * /dashboard — signed-in owner home (interim shell).
  *
- * Requires authentication: redirects to /login when signed out. The key-
- * management UI was removed with the credential-issuance reset; the agent
- * dashboard (Overview, Inboxes, Settings) lands with the owner-experience
- * cleanup. Until then this page confirms the signed-in identity, surfaces
- * account-sync errors, and offers sign-out.
+ * Requires authentication: redirects to /login when signed out. This page is
+ * the first owner journey: create a logical Agent and pair it with a
+ * short-lived code. Connection credentials are disclosed only to the Agent,
+ * never displayed as reusable API keys in the dashboard.
  */
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/components/AuthProvider';
+import AgentConnectionsPanel from '@/components/AgentConnectionsPanel';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -65,13 +65,7 @@ export default function DashboardPage() {
         </div>
       )}
 
-      <section className="mt-10 rounded-lg border border-border-subtle bg-surface-container-lowest px-4 py-8 text-sm text-on-surface-variant">
-        <p className="font-medium text-on-surface">Agent tools are on the way</p>
-        <p className="mt-2">
-          Connect your first agent from its conversation using a Pairing Code —
-          the dashboard for agents, inboxes, and usage lands here next.
-        </p>
-      </section>
+      <AgentConnectionsPanel />
     </main>
   );
 }

@@ -78,6 +78,14 @@ export async function getConnectionStatus(actor: ConnectionActor): Promise<Conne
   await connectDB(); const [connection, agent] = await Promise.all([Connection.findOne({ connectionId: actor.connectionId, accountId: actor.accountId }).lean(), Agent.findOne({ agentId: actor.agentId, accountId: actor.accountId }).lean()]);
   if (!connection || !agent) throw Errors.notFound(); return { agentName: agent.name, connection: connectionView(connection), plan: actor.plan, capabilities: ['inbox', 'state', 'files'] };
 }
+/** Return the owner's connections without exposing credential material. */
+export async function listConnections(owner: { accountId: string }): Promise<ConnectionView[]> {
+  await connectDB();
+  const connections = await Connection.find({ accountId: owner.accountId })
+    .sort({ createdAt: 1 })
+    .lean();
+  return connections.map(connectionView);
+}
 /** Revocation is idempotent for a connection owned by the caller; cross-account ids stay uniformly not found. */
 export async function revokeConnection(owner: { accountId: string }, connectionId: string): Promise<void> {
   await connectDB(); const result = await Connection.updateOne({ accountId: owner.accountId, connectionId }, { $set: { status: 'revoked', revokedAt: new Date() } }); if (!result.matchedCount) throw Errors.notFound();

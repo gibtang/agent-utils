@@ -36,7 +36,7 @@ export function renderWelcomeEmailHtml(input: RegistrationNotificationInput): st
 <html><body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#0f172a;max-width:560px;margin:0 auto;padding:24px;">
   <h2 style="margin:0 0 16px;">Welcome to AgentUtils</h2>
   <p>${greeting}</p>
-  <p>Your free AgentUtils account is ready. You can now create and manage API keys from your dashboard and start connecting your agents.</p>
+  <p>Your free AgentUtils account is ready. Open your dashboard to create a short-lived pairing code and connect your first agent without handling a reusable API key.</p>
   <p style="margin:24px 0;"><a href="https://agent-utils.com/dashboard" style="display:inline-block;background:#0f172a;color:#fff;text-decoration:none;padding:12px 20px;border-radius:6px;font-weight:600;">Open dashboard</a></p>
   <p style="font-size:12px;color:#64748b;">If you did not create this account, you can safely ignore this email.</p>
 </body></html>`;
