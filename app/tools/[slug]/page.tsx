@@ -4,6 +4,8 @@ import { getToolBySlug, getAllToolSlugs, tools } from '@/lib/seo-tools';
 import { notFound } from 'next/navigation';
 import MobileNav from '@/components/MobileNav';
 import GetApiKeyButton from '@/components/GetApiKeyButton';
+import ToolAnalytics from '@/components/ToolAnalytics';
+import TrackedLink from '@/components/TrackedLink';
 
 export const dynamic = 'force-static';
 
@@ -91,6 +93,7 @@ export default async function ToolPage({ params }: { params: Promise<{ slug: str
 
   return (
     <>
+      <ToolAnalytics slug={slug} />
       <SchemaMarkup tool={tool} />
 
       {/* Nav */}
@@ -125,12 +128,14 @@ export default async function ToolPage({ params }: { params: Promise<{ slug: str
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight">{tool.h1}</h1>
           <p className="mt-4 text-lg text-zinc-400 max-w-2xl">{tool.subtitle}</p>
           <div className="mt-6 flex gap-3">
-            <Link
+            <TrackedLink
               href={tool.docsUrl}
+              eventName="docs_cta_clicked"
+              eventParameters={{ tool_slug: tool.slug }}
               className="px-5 py-3 rounded-lg bg-zinc-100 text-zinc-950 font-semibold hover:bg-white transition-colors text-sm min-h-[44px] flex items-center"
             >
               View API Docs
-            </Link>
+            </TrackedLink>
             <GetApiKeyButton
               className="px-5 py-3 rounded-lg border border-zinc-700 text-zinc-300 font-medium hover:border-zinc-500 transition-colors text-sm min-h-[44px] flex items-center"
             >
@@ -268,12 +273,14 @@ export default async function ToolPage({ params }: { params: Promise<{ slug: str
             >
               Get API Key
             </GetApiKeyButton>
-            <Link
+            <TrackedLink
               href={tool.docsUrl}
+              eventName="docs_cta_clicked"
+              eventParameters={{ tool_slug: tool.slug, location: 'bottom_cta' }}
               className="px-6 py-3 rounded-lg border border-zinc-700 text-zinc-300 font-medium hover:border-zinc-500 transition-colors"
             >
               Read Docs
-            </Link>
+            </TrackedLink>
           </div>
         </section>
       </main>

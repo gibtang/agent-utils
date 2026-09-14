@@ -30,6 +30,7 @@ import {
   updateProfile,
 } from 'firebase/auth';
 import { getFirebaseAuth } from '@/lib/firebase/client';
+import { trackApiActivation } from '@/lib/analytics';
 
 export interface AuthUser {
   uid: string;
@@ -126,7 +127,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             const json = (await res.json()) as {
               data?: { new_key?: NewKey | null };
             };
-            if (json.data?.new_key) setNewKey(json.data.new_key);
+            if (json.data?.new_key) {
+              setNewKey(json.data.new_key);
+              // Activation is defined as the first usable API key provisioned
+              // by the auth sync flow, not merely an account page view.
+              trackApiActivation('auth_sync');
+            }
             setSyncError(null);
           } else {
             // Surface why account/key provisioning failed so the dashboard can

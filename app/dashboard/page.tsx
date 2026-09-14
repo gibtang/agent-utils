@@ -13,6 +13,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/components/AuthProvider';
 import { generateKeyName } from '@/lib/dashboard/keynames';
 import { ConfessionsInbox } from '@/components/ConfessionsInbox';
+import { trackApiActivation } from '@/lib/analytics';
 
 interface KeyRow {
   agent_id: string;
@@ -107,6 +108,7 @@ export default function DashboardPage() {
       if (json.data?.key) {
         clearNewKey();
         setJustCreated(json.data.key);
+        trackApiActivation('dashboard_key');
       }
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not create key');
@@ -153,6 +155,7 @@ export default function DashboardPage() {
       if (json.data?.key) {
         clearNewKey();
         setJustCreated(json.data.key);
+        trackApiActivation('dashboard_key');
       }
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not recover keys. Try again.');
