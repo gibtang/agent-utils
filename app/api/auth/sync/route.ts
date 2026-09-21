@@ -17,7 +17,7 @@
 import { Errors } from '@/lib/core/errors';
 import { success, failure } from '@/lib/core/envelope';
 import { verifyFirebaseIdToken } from '@/lib/firebase/verify';
-import { provisionAccount } from '@/lib/accounts/service';
+import { provisionAccountWithStatus } from '@/lib/accounts/service';
 import { resourceId } from '@/lib/core/ids';
 import { NextResponse } from 'next/server';
 import Agent from '@/models/Agent';
@@ -38,7 +38,7 @@ export async function POST(req: Request) {
   }
 
   try {
-    const account = await provisionAccount({
+    const { account, created } = await provisionAccountWithStatus({
       uid: decoded.uid,
       email: decoded.email ?? null,
       displayName: decoded.name ?? null,
@@ -56,7 +56,7 @@ export async function POST(req: Request) {
             photoUrl: account.ownerPhotoUrl ?? null,
             email: account.ownerEmail ?? null,
           },
-          onboarding: { hasAgent },
+          onboarding: { hasAgent, isNewAccount: created },
         },
         resourceId('req_'),
         { status: 200 },

@@ -9,7 +9,7 @@ import { MongoMemoryServer } from 'mongodb-memory-server';
  * Contract under test:
  *   success → { data: { account: {accountId, plan, status},
  *                       profile: {displayName, photoUrl, email},
- *                       onboarding: {hasAgent: boolean} }, request_id }
+ *                       onboarding: {hasAgent: boolean, isNewAccount: boolean} }, request_id }
  *   no plaintext credentials, no tenant_id, no new_key — ever.
  */
 vi.mock('@/lib/firebase/verify', () => ({
@@ -89,7 +89,7 @@ describe('POST /api/auth/sync', () => {
       photoUrl: 'https://example.com/p.png',
       email: 'owner@example.com',
     });
-    expect(body.data.onboarding).toEqual({ hasAgent: false });
+    expect(body.data.onboarding).toEqual({ hasAgent: false, isNewAccount: true });
     expect(typeof body.request_id).toBe('string');
 
     // Exactly one Account row, owned by the verified uid.
@@ -123,7 +123,7 @@ describe('POST /api/auth/sync', () => {
     mockedVerify.mockResolvedValueOnce({ uid: 'uid-with-agent' });
     const res = await POST(syncRequest('agent-owner-token'));
     const body = await res.json();
-    expect(body.data.onboarding).toEqual({ hasAgent: true });
+    expect(body.data.onboarding).toEqual({ hasAgent: true, isNewAccount: false });
   });
 
   it('scoping: another owner\'s agents never leak into onboarding', async () => {
@@ -134,7 +134,7 @@ describe('POST /api/auth/sync', () => {
     mockedVerify.mockResolvedValueOnce({ uid: 'uid-mine' });
     const res = await POST(syncRequest('mine-token'));
     const body = await res.json();
-    expect(body.data.onboarding).toEqual({ hasAgent: false });
+    expect(body.data.onboarding).toEqual({ hasAgent: false, isNewAccount: false });
     expect(mine.accountId).not.toBe(theirs.accountId);
   });
 });

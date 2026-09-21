@@ -22,6 +22,7 @@ import {
 } from 'react';
 import { GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut } from 'firebase/auth';
 import { getFirebaseAuth } from '@/lib/firebase/client';
+import { trackSignUp } from '@/lib/analytics';
 
 export interface AuthUser {
   uid: string;
@@ -105,6 +106,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             headers: { authorization: `Bearer ${idToken}`, 'content-type': 'application/json' },
           });
           if (res.ok) {
+            const payload = (await res.json().catch(() => null)) as
+              | { data?: { onboarding?: { isNewAccount?: boolean } } }
+              | null;
+            if (payload?.data?.onboarding?.isNewAccount) {
+              trackSignUp('google');
+            }
             setSyncError(null);
           } else {
             // Surface why account provisioning failed so the app can tell the

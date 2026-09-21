@@ -47,3 +47,8 @@ export function trackConnectionConfirmed(runtime: 'codex' | 'hermes' | 'other'):
 export function trackPairingCodeCreated(runtime: 'codex' | 'hermes' | 'other'): void {
   trackEvent('pairing_code_created', { source: 'dashboard', runtime });
 }
+
+/** Record a newly created account without sending identity or account data. */
+export function trackSignUp(method: 'google'): void {
+  trackEvent('sign_up', { method });
+}
