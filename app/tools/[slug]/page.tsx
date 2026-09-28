@@ -1,6 +1,6 @@
 import { type Metadata } from 'next';
 import Link from 'next/link';
-import { getToolBySlug, getAllToolSlugs, tools, type ToolSEO } from '@/lib/seo-tools';
+import { getToolBySlug, getAllToolSlugs, tools } from '@/lib/seo-tools';
 import { notFound } from 'next/navigation';
 import MobileNav from '@/components/MobileNav';
 import GetApiKeyButton from '@/components/GetApiKeyButton';
@@ -51,57 +51,27 @@ function CodeBlock({ label, code }: { label: string; code: string }) {
   );
 }
 
-function getToolFaqs(tool: ToolSEO) {
-  return [
-    {
-      question: `What does the ${tool.name} API do?`,
-      answer: tool.whatItDoes,
-    },
-    {
-      question: `When should an AI agent use ${tool.name}?`,
-      answer: tool.useCases[0]?.description ?? tool.whyAgentsNeed[0],
-    },
-    {
-      question: `How do I call the ${tool.name} API?`,
-      answer: `Send ${tool.apiEndpoint} with the x-agent-id and x-api-key headers. The copy-pasteable cURL, Python, and JavaScript examples on this page show the request shape.`,
-    },
-  ];
-}
-
-function SchemaMarkup({ tool }: { tool: ToolSEO }) {
-  const faqs = getToolFaqs(tool);
+function SchemaMarkup({ tool }: { tool: ReturnType<typeof getToolBySlug> & {} }) {
   const schema = {
     '@context': 'https://schema.org',
-    '@graph': [
-      {
-        '@type': 'SoftwareApplication',
-        name: `${tool.name} — AgentUtils`,
-        description: tool.metaDescription,
-        url: `https://www.agent-utils.com/tools/${tool.slug}`,
-        applicationCategory: 'DeveloperApplication',
-        operatingSystem: 'Any',
-        offers: {
-          '@type': 'AggregateOffer',
-          priceCurrency: 'USD',
-          lowPrice: '0',
-          highPrice: '49',
-          offerCount: '3',
-        },
-        provider: {
-          '@type': 'Organization',
-          name: 'AgentUtils',
-          url: 'https://www.agent-utils.com',
-        },
-      },
-      {
-        '@type': 'FAQPage',
-        mainEntity: faqs.map((faq) => ({
-          '@type': 'Question',
-          name: faq.question,
-          acceptedAnswer: { '@type': 'Answer', text: faq.answer },
-        })),
-      },
-    ],
+    '@type': 'SoftwareApplication',
+    name: `${tool.name} — AgentUtils`,
+    description: tool.metaDescription,
+    url: `https://www.agent-utils.com/tools/${tool.slug}`,
+    applicationCategory: 'DeveloperApplication',
+    operatingSystem: 'Any',
+    offers: {
+      '@type': 'AggregateOffer',
+      priceCurrency: 'USD',
+      lowPrice: '0',
+      highPrice: '49',
+      offerCount: '3',
+    },
+    provider: {
+      '@type': 'Organization',
+      name: 'AgentUtils',
+      url: 'https://www.agent-utils.com',
+    },
   };
 
   return (
@@ -217,17 +187,26 @@ export default async function ToolPage({ params }: { params: Promise<{ slug: str
           </div>
         </section>
 
-        <section className="mt-12">
-          <h2 className="text-2xl font-semibold mb-4">Frequently asked questions</h2>
-          <div className="space-y-4">
-            {getToolFaqs(tool).map((faq) => (
-              <div key={faq.question} className="rounded-lg border border-zinc-800 p-4">
-                <h3 className="font-medium text-zinc-100">{faq.question}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-zinc-400">{faq.answer}</p>
-              </div>
-            ))}
-          </div>
-        </section>
+        {slug === 'audit-log' && (
+          <section className="mt-12 rounded-lg border border-zinc-800 bg-zinc-950/60 p-6">
+            <h2 className="text-2xl font-semibold mb-3">A practical AI-agent audit trail</h2>
+            <p className="text-zinc-300 leading-relaxed">
+              Write the agent decision before the side effect, then append the result with the same run label. Reviewers can
+              reconstruct what happened from server timestamps without trusting client clocks or scattered application logs.
+            </p>
+            <div className="mt-4 grid gap-3 sm:grid-cols-3 text-sm">
+              <Link href="/docs/audit-log" className="rounded-md border border-zinc-700 p-3 text-zinc-200 hover:border-zinc-500">
+                Read the audit-log API guide →
+              </Link>
+              <Link href="/tools/checkpoint" className="rounded-md border border-zinc-700 p-3 text-zinc-200 hover:border-zinc-500">
+                Gate risky actions with checkpoints →
+              </Link>
+              <Link href="/tools/dlq" className="rounded-md border border-zinc-700 p-3 text-zinc-200 hover:border-zinc-500">
+                Trace failed runs with a DLQ →
+              </Link>
+            </div>
+          </section>
+        )}
 
         {/* Alternatives */}
         <section className="mt-12">

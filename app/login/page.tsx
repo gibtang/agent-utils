@@ -1,10 +1,12 @@
 'use client';
 
 /**
- * /login — email/password + Google sign-in.
+ * /login — Google sign-in only.
  *
  * Redirects to /dashboard when already authenticated. The AuthProvider's
- * onAuthStateChanged handles provisioning + the redirect-after-auth effect here.
+ * onAuthStateChanged handles account provisioning; the redirect-after-auth
+ * effect here is routing only. Email/password sign-up surfaces were removed
+ * with the product reset — Google is the single auth path.
  */
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -13,9 +15,7 @@ import { useAuth } from '@/components/AuthProvider';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { user, loading, signIn, signInWithGoogle } = useAuth();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const { user, loading, signInWithGoogle } = useAuth();
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -23,23 +23,12 @@ export default function LoginPage() {
     if (!loading && user) router.replace('/dashboard');
   }, [user, loading, router]);
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setError(null);
-    setBusy(true);
-    try {
-      await signIn(email, password);
-    } catch (err) {
-      setError(humanizeAuthError(err));
-      setBusy(false);
-    }
-  }
-
   async function handleGoogle() {
     setError(null);
     setBusy(true);
     try {
       await signInWithGoogle();
+      // Redirect (if any) is handled by the auth-state effect above.
     } catch (err) {
       setError(humanizeAuthError(err));
       setBusy(false);
@@ -53,7 +42,7 @@ export default function LoginPage() {
           Welcome back
         </h1>
         <p className="mt-2 text-center text-sm text-on-surface-variant">
-          Sign in to manage your API keys
+          Sign in to manage your agents
         </p>
 
         <button
@@ -65,66 +54,25 @@ export default function LoginPage() {
           <GoogleIcon /> Continue with Google
         </button>
 
-        <div className="my-6 flex items-center gap-3 text-xs text-on-surface-variant">
-          <div className="h-px flex-1 bg-outline-variant" />
-          or
-          <div className="h-px flex-1 bg-outline-variant" />
-        </div>
+        {error && (
+          <p className="mt-6 rounded-lg border border-error/40 bg-error-container/20 px-3 py-2 text-sm text-error">
+            {error}
+          </p>
+        )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <Field label="Email">
-            <input
-              type="email"
-              required
-              autoComplete="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2.5 text-sm text-on-surface outline-none focus:border-primary-fixed-dim"
-            />
-          </Field>
-          <Field label="Password">
-            <input
-              type="password"
-              required
-              autoComplete="current-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2.5 text-sm text-on-surface outline-none focus:border-primary-fixed-dim"
-            />
-          </Field>
-
-          {error && (
-            <p className="rounded-lg border border-error/40 bg-error-container/20 px-3 py-2 text-sm text-error">
-              {error}
-            </p>
-          )}
-
-          <button
-            type="submit"
-            disabled={busy}
-            className="w-full rounded-lg bg-primary-fixed px-4 py-2.5 text-sm font-semibold text-on-primary-fixed transition-opacity hover:opacity-90 disabled:opacity-50"
-          >
-            {busy ? 'Signing in…' : 'Sign in'}
-          </button>
-        </form>
-
-        <p className="mt-6 text-center text-sm text-on-surface-variant">
-          No account?{' '}
-          <Link href="/signup" className="font-medium text-primary-fixed-dim hover:underline">
-            Sign up free
+        <p className="mt-6 text-center text-xs text-on-surface-variant">
+          By continuing you agree to our{' '}
+          <Link href="/terms" className="font-medium text-primary-fixed-dim hover:underline">
+            Terms
+          </Link>{' '}
+          and{' '}
+          <Link href="/privacy" className="font-medium text-primary-fixed-dim hover:underline">
+            Privacy Policy
           </Link>
+          .
         </p>
       </div>
     </main>
-  );
-}
-
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <label className="block">
-      <span className="mb-1.5 block text-xs font-medium text-on-surface-variant">{label}</span>
-      {children}
-    </label>
   );
 }
 
@@ -153,20 +101,8 @@ function GoogleIcon() {
 
 function humanizeAuthError(err: unknown): string {
   const code = (err as { code?: string })?.code ?? '';
-  if (code === 'auth/invalid-credential' || code === 'auth/wrong-password' || code === 'auth/user-not-found') {
-    return 'Invalid email or password.';
-  }
-  if (code === 'auth/too-many-requests') {
-    return 'Too many attempts. Try again later.';
-  }
-  if (code === 'auth/popup-closed-by-user') {
-    return 'Google sign-in was cancelled.';
-  }
-  if (code === 'auth/email-already-in-use') {
-    return 'An account with this email already exists.';
-  }
-  if (code === 'auth/weak-password') {
-    return 'Password should be at least 6 characters.';
-  }
+  if (code === 'auth/popup-closed-by-user') return 'Google sign-in was cancelled.';
+  if (code === 'auth/popup-blocked') return 'Your browser blocked the sign-in popup. Allow popups and try again.';
+  if (code === 'auth/unauthorized-domain') return 'This domain is not authorized for sign-in.';
   return 'Something went wrong. Please try again.';
 }

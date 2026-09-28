@@ -12,13 +12,16 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "prepare": "husky",
-    "gen:openapi": "python3 scripts/gen-openapi-v2.py"
+    "gen:openapi": "python3 scripts/gen-openapi-v2.py",
+    "generate:contracts": "tsx scripts/generate-contracts.ts",
+    "check:contracts": "npm run generate:contracts && git diff --exit-code -- public/openapi.json public/llms.txt"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": "eslint --max-warnings=0"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1037.0",
+    "@modelcontextprotocol/sdk": "^1.30.0",
     "@mozilla/readability": "^0.6.0",
     "@next/third-parties": "^16.2.6",
     "ajv": "^8.20.0",
@@ -34,9 +37,11 @@
     "react-dom": "19.2.4",
     "resend": "^6.12.2",
     "stripe": "^22.1.0",
+    "tsx": "^4.23.13",
     "turndown": "^7.2.4",
     "twilio": "^6.0.0",
-    "uuid": "^14.0.0"
+    "uuid": "^14.0.0",
+    "zod": "^4.6.4"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
