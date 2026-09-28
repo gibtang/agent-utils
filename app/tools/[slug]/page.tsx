@@ -1,6 +1,6 @@
 import { type Metadata } from 'next';
 import Link from 'next/link';
-import { getToolBySlug, getAllToolSlugs, tools } from '@/lib/seo-tools';
+import { getToolBySlug, getAllToolSlugs, tools, type ToolSEO } from '@/lib/seo-tools';
 import { notFound } from 'next/navigation';
 import MobileNav from '@/components/MobileNav';
 import GetApiKeyButton from '@/components/GetApiKeyButton';
@@ -51,27 +51,57 @@ function CodeBlock({ label, code }: { label: string; code: string }) {
   );
 }
 
-function SchemaMarkup({ tool }: { tool: ReturnType<typeof getToolBySlug> & {} }) {
+function getToolFaqs(tool: ToolSEO) {
+  return [
+    {
+      question: `What does the ${tool.name} API do?`,
+      answer: tool.whatItDoes,
+    },
+    {
+      question: `When should an AI agent use ${tool.name}?`,
+      answer: tool.useCases[0]?.description ?? tool.whyAgentsNeed[0],
+    },
+    {
+      question: `How do I call the ${tool.name} API?`,
+      answer: `Send ${tool.apiEndpoint} with the x-agent-id and x-api-key headers. The copy-pasteable cURL, Python, and JavaScript examples on this page show the request shape.`,
+    },
+  ];
+}
+
+function SchemaMarkup({ tool }: { tool: ToolSEO }) {
+  const faqs = getToolFaqs(tool);
   const schema = {
     '@context': 'https://schema.org',
-    '@type': 'SoftwareApplication',
-    name: `${tool.name} — AgentUtils`,
-    description: tool.metaDescription,
-    url: `https://www.agent-utils.com/tools/${tool.slug}`,
-    applicationCategory: 'DeveloperApplication',
-    operatingSystem: 'Any',
-    offers: {
-      '@type': 'AggregateOffer',
-      priceCurrency: 'USD',
-      lowPrice: '0',
-      highPrice: '49',
-      offerCount: '3',
-    },
-    provider: {
-      '@type': 'Organization',
-      name: 'AgentUtils',
-      url: 'https://www.agent-utils.com',
-    },
+    '@graph': [
+      {
+        '@type': 'SoftwareApplication',
+        name: `${tool.name} — AgentUtils`,
+        description: tool.metaDescription,
+        url: `https://www.agent-utils.com/tools/${tool.slug}`,
+        applicationCategory: 'DeveloperApplication',
+        operatingSystem: 'Any',
+        offers: {
+          '@type': 'AggregateOffer',
+          priceCurrency: 'USD',
+          lowPrice: '0',
+          highPrice: '49',
+          offerCount: '3',
+        },
+        provider: {
+          '@type': 'Organization',
+          name: 'AgentUtils',
+          url: 'https://www.agent-utils.com',
+        },
+      },
+      {
+        '@type': 'FAQPage',
+        mainEntity: faqs.map((faq) => ({
+          '@type': 'Question',
+          name: faq.question,
+          acceptedAnswer: { '@type': 'Answer', text: faq.answer },
+        })),
+      },
+    ],
   };
 
   return (
@@ -182,6 +212,18 @@ export default async function ToolPage({ params }: { params: Promise<{ slug: str
               <div key={uc.title} className="rounded-lg border border-zinc-800 p-4">
                 <h3 className="font-medium text-zinc-100">{uc.title}</h3>
                 <p className="mt-1 text-sm text-zinc-400">{uc.description}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="mt-12">
+          <h2 className="text-2xl font-semibold mb-4">Frequently asked questions</h2>
+          <div className="space-y-4">
+            {getToolFaqs(tool).map((faq) => (
+              <div key={faq.question} className="rounded-lg border border-zinc-800 p-4">
+                <h3 className="font-medium text-zinc-100">{faq.question}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-zinc-400">{faq.answer}</p>
               </div>
             ))}
           </div>

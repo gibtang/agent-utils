@@ -73,13 +73,13 @@ export const toolDocPages: ToolDocPage[] = [
   buildDocPage('audit-log', {
     title: 'Audit Log',
     canonicalPath: '/docs/audit-log',
-    summary: 'Append-only decision records for accountability, compliance, and debugging.',
+    summary: 'AI agent audit log with append-only decision records for accountability, compliance, replay, and debugging.',
     endpoint: 'POST /v1/audit',
     method: 'POST',
     auth: 'x-agent-id + x-api-key',
     machineReadable: true,
     whatItDoes:
-      'Creates immutable, server-timestamped audit records that explain what an agent did, when it did it, and which metadata was attached.',
+      'Creates an immutable, server-timestamped AI agent audit log that explains what an agent did, when it did it, and which metadata was attached. Entries form a durable audit trail that can be replayed during incident review.',
     whenToUse: [
       'You need a permanent trail of each agent decision.',
       'You need evidence for support, SOC 2, or regulated workflows.',
@@ -92,7 +92,7 @@ export const toolDocPages: ToolDocPage[] = [
     agentWorkflows: [
       'A support agent logs the reason for every refund or escalation before it acts.',
       'A pricing bot records the model, prompt version, and decision metadata for later review.',
-      'An ops agent stamps every high-risk action so humans can replay the full chain.',
+      'An ops agent stamps every high-risk action so humans can replay the full audit trail.',
     ],
     requestShape: ['action: string', 'metadata?: object', 'request_id?: string'],
     codeExamples: requireTool('audit-log').codeExample,

@@ -11,6 +11,7 @@ import { resolveCredentials, requireAgentKey, type Resolved } from './auth';
 import { checkRateLimit } from './rateLimit';
 import { lookupIdempotency, storeIdempotency, readIdempotencyKey } from './idempotency';
 import { requestId as generateRequestId } from './ids';
+import { emitApiCallSucceeded } from '../server/analytics';
 
 export interface RouteContext<TParams = Record<string, string | string[]>> {
   req: NextRequest;
@@ -197,6 +198,22 @@ export function createRoute<TParams extends Record<string, string | string[]> = 
             await storeIdempotency(idemScope, options.idempotent, idemKey, body, status, snapshot);
           }
         }
+      }
+
+      // Only a handler that actually ran can represent a fresh API success.
+      // Auth failures, rate limits, malformed requests, and idempotency
+      // replays are intentionally excluded from this funnel event.
+      if (!isApiError(result)) {
+        const responseStatus = result.kind === 'created'
+          ? 201
+          : result.kind === 'noContent'
+            ? 204
+            : result.kind === 'ok'
+              ? result.status ?? 200
+              : 200;
+        // Await the bounded (500 ms) best-effort send so short-lived serverless
+        // instances do not terminate before the Measurement Protocol request.
+        await emitApiCallSucceeded(req, responseStatus);
       }
 
       return toNextResponse(result, requestId || generateRequestId(), rl);

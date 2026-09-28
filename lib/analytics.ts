@@ -8,10 +8,11 @@
  * arbitrary URL/query-string values here.
  */
 export const ACTIVATION_KEY_EVENT = 'api_key_activated';
+const CONSENT_KEY = 'agent_utils_analytics_consent';
 
 declare global {
   interface Window {
-    dataLayer?: Array<Record<string, unknown>>;
+    dataLayer?: unknown[];
     gtag?: (...args: unknown[]) => void;
   }
 }
@@ -21,6 +22,11 @@ export function trackEvent(
   parameters: Record<string, string | number | boolean> = {},
 ): void {
   if (typeof window === 'undefined') return;
+  try {
+    if (window.localStorage.getItem(CONSENT_KEY) !== 'accepted') return;
+  } catch {
+    return;
+  }
 
   if (window.gtag) {
     window.gtag('event', eventName, parameters);

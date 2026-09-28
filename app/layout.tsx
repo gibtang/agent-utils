@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, JetBrains_Mono } from "next/font/google";
-import { GoogleAnalytics } from "@next/third-parties/google";
 import Footer from "@/components/Footer";
 import { AuthProvider } from "@/components/AuthProvider";
+import AnalyticsConsent from "@/components/AnalyticsConsent";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -63,13 +63,11 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-space-black text-on-surface">
-          {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID && (
-            <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID} />
-          )}
           <AuthProvider>
             {children}
           </AuthProvider>
           <Footer />
+          <AnalyticsConsent />
       </body>
     </html>
   );

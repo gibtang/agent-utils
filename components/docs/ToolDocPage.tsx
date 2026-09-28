@@ -1,6 +1,23 @@
 import Link from 'next/link';
 import { type ToolDocPage } from '@/lib/docs-pages';
 
+function getDocFaqs(page: ToolDocPage) {
+  return [
+    {
+      question: `What does the ${page.title} endpoint do?`,
+      answer: page.whatItDoes,
+    },
+    {
+      question: `When should an AI agent use ${page.title}?`,
+      answer: page.whenToUse[0] ?? `Use ${page.title} when the workflow needs the documented endpoint.`,
+    },
+    {
+      question: `How is the ${page.title} endpoint authenticated?`,
+      answer: `${page.method} ${page.endpoint} uses ${page.auth}. The request examples below show the required headers and payload shape.`,
+    },
+  ];
+}
+
 function CodeBlock({ label, code }: { label: string; code: string }) {
   return (
     <div>
@@ -23,18 +40,31 @@ function JsonBlock({ id, value }: { id: string; value: unknown }) {
 }
 
 export default function ToolDocPageView({ page }: { page: ToolDocPage }) {
+  const faqs = getDocFaqs(page);
   const schema = {
     '@context': 'https://schema.org',
-    '@type': 'TechArticle',
-    name: page.title,
-    description: page.summary,
-    url: `https://www.agent-utils.com${page.canonicalPath}`,
-    about: {
-      '@type': 'SoftwareApplication',
-      name: `${page.tool.name} — AgentUtils`,
-      applicationCategory: 'DeveloperApplication',
-      operatingSystem: 'Any',
-    },
+    '@graph': [
+      {
+        '@type': 'TechArticle',
+        name: page.title,
+        description: page.summary,
+        url: `https://www.agent-utils.com${page.canonicalPath}`,
+        about: {
+          '@type': 'SoftwareApplication',
+          name: `${page.tool.name} — AgentUtils`,
+          applicationCategory: 'DeveloperApplication',
+          operatingSystem: 'Any',
+        },
+      },
+      {
+        '@type': 'FAQPage',
+        mainEntity: faqs.map((faq) => ({
+          '@type': 'Question',
+          name: faq.question,
+          acceptedAnswer: { '@type': 'Answer', text: faq.answer },
+        })),
+      },
+    ],
   };
 
   const summary = {
@@ -59,11 +89,15 @@ export default function ToolDocPageView({ page }: { page: ToolDocPage }) {
         ← Docs
       </Link>
 
-      <div className="mt-4 flex items-center gap-2 text-sm text-zinc-500">
+      <div className="mt-4 flex flex-wrap items-center gap-2 text-sm text-zinc-500">
         <span>{page.tool.icon}</span>
         <span>{page.tool.name}</span>
         <span>•</span>
         <span>{page.endpoint}</span>
+        <span>•</span>
+        <Link href={`/tools/${page.slug}`} className="text-emerald-400 hover:text-emerald-300">
+          View tool
+        </Link>
       </div>
 
       <h1 className="mt-3 text-3xl font-bold tracking-tight text-zinc-50">{page.title}</h1>
@@ -150,6 +184,18 @@ export default function ToolDocPageView({ page }: { page: ToolDocPage }) {
             </li>
           ))}
         </ul>
+      </section>
+
+      <section className="mt-10">
+        <h2 className="text-xl font-semibold text-zinc-50">Frequently asked questions</h2>
+        <div className="mt-3 space-y-3">
+          {faqs.map((faq) => (
+            <div key={faq.question} className="rounded-lg border border-zinc-800 bg-zinc-950 p-4">
+              <h3 className="font-medium text-zinc-100">{faq.question}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-zinc-400">{faq.answer}</p>
+            </div>
+          ))}
+        </div>
       </section>
 
       <section className="mt-10">
