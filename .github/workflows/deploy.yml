@@ -98,7 +98,6 @@ jobs:
           msg="✅ <b>ghcr.io/gibtang/agent-utils</b> #${{ github.run_number }} — deploy SUCCESS: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           bash .infra/scripts/telegram-notify.sh "$msg" || true
 
-      - name: Notify failure
       - name: Close linked issues
         if: success()
         env:
@@ -106,6 +105,7 @@ jobs:
           GH_REPO: ${{ github.repository }}
         run: |
           bash .infra/scripts/close-pr-issues.sh "${{ github.sha }}" "Closed via production deploy ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+      - name: Notify failure
         if: failure()
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
