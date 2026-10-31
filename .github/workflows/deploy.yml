@@ -87,7 +87,7 @@ jobs:
         env:
           COOLIFY_API_TOKEN: ${{ secrets.COOLIFY_API_TOKEN }}
         run: |
-          bash .infra/scripts/coolify-deploy.sh "yz21u33pxwy51638mq4fiytd"
+          bash .infra/scripts/coolify-deploy.sh "x3kpezlr34x06i2nbp8dq43i"
 
       - name: Notify success
         if: success()
