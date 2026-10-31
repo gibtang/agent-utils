@@ -2,12 +2,16 @@ name: deploy
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - '.github/**'
   workflow_dispatch:
 concurrency:
   group: deploy-${{ github.ref }}
   cancel-in-progress: true
 permissions:
   contents: read
+  issues: write
+  pull-requests: read
 env:
   COOLIFY_API_URL: https://coolify-api.feedcode.dev
 jobs:
@@ -95,6 +99,13 @@ jobs:
           bash .infra/scripts/telegram-notify.sh "$msg" || true
 
       - name: Notify failure
+      - name: Close linked issues
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          bash .infra/scripts/close-pr-issues.sh "${{ github.sha }}" "Closed via production deploy ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
         if: failure()
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
