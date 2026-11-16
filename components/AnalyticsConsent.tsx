@@ -12,19 +12,12 @@ function mirrorConsentToCookie(value: 'accepted' | 'declined'): void {
   document.cookie = `${CONSENT_KEY}=${value}; Max-Age=31536000; Path=/; SameSite=Lax${secure}`;
 }
 
-declare global {
-  interface Window {
-    dataLayer?: unknown[];
-    gtag?: (...args: unknown[]) => void;
-  }
-}
-
 function loadAnalytics(): void {
   if (!GA_MEASUREMENT_ID || typeof window === 'undefined') return;
 
   window.dataLayer = window.dataLayer ?? [];
   window.gtag = window.gtag ?? ((...args: unknown[]) => {
-    window.dataLayer?.push(args);
+    (window.dataLayer as unknown[] | undefined)?.push(args);
   });
 
   if (!document.querySelector('script[data-agent-utils-ga]')) {
@@ -50,6 +43,7 @@ export default function AnalyticsConsent() {
     try {
       const stored = window.localStorage.getItem(CONSENT_KEY);
       if (stored === 'accepted' || stored === 'declined') {
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- syncing client-only persisted consent after hydration
         setDecision(stored);
         mirrorConsentToCookie(stored);
       }
