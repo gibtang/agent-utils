@@ -32,7 +32,7 @@ jobs:
       - name: Install
         env:
           npm_config_legacy_peer_deps: true
-        run: npm ci --legacy-peer-deps
+        run: npm ci
 
       - name: Lint
         run: npm run lint
