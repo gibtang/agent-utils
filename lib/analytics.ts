@@ -15,7 +15,7 @@ const CONSENT_KEY = 'agent_utils_analytics_consent';
 
 declare global {
   interface Window {
-    dataLayer?: Array<Record<string, unknown>>;
+    dataLayer?: unknown[];
     gtag?: (...args: unknown[]) => void;
   }
 }
